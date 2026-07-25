@@ -1,0 +1,73 @@
+<div class="card dss-card-vh-100" dssViewportHeight="140px">
+  <div class="card-body dss-card-body-scroll">
+    <dss-table-dashboard
+      #dashboardGrid
+      class="dss-table-grid-header"
+      [title]="dashboardTitle"
+      [isFilterVisible]="false"
+      [items]="jsonData"
+      [columns]="columns"
+      [autoLoad]="false"
+      [bordered]="true"
+      [paginated]="true"
+      [actions]="true"
+      [handleAdd]="handleAdd"
+      [handleEdit]=""
+      [bodyHeight]="'calc(100vh - 350px)'"
+    >
+    </dss-table-dashboard>
+  </div>
+</div>
+
+<c-modal id="liveDemoModal" alignment="center" [(visible)]="visible">
+  <c-modal-header>
+    <h5 cModalTitle>User Management</h5>
+    <button (click)="close()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="userInputs" class="card dss-card-vh-100">
+      <div class="card-body">
+        <dss-input-text
+          label="Username"
+          formControlName="username"
+          class="mb-3"
+          [caseStyle]="caseStyle.TITLECASE"
+        ></dss-input-text>
+
+        <dss-input-text
+          label="Email"
+          formControlName="email"
+          class="mb-3"
+        ></dss-input-text>
+
+        <dss-input-text
+          label="Password"
+          type="password"
+          formControlName="password"
+          class="mb-3"
+        ></dss-input-text>
+
+        <dss-ng-select
+          id="userRole"
+          label="Role"
+          bindLabel="nm"
+          bindValue="cd"
+          formControlName="role"
+          [items]="userRole"
+        >
+        </dss-ng-select>
+      </div>
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="close()" cButton color="secondary">CLOSE</button>
+    <button
+      cButton
+      color="success"
+      [disabled]="userInputs.invalid"
+      (click)="saveModalData()"
+    >
+      SUBMIT
+    </button>
+  </c-modal-footer>
+</c-modal>

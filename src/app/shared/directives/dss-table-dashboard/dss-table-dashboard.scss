@@ -1,0 +1,161 @@
+:host {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dss-dashboard-card-header {
+  background: linear-gradient(180deg, #eef7ff 0%, #dceeff 100%) !important;
+  border-bottom: 1px solid #b8d9f4;
+  box-shadow: 0 0.22rem 0.75rem 0.08rem rgba(0, 76, 143, 0.14);
+  color: #16324f;
+}
+
+.dss-dashboard-title {
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'Trebuchet MS', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+:host(.dss-dashboard-filter-hidden) .dss-dashboard-filter-control {
+  display: none !important;
+}
+
+.dss-table-dashboard { 
+  min-height: var(--dss-table-dashboard-height, auto);
+}
+
+.dss-table-dashboard-empty {
+  min-height: var(--dss-table-dashboard-height, 240px);
+  pointer-events: auto;
+  top: 3.75rem;
+  width: min(100%, 24rem);
+}
+
+:host-context([data-coreui-theme="dark"]) .dss-dashboard-card-header,
+:host-context([data-bs-theme="dark"]) .dss-dashboard-card-header,
+:host-context(.dark) .dss-dashboard-card-header {
+  background: linear-gradient(180deg, #273448 0%, #1f2a3a 100%) !important;
+  border-bottom-color: #3a4d66;
+  box-shadow: 0 0.22rem 0.75rem 0.08rem rgba(0, 0, 0, 0.34);
+  color: #e8f2ff;
+}
+
+:host ::ng-deep .dss-filter-modal .modal-content {
+  border: 1px solid color-mix(in srgb, #2f80ed 18%, var(--cui-border-color, #d8dbe0));
+  border-radius: 0.5rem;
+  box-shadow: 0 1rem 2.5rem rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+}
+
+.dss-filter-modal-header {
+  background: linear-gradient(135deg, #edf6ff 0%, #e6fff7 100%);
+  border-bottom: 1px solid #c9e2f7;
+  color: #17324d;
+  min-height: 3.1rem;
+}
+
+.dss-filter-modal-title {
+  color: inherit;
+  font-family: 'Trebuchet MS', Arial, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.dss-filter-modal-body {
+  background: #f8fbff;
+  padding: 1rem;
+}
+
+.dss-filter-mode {
+  background: #ffffff;
+  border: 1px solid #d9e8f7;
+  border-radius: 0.45rem;
+  padding: 0.75rem;
+}
+
+.dss-filter-label,
+.dss-filter-panel-title {
+  color: #254766;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.dss-filter-panel {
+  background: linear-gradient(180deg, #ffffff 0%, #f3f9ff 100%);
+  border: 1px solid #d9e8f7;
+  border-radius: 0.45rem;
+  box-shadow: 0 0.25rem 0.8rem rgba(47, 128, 237, 0.08);
+  padding: 0.75rem;
+}
+
+.dss-filter-modal-body .btn-check:checked + .btn {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+  box-shadow: 0 0.35rem 0.7rem rgba(37, 99, 235, 0.2);
+}
+
+.dss-filter-modal-body .form-control:focus {
+  border-color: #2dd4bf;
+  box-shadow: 0 0 0 0.2rem rgba(45, 212, 191, 0.18);
+}
+
+.dss-filter-modal-footer {
+  background: #ffffff;
+  border-top: 1px solid #d9e8f7;
+}
+
+:host-context([data-coreui-theme="dark"]) ::ng-deep .dss-filter-modal .modal-content,
+:host-context([data-bs-theme="dark"]) ::ng-deep .dss-filter-modal .modal-content,
+:host-context(.dark) ::ng-deep .dss-filter-modal .modal-content {
+  border-color: #35465f;
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.45);
+}
+
+:host-context([data-coreui-theme="dark"]) .dss-filter-modal-header,
+:host-context([data-bs-theme="dark"]) .dss-filter-modal-header,
+:host-context(.dark) .dss-filter-modal-header {
+  background: linear-gradient(135deg, #24324a 0%, #173c3a 100%);
+  border-bottom-color: #35465f;
+  color: #eef7ff;
+}
+
+:host-context([data-coreui-theme="dark"]) .dss-filter-modal-body,
+:host-context([data-bs-theme="dark"]) .dss-filter-modal-body,
+:host-context(.dark) .dss-filter-modal-body {
+  background: #1d2635;
+}
+
+:host-context([data-coreui-theme="dark"]) .dss-filter-mode,
+:host-context([data-bs-theme="dark"]) .dss-filter-mode,
+:host-context(.dark) .dss-filter-mode,
+:host-context([data-coreui-theme="dark"]) .dss-filter-panel,
+:host-context([data-bs-theme="dark"]) .dss-filter-panel,
+:host-context(.dark) .dss-filter-panel {
+  background: #263247;
+  border-color: #3a4d66;
+  box-shadow: 0 0.25rem 0.8rem rgba(0, 0, 0, 0.18);
+}
+
+:host-context([data-coreui-theme="dark"]) .dss-filter-label,
+:host-context([data-bs-theme="dark"]) .dss-filter-label,
+:host-context(.dark) .dss-filter-label,
+:host-context([data-coreui-theme="dark"]) .dss-filter-panel-title,
+:host-context([data-bs-theme="dark"]) .dss-filter-panel-title,
+:host-context(.dark) .dss-filter-panel-title {
+  color: #cfe7ff;
+}
+
+:host-context([data-coreui-theme="dark"]) .dss-filter-modal-footer,
+:host-context([data-bs-theme="dark"]) .dss-filter-modal-footer,
+:host-context(.dark) .dss-filter-modal-footer {
+  background: #202a3b;
+  border-top-color: #35465f;
+}

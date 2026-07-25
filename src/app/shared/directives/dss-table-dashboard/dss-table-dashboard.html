@@ -1,0 +1,188 @@
+ 
+<form [formGroup]="dashboardForm" class="h-100" novalidate>
+  @if (dashboardTitle) {
+    <div class="card h-100">
+      <div class="card-header dss-dashboard-card-header d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2">
+        <h5 class="dss-dashboard-title mb-0">{{ dashboardTitle }}</h5>
+
+        <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-sm-end gap-2">
+          <div class="btn-group btn-group-sm dss-dashboard-filter-control" role="group" aria-label="Transaction scope">
+            <button
+              cButton
+              size="sm"
+              type="button"
+              [color]="scope === 'me' ? 'primary' : 'secondary'"
+              [variant]="scope === 'me' ? undefined : 'outline'"
+              (click)="setScope('me')"
+            >
+              Me
+            </button>
+            <button
+              cButton
+              size="sm"
+              type="button"
+              [color]="scope === 'public' ? 'primary' : 'secondary'"
+              [variant]="scope === 'public' ? undefined : 'outline'"
+              (click)="setScope('public')"
+            >
+              Public
+            </button>
+          </div>
+
+          <button
+            cButton
+            class="dss-dashboard-filter-control d-inline-flex align-items-center justify-content-center gap-1"
+            color="secondary"
+            variant="outline"
+            size="sm"
+            type="button"
+            title="Filter"
+            aria-label="Filter"
+            (click)="openFilter()"
+          >
+            <svg cIcon name="cilFilter" size="sm"></svg>
+            <span>{{ filterButtonLabel }}</span>
+          </button>
+
+          @if (showNewButton) {
+            <button cButton class="d-inline-flex align-items-center justify-content-center gap-1" color="primary" size="sm" type="button" (click)="onAdd()">
+              <span aria-hidden="true">+</span>
+              <span>{{ newButtonLabel }}</span>
+            </button>
+          }
+
+          <ng-content select="[dssTableDashboardAction]"></ng-content>
+        </div>
+      </div>
+
+      <div class="card-body d-flex flex-column" [attr.style]="dashboardBodyStyle">
+        <ng-container *ngTemplateOutlet="gridTemplate"></ng-container>
+      </div>
+    </div>
+  } @else {
+    <ng-container *ngTemplateOutlet="gridTemplate"></ng-container>
+  }
+
+  <c-modal class="dss-filter-modal" [visible]="modalVisible" (visibleChange)="onModalVisibleChange($event)" alignment="center" backdrop="static">
+    <c-modal-header class="dss-filter-modal-header">
+      <h5 cModalTitle class="dss-filter-modal-title mb-0">{{ resolvedFilterTitle }}</h5>
+      <button class="btn-close" type="button" aria-label="Close" (click)="closeFilter()"></button>
+    </c-modal-header>
+
+    <c-modal-body class="dss-filter-modal-body">
+      <div class="dss-filter-mode mb-3">
+        <div class="dss-filter-label mb-2">Search By</div>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Filter mode">
+          <input id="filterRange" class="btn-check" type="radio" formControlName="filterMode" value="range" (change)="setFilterMode('range')" />
+          <label class="btn btn-outline-primary" for="filterRange">Date Range</label>
+
+          <input id="filterTransactionNo" class="btn-check" type="radio" formControlName="filterMode" value="transactionNo" (change)="setFilterMode('transactionNo')" />
+          <label class="btn btn-outline-primary" for="filterTransactionNo">Transaction No</label>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="dss-filter-panel h-100">
+            <div class="dss-filter-panel-title mb-2">Date Range</div>
+            <div class="mb-2">
+              <label class="form-label fw-semibold small" for="fromDate">From Date</label>
+              <input
+                id="fromDate"
+                class="form-control form-control-sm"
+                type="date"
+                formControlName="fromDate"
+              />
+            </div>
+            <div>
+              <label class="form-label fw-semibold small" for="toDate">To Date</label>
+              <input
+                id="toDate"
+                class="form-control form-control-sm"
+                type="date"
+                formControlName="toDate"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="dss-filter-panel h-100">
+            <div class="dss-filter-panel-title mb-2">Transaction No</div>
+            <input
+              id="challan"
+              class="form-control form-control-sm"
+              type="text"
+              formControlName="challan"
+              placeholder="Enter transaction no"
+            />
+          </div>
+        </div>
+      </div>
+    </c-modal-body>
+
+    <c-modal-footer class="dss-filter-modal-footer gap-2">
+      <button cButton color="secondary" variant="outline" size="sm" type="button" (click)="resetFilter()">Reset</button>
+      <button cButton color="secondary" size="sm" type="button" (click)="closeFilter()">Cancel</button>
+      <button cButton color="primary" size="sm" type="button" (click)="submitFilter()">Submit</button>
+    </c-modal-footer>
+  </c-modal>
+</form>
+
+<ng-template #gridTemplate>
+  <div
+    class="dss-table-dashboard position-relative"
+    [style.--dss-table-dashboard-height]="bodyHeight || null"
+  >
+    <dss-table-grid
+      #grid
+      [url]="url"
+      [apiParams]="dashboardApiParams"
+      [pageNumber]="pageNumber"
+      [itemsPerPage]="itemsPerPage"
+      [itemsPerPageOptions]="itemsPerPageOptions"
+      [paginated]="paginated"
+      [autoLoad]="autoLoad"
+      [header]="header"
+      [columnFilter]="columnFilter"
+      [columnSorter]="columnSorter"
+      [bordered]="bordered"
+      [borderColor]="borderColor"
+      [striped]="striped"
+      [hover]="hover"
+      [searchDebounceTime]="searchDebounceTime"
+      [bodyHeight]="bodyHeight"
+      [showActions]="showActions"
+      [showEdit]="showEdit"
+      [showDelete]="showDelete"
+      [showRecord]="showRecord"
+      [showPrint]="showPrint"
+      [clickableRows]="clickableRows"
+      [frozenColumns]="frozenColumns"
+      [columns]="columns"
+      [items]="items"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+      (record)="onRecord($event)"
+      (print)="onPrint($event)"
+      (rowClick)="rowClick.emit($event)"
+    >
+      <ng-content select="[dssTableGridHeaderAction], [customHeader]"></ng-content>
+    </dss-table-grid>
+
+    @if (showEmptyMessage) {
+      <div class="dss-table-dashboard-empty position-absolute start-50 translate-middle-x d-flex flex-column align-items-center justify-content-center gap-2 text-center px-3">
+        <div class="small text-body-secondary">{{ resolvedEmptyMessage }}</div>
+        @if (resolvedEmptyActionLabel) {
+          <button class="btn btn-primary btn-sm" type="button" (click)="onEmptyAction()">
+            {{ resolvedEmptyActionLabel }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+</ng-template>
+
+
+
+

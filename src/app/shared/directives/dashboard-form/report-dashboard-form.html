@@ -1,0 +1,46 @@
+<div class="card dss-card-vh-100" dssViewportHeight="140px">
+  <div class="card-body dss-card-body-scroll">
+    @if (showReport) {
+    <dss-table-dashboard
+      #dashboardGrid
+      class="dss-table-grid-header"
+      [title]="dashboardTitle"
+      [url]="$any(this).data?.length ? '' : ($any(this).url ?? '')"
+      [apiParams]="apiParams"
+      [items]="$any(this).data?.length ? $any(this).data : null"
+      [isFilterVisible]="isFilterVisible"
+      [actions]="dashboardActions"
+      [handleAdd]="handleAdd"
+      [handleEdit]="handleEdit"
+      [handleDelete]="handleDelete"
+      [handleRecord]="$any(this).handleRecord"
+      [handlePrint]="$any(this).handlePrint"
+      [columns]="columns"
+      [autoLoad]="$any(this).autoLoad ?? false"
+      [bordered]="true"
+      [paginated]="true"
+      [bodyHeight]="'calc(100vh - 355px)'"
+    >
+      @if ($any(this).handleBack) {
+      <button
+        dssTableDashboardAction
+        class="btn btn-outline-secondary btn-sm"
+        type="button"
+        (click)="$any(this).handleBack()"
+      >
+        Back
+      </button>
+      }
+    </dss-table-dashboard>
+    } @else {
+    <dss-rdlc-viewer
+      title="Pay Slip Report"
+      closeLabel="Back to Detail"
+      [reportProps]="rdlcViewerProps"
+      height="calc(100vh - 220px)"
+      minHeight="420px"
+      (closed)="showReport = false"
+    />
+    }
+  </div>
+</div>

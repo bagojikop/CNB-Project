@@ -1,0 +1,58 @@
+<!--sidebar-->
+<c-sidebar #sidebar1="cSidebar" class="d-print-none sidebar sidebar-fixed bg-dark-gradient border-end"
+  colorScheme="dark" id="sidebar1" visible>
+  <c-sidebar-header class="border-bottom">
+    <c-sidebar-brand cSidebarToggle="sidebar1" toggle="unfoldable" class="dss-sidebar-brand">
+      <span class="sidebar-brand-full dss-sidebar-brand-full">
+        <svg [class]="{icon: false}" cIcon class="dss-sidebar-logo-full" height="34" name="logo" title="DSSERP"></svg>
+        <span class="dss-sidebar-brand-text">DSSERP</span>
+      </span>
+      <svg cIcon class="sidebar-brand-narrow dss-sidebar-logo-narrow" height="30" name="logo" title="DSSERP"></svg>
+    </c-sidebar-brand>
+    <button cSidebarToggle="sidebar1" cButtonClose class="d-lg-none" dark toggle="visible" aria-label="Toggle sidebar">
+    </button>
+    <button cSidebarToggler="sidebar1" toggle="unfoldable" aria-label="Toggle sidebar fold"></button>
+  </c-sidebar-header>
+
+  @if (activeModuleTitle) {
+    <div class="sidebar-module-title">
+      {{ activeModuleTitle }}
+    </div>
+  }
+
+  <ng-scrollbar pointerEventsMethod="scrollbar" visibility="hover">
+    <c-sidebar-nav [navItems]="navItems" dropdownMode="none" />
+  </ng-scrollbar>
+</c-sidebar>
+
+<!--main-->
+<div class="wrapper d-flex flex-column min-vh-100">
+  <!--app-header-->
+  <app-default-header [cShadowOnScroll]="'sm'" class="mb-1 d-print-none header header-sticky p-0 shadow-sm"
+    position="sticky" sidebarId="sidebar1" />
+
+  <!--app-body-->
+  <div class="body flex-grow-1">
+    @if (apiLoading()) {
+      <div class="api-loading-backdrop" role="status" aria-live="polite" aria-label="Loading">
+        <div class="spinner-border text-primary" aria-hidden="true"></div>
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    }
+    <div class="container-fluld">
+      <div class="px-4">
+      <app-default-breadcrumb />
+      </div>
+      <div  class="px-2"  style="height:calc(100vh - 135px); overflow-y:auto;  overflow-x:hidden;">
+        <router-outlet />
+      </div>
+    </div>
+
+    <!--app footer-->
+   <app-default-footer/>
+  </div>
+  
+  <!--aside-->
+  <app-default-aside (moduleSelected)="selectModule($event)" style="display: none;" />
+
+

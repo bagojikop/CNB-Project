@@ -1,0 +1,171 @@
+<div>
+    <dss-nav-actions [title]="'Sales Return(Credit Note)'" [navType]="navType.T"></dss-nav-actions>
+</div>
+<form [formGroup]="sample1Form" (ngSubmit)="save()" class="card dss-card-vh-100" dssViewportHeight="175px" novalidate>
+    <div class="card-body dss-card-body-scroll">
+        <h5 class="card-title">Sample 1</h5>
+        <p class="card-text">
+            This is a sample page to demonstrate the navigation actions component.
+        </p>
+
+
+        <c-row>
+            <c-col sm="2">
+                <dss-input-text id="input1" label="dss-input-sm" [caseStyle]="caseStyle.TITLECASE" required
+                    minlength="5" formControlName="input1" placeholder="Enter sm text">
+                </dss-input-text>
+                <dss-input-text id="input2" label="dss-input-md" sizing="md" [caseStyle]="caseStyle.UPPERCASE"
+                    formControlName="input2" placeholder="Enter md text">
+                </dss-input-text>
+                <dss-input-text id="input3" label="dss-input-lg" sizing="lg" formControlName="input3"
+                    placeholder="Enter lg text">
+                </dss-input-text>
+            </c-col>
+            <c-col sm="2">
+
+                <div class="dss-form-group">
+                    <label class="dss-input-label">Label1</label>
+                    <input id="input11" class="form-control dss-control" formControlName="input11" />
+                </div>
+                <div class="dss-form-group">
+                    <label class="dss-input-label-md">Label2</label>
+                    <input id="input12" class="form-control dss-control-md" formControlName="input12" />
+                </div>
+                <div class="dss-form-group">
+                    <label class="dss-input-label-lg">Label3</label>
+                    <input id="input13" class="form-control dss-control-lg" formControlName="input13" />
+                </div>
+
+
+            </c-col>
+
+
+            <c-col sm="2">
+                <div class="dss-form-group">
+                    <label class="dss-input-label">Checkbox</label>
+                    <div class="form-check">
+                        <input cFormCheckInput class="form-check-input" id="agreeTerms" type="checkbox"
+                            formControlName="agreeTerms" />
+                        <label class="form-check-label" for="agreeTerms">Agree Terms</label>
+                    </div>
+                </div>
+
+
+
+                <div class="dss-form-group">
+                    <label class="dss-input-label-md">Radio Button</label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input cFormCheckInput class="form-check-input" id="statusActive" type="radio"
+                                value="active" formControlName="status" />
+                            <label class="form-check-label" for="statusActive">Active</label>
+                        </div>
+                        <div class="form-check">
+                            <input cFormCheckInput class="form-check-input" id="statusInactive" type="radio"
+                                value="inactive" formControlName="status" />
+                            <label class="form-check-label" for="statusInactive">Inactive</label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <dss-date-fin id="sampleDate" label="Date" sizing="lg" formControlName="sampleDate"></dss-date-fin>
+            </c-col>
+            <c-col sm="2">
+                <div class="dss-form-group">
+                    <label class="dss-input-label">&nbsp;</label>
+                    <button cButton size="sm" color="primary">Primary</button>
+                </div>
+
+                <div class="dss-form-group">
+                    <label class="dss-input-label-md">&nbsp; </label>
+                    <button cButton size="md" color="secondary">Primary</button>
+                </div>
+                <div class="dss-form-group">
+                    <label class="dss-input-label-lg">&nbsp;</label>
+                    <button cButton size="lg" color="danger">Primary</button>
+                </div>
+
+            </c-col>
+            <c-col>
+                <div class="card group-box">
+                    <div class="group-title">Customer Details</div>
+
+                    <div class="card-body pt-4">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Customer Name</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Mobile No</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">GST No</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <dss-input-text id="input13" textarea rows="3" label="dss-input-sm" [caseStyle]="caseStyle.TITLECASE" required
+                    minlength="5" formControlName="input1" placeholder="Enter sm text">
+                </dss-input-text>
+            </c-col>
+        </c-row>
+
+      
+
+
+        <c-row>
+            <c-col sm="2">
+                  <dss-ng-select id="select1" label="dss-ng-select" [items]="['Option 1', 'Option 2', 'Option 3']"
+            formControlName="select1" placeholder="Select an option">
+        </dss-ng-select>
+
+            </c-col>
+            <c-col sm="2">
+                <dss-ng-select id="select2" url="Account/getAcclistbyMgCode" label="Account"
+                    bindLabel="Acc_name,City_name" bindValue="acc_code" formControlName="recpayeeaccount"
+                    [apiParams]="{ firm_id:null,branch_id:null, mgCode: '5,14' }"
+                    [bindSubObj]="[{ key: 'Place', value: 'City_name' },{ key: 'Group', value: 'mst003.sg_name' }]"
+                    required>
+                </dss-ng-select>
+            </c-col>
+            <c-col sm="2">
+                <dss-date-fin id="finDate" label="Fin Date" required formControlName="finDate"></dss-date-fin>
+            </c-col>
+        </c-row>
+        <div class="row g-2">
+            <div class="col-1">
+                <dss-input-num label="Number" labelAlign="center" labelBg="#e7f1ff" labelDarkBg="#1f3554"
+                    labelDarkColor="#f8f9fa" required min="1" max="999" formControlName="number"
+                    placeholder="Enter number">
+                </dss-input-num>
+            </div>
+            <div class="col-1">
+                <dss-input-num label="Simple Amount" labelAlign="center" labelBg="#e7f1ff" labelDarkBg="#1f3554"
+                    labelDarkColor="#f8f9fa" required min="1" max="999" fraction="2" isneg
+                    formControlName="simpleAmount" placeholder="Enter number">
+                </dss-input-num>
+            </div>
+            <div class="col-2">
+                <dss-input-num label="Currency Amount" labelAlign="right" labelBg="#e9f7ef" labelDarkBg="#173b28"
+                    labelDarkColor="#f8f9fa" currency="true" required min="1" max="999" fraction="2" isneg
+                    formControlName="currencyAmount" placeholder="Enter Amount">
+                </dss-input-num>
+            </div>
+            <div class="col-2">
+                <dss-input-num label="Currency Symbol Amount" currency="true" currencyCode="INR" fraction="2" isneg
+                    formControlName="currencySymbolAmount" placeholder="Enter Amount">
+                </dss-input-num>
+            </div>
+        </div>
+        <dss-table-grid url="Account/getAccList" [apiParams]="{ firm_id: 191, branch_id: '101' }" [frozenColumns]="1"
+            [columns]="columns" [showActions]="true" [bordered]="true" (edit)="onGridEdit($event)"
+            (delete)="onGridDelete($event)" [paginated]="true" bodyHeight="360px">
+        </dss-table-grid>
+    </div>
+</form>

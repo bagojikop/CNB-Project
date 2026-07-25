@@ -1,0 +1,122 @@
+﻿:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.rdlc-viewer {
+  overflow: hidden;
+  border: 1px solid var(--cui-border-color-translucent);
+  border-radius: .75rem;
+  background: var(--cui-body-bg);
+  box-shadow: 0 .25rem 1rem rgba(16, 24, 40, .07);
+}
+
+.rdlc-viewer__toolbar {
+  min-height: 3.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .65rem .85rem;
+  border-bottom: 1px solid var(--cui-border-color-translucent);
+  background: var(--cui-tertiary-bg);
+}
+
+.rdlc-viewer__title,
+.rdlc-viewer__actions {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.rdlc-viewer__icon {
+  width: 1.8rem;
+  height: 1.8rem;
+  display: inline-grid;
+  place-items: center;
+  border-radius: .4rem;
+  background: rgba(0, 139, 139, .14);
+  color: darkcyan;
+  font-size: 1.05rem;
+}
+
+.rdlc-viewer__body {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--cui-secondary-bg);
+}
+
+.rdlc-viewer__frame {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+  background: #fff;
+  transition: opacity .2s ease;
+}
+
+.rdlc-viewer__frame--loading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rdlc-viewer__state {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  padding: 1.5rem;
+  color: var(--cui-secondary-color);
+  text-align: center;
+  background: var(--cui-body-bg);
+}
+
+.rdlc-viewer__state strong {
+  color: var(--cui-body-color);
+}
+
+.rdlc-viewer__state--error {
+  color: var(--cui-danger-text-emphasis);
+}
+
+:host-context([data-coreui-theme="dark"]) .rdlc-viewer,
+:host-context([data-bs-theme="dark"]) .rdlc-viewer {
+  box-shadow: 0 .25rem 1rem rgba(0, 0, 0, .24);
+}
+
+:host-context([data-coreui-theme="dark"]) .rdlc-viewer__icon,
+:host-context([data-bs-theme="dark"]) .rdlc-viewer__icon {
+  background: rgba(80, 210, 210, .16);
+  color: #7cdddd;
+}
+
+@media (max-width: 575.98px) {
+  .rdlc-viewer {
+    border-radius: .5rem;
+  }
+
+  .rdlc-viewer__toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rdlc-viewer__actions,
+  .rdlc-viewer__actions button {
+    width: 100%;
+  }
+
+  .rdlc-viewer__actions button {
+    flex: 1 1 0;
+  }
+
+  .rdlc-viewer__body {
+    min-height: 420px !important;
+    height: 68vh !important;
+  }
+}

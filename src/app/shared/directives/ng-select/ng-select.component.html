@@ -1,0 +1,112 @@
+<div class="cFormGroup mb-2">
+  @if (label) {
+  <label class="dss-input-label" [ngStyle]="labelStyle()">
+    {{ label }}
+    @if (showRequiredMark(false)) {
+    <span
+      class="dss-validation-error"
+      role="button"
+      tabindex="0"
+      [cTooltip]="validationMessage(false)"
+      cTooltipPlacement="top"
+      [cTooltipTrigger]="[]"
+      [cTooltipVisible]="validationTooltipVisible()"
+      (click)="toggleValidationTooltip($event)"
+      (keydown.enter)="toggleValidationTooltip($event)"
+      (keydown.space)="toggleValidationTooltip($event)"
+      (blur)="hideValidationTooltip()"
+    ></span>
+    }
+  </label>
+  }
+
+  @if (disabled) {
+  <div
+    class="dss-ng-select-readonly"
+    [class.dss-ng-select-sm]="sizing === 'sm' || !sizing"
+    [class.dss-ng-select-md]="sizing === 'md'"
+    [class.dss-ng-select-lg]="sizing === 'lg'"
+    [title]="selectedDisplayText()"
+    aria-disabled="true"
+  >
+    <span class="dss-ng-select-readonly-value">{{ selectedDisplayText() || displayPlaceholder() }}</span>
+  </div>
+  }
+  @else {
+  <ng-select
+    #selectRef
+    [class.dss-ng-select-sm]="sizing === 'sm' || !sizing"
+    [class.dss-ng-select-md]="sizing === 'md'"
+    [class.dss-ng-select-lg]="sizing === 'lg'"
+    [ngModel]="selectedValue()"
+    [items]="displayItems()"
+    [bindValue]="bindValue || undefined"
+    [bindLabel]="displayBindLabel"
+    [placeholder]="displayPlaceholder()"
+    (search)="OnSearch($event)"
+    [loading]="loading()"
+    (open)="onOpen()"
+    [clearOnBackspace]="true"
+    (clear)="onClear()"
+    [clearable]="true"
+    (ngModelChange)="onModelChange($event)"
+    [searchable]="true"
+    [virtualScroll]="true"
+    (scrollToEnd)="loadMore()"
+    [multiple]="multiple"
+    (change)="onChange($event)"
+    #name="ngModel"
+    [disabled]="disabled"
+    (blur)="OnBlur()"
+    [required]="required"
+    [addTag]="addTagFn ? onAddTag.bind(this) : addNewText"
+    [dropdownPosition]="comboPosition"
+    [appendTo]="dropdownAppendTo || undefined"
+    [ngClass]="{ 'no-margin': !applyMargins }"
+    [cTooltip]="getSelectedTooltipRows().length > 0 ? selectTooltip : undefined"
+    cTooltipPlacement="top"
+    [cTooltipTrigger]="[]"
+    [cTooltipVisible]="tooltipVisible()"
+    (mouseover)="onSelectMouseOver($event)"
+    (mouseleave)="hideSelectTooltip()"
+    (keydown)="onSelectKeyDown($event)"
+    (focusin)="onSelectFocusIn($event)"
+  >
+    <ng-template ng-label-tmp let-item="item">
+      <span class="dss-ng-select-label">
+        {{ getSelectedLabel(item) }}
+      </span>
+    </ng-template>
+
+    <ng-template ng-option-tmp let-item="item" let-index="index">
+      <label class="h6">{{ titleCase(getOptionLabel(item)) }}</label>
+      <div class="d-flex">
+        @for (x of bindSubObj ; track x.key; let i = $index) { @if( x.value && subRowObj(
+        item,x.value)) {
+        <div>
+          @if (showSubObjLabel(x)) {
+          <small class="text-success">{{ x.key }} :</small>
+          }
+          <small class="text-success">{{ titleCase(subRowObj(item, x.value)) }}@if(bindSubObj[i+1]?.value) {{{ ShowSeperator(item, i + 1) }}}</small>
+        </div>
+        } }
+      </div>
+    </ng-template>
+  </ng-select>
+  }
+
+  <ng-template #selectTooltip>
+  <div class="dss-ng-select-tooltip-content">
+    @for (row of getSelectedTooltipRows(); track row.key) {
+    <div class="dss-ng-select-tooltip-row">
+      @if (row.key) {
+      <span class="dss-ng-select-tooltip-key">{{ row.key }}</span>
+      }
+      <span class="dss-ng-select-tooltip-value">{{ row.value }}</span>
+    </div>
+    }
+  </div>
+  </ng-template>
+</div>
+
+

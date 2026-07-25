@@ -1,0 +1,30 @@
+.floating-company-switch {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  width: 60px;
+  height: 60px;
+  background: #0d6efd;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 2147483647 !important;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+.floating-company-switch svg {
+  cursor: pointer;
+  width: 26px;
+  height: 26px;
+}
+
+.floating-company-switch:hover {
+  transform: scale(3.1) rotate(15deg);
+  background: #0b5ed7;
+}
+ 

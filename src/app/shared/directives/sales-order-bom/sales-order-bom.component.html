@@ -1,0 +1,190 @@
+<c-modal [visible]="visible" (visibleChange)="visible = $event" #modalLg id="modalLg" size="lg" alignment="center">
+
+    <c-modal-header>
+        <h5 cModalTitle>BOM Details</h5>
+    </c-modal-header>
+
+    <c-modal-body>
+
+        <form [formGroup]="form">
+
+            <div class="row">
+                <div class="col-md-8">
+                    <dss-ng-select label="Product" url="product/getproductList" bindLabel="I_name" bindValue="I_id"
+                        formControlName="i_id">
+                    </dss-ng-select>
+                </div>
+                <dss-ng-select class="col-md-4" label="Unit" url="Unit/unitList" bindLabel="unit_name"
+                    bindValue="unit_code" formControlName="i_unit">
+                </dss-ng-select>
+
+
+                <!-- </div>
+ 
+            <div class="row"> -->
+
+
+
+
+
+                <dss-input-num class="col-md-2" label="M.R.P.(₹)" formControlName="mrp" currency="true" fraction="2">
+                </dss-input-num>
+
+                <dss-input-num class="col-md-2" label="Cases" formControlName="cases" (input)="calcQty()">
+                </dss-input-num>
+
+                <dss-ng-select class="col-md-4" label="Delivery Mode" [items]="deliveryModes" bindLabel="name"
+                    bindValue="id" formControlName="deliveryMode">
+                </dss-ng-select>
+                <!-- </div>
+ 
+
+            <div class="row"> -->
+
+                <dss-input-num class="col-md-2" label="Quantity" formControlName="qty" fraction="3"
+                    (input)="calcTotal()">
+                </dss-input-num>
+
+                <dss-input-num class="col-md-2" label="Rate(Incl.tax)(₹)" formControlName="incltaxrate" currency="true"
+                    fraction="2" (input)="calcBasicRate()">
+                </dss-input-num>
+
+                <dss-input-num class="col-md-2" label="Rate(₹)" formControlName="rate" currency="true" fraction="2"
+                    (input)="calcTotal()">
+                </dss-input-num>
+
+                <dss-input-num class="col-md-2" label="Gross Amount(₹)" formControlName="grossamt" currency="true"
+                    disabled fraction="2" [readonly]="true">
+                </dss-input-num>
+
+                <dss-ng-select class="col-md-4" label="Disc. on" [items]="Discon" bindLabel="name" bindValue="id"
+                    formControlName="disc_type" (change)="calcDiscount()">
+                </dss-ng-select>
+
+                <dss-input-num class="col-md-2" label="Disc. Rate(%)" formControlName="disc_rate" currency="true"
+                    fraction="2" (input)="calcDiscount()">
+                </dss-input-num>
+
+                <!-- </div> 
+            <div class="row"> -->
+
+                <dss-input-num class="col-md-2" label="Taxable Amount" formControlName="taxableamt" currency="true"
+                    fraction="2" [readonly]="true">
+                </dss-input-num>
+
+                <dss-input-num class="col-md-2" label="Other Charges" formControlName="other_charges" currency="true"
+                    disabled fraction="2" (input)="calcGST()">
+                </dss-input-num>
+
+                <dss-input-num class="col-md-2" label="Total Amount(₹)" formControlName="totalamt" currency="true"
+                    fraction="2" [readonly]="true">
+                </dss-input-num>
+
+                <dss-ng-select class="col-md-4" label="Life Type" [items]="lifetypes" bindLabel="name" bindValue="id"
+                    formControlName="life_type">
+                </dss-ng-select>
+
+                <dss-input-num class="col-md-2" label="Life" formControlName="life" fraction="2">
+                </dss-input-num>
+
+                <dss-input-num class="col-md-2" label="Disc. Amount(₹)" formControlName="discamt" currency="true"
+                    disabled fraction="2" [readonly]="true">
+                </dss-input-num>
+
+            </div>
+
+            <!-- GST Table -->
+
+            <table cTable bordered small class="mt-3">
+
+                <thead>
+
+                    <tr class="text-center">
+                        <th></th>
+                        <th>Central Tax</th>
+                        <th>State / UT Tax</th>
+                        <th>Integrated Tax</th>
+                        <th>CESS</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td><strong>Rate (%)</strong></td>
+
+                        <td>
+                            <dss-input-num formControlName="crate" fraction="2" (input)="calcGST()" disabled>
+                            </dss-input-num>
+                        </td>
+
+                        <td>
+                            <dss-input-num formControlName="srate" fraction="2" (input)="calcGST()" disabled>
+                            </dss-input-num>
+                        </td>
+
+                        <td>
+                            <dss-input-num formControlName="irate" fraction="2" (input)="calcGST()">
+                            </dss-input-num>
+                        </td>
+
+                        <td>
+                            <dss-input-num formControlName="csrate" fraction="2" (input)="calcGST()">
+                            </dss-input-num>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td><strong>Amount (₹)</strong></td>
+
+                        <td>
+                            <dss-input-num formControlName="camt" currency="true" fraction="2" disabled>
+                            </dss-input-num>
+                        </td>
+
+                        <td>
+                            <dss-input-num formControlName="samt" currency="true" fraction="2" disabled>
+                            </dss-input-num>
+                        </td>
+
+                        <td>
+                            <dss-input-num formControlName="iamt" currency="true" fraction="2" disabled>
+                            </dss-input-num>
+                        </td>
+
+                        <td>
+                            <dss-input-num formControlName="csamt" currency="true" fraction="2" disabled>
+                            </dss-input-num>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </form>
+
+    </c-modal-body>
+
+    <c-modal-footer>
+
+        <button cButton color="secondary" (click)="clear()">
+            Clear
+        </button>
+
+        <button cButton color="secondary" (click)="close()">
+            Close
+        </button>
+
+        <button cButton color="primary" (click)="saveData()">
+            Save
+        </button>
+
+    </c-modal-footer>
+
+</c-modal>

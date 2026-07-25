@@ -1,0 +1,62 @@
+<c-modal [visible]="visible" (visibleChange)="$event ? open() : close()" size="lg" alignment="center" backdrop="static">
+  <c-modal-header class="d-flex align-items-center gap-3">
+    <h5 cModalTitle class="mb-0">{{ title }}</h5>
+    <button type="button" class="btn btn-outline-primary ms-2" (click)="fileInput.click()">
+      <i class="fa fa-camera"></i> {{ uploadLabel }}
+    </button>
+    <button type="button" class="btn-close ms-auto" (click)="close()"></button>
+  </c-modal-header>
+
+  <c-modal-body>
+    <input
+      #fileInput
+      type="file"
+      hidden
+      [attr.accept]="accept"
+      [attr.capture]="capture"
+      (change)="onFileSelect($event)">
+
+    <div
+      class="border rounded bg-light d-flex align-items-center justify-content-center text-center overflow-hidden"
+      [style.height]="previewHeight"
+      [style.max-height]="previewMaxHeight">
+      @if (previewLoading) {
+        <div class="text-muted px-4">Loading document preview...</div>
+      } @else if (previewUrl && previewKind === 'image') {
+        <img [src]="previewUrl" class="d-block" style="width: 100%; height: 100%; object-fit: contain;">
+      } @else if (previewResourceUrl && previewKind === 'pdf') {
+        <iframe [src]="previewResourceUrl" title="PDF preview" style="width: 100%; height: 100%; border: 0;"></iframe>
+      } @else {
+        <div class="text-muted px-4">
+          <i class="fa fa-camera d-block mb-2" style="font-size: 32px;"></i>
+          {{ emptyMessage }}
+        </div>
+      }
+    </div>
+
+    @if (file) {
+      <div class="alert alert-info mt-3 mb-0">
+        Selected File: {{ file.name }}
+      </div>
+    }
+  </c-modal-body>
+
+  <c-modal-footer class="d-flex justify-content-between">
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-outline-secondary" [disabled]="!previewUrl || previewLoading" (click)="openPreview()">
+        Open
+      </button>
+      <button type="button" class="btn btn-outline-secondary" [disabled]="!previewUrl || previewLoading" (click)="downloadPreview()">
+        Download
+      </button>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-secondary" (click)="close()">Cancel</button>
+      @if (showSave) {
+        <button type="button" class="btn btn-primary" [disabled]="saveDisabled || !file" (click)="emitSave()">
+          {{ saveLabel }}
+        </button>
+      }
+    </div>
+  </c-modal-footer>
+</c-modal>

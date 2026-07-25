@@ -1,0 +1,22 @@
+[
+    {
+        "cd": 0,
+        "nm": "Regular"
+    },
+    {
+        "cd": 1,
+        "nm": "Composition"
+    },
+    {
+        "cd": 2,
+        "nm": "Exempted"
+    },
+    {
+        "cd": 3,
+        "nm": "URD"
+    },
+    {
+        "cd": 4,
+        "nm": "UIN"
+    }
+]

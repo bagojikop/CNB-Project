@@ -1,0 +1,1123 @@
+// Here you can add other styles
+
+// custom .chartjs-tooltip-body-item padding
+@use "charts";
+
+// custom tweaks for scrollbar styling (wip)
+@use "scrollbar";
+
+// custom calendar today cell color
+.calendar-cell.today {
+  --cui-calendar-cell-today-color: var(--cui-info) !important;
+}
+
+// custom select week cursor pointer
+.select-week .calendar-row.current {
+  cursor: pointer;
+}
+
+* {
+  cursor: default;
+}
+
+.floating-company-switch,
+.floating-company-switch * {
+  cursor: pointer !important;
+}
+
+:root {
+  --dss-control-height-sm: 31px;
+  --dss-control-height-md: 38px;
+  --dss-control-height-lg: 48px;
+  --dss-control-font-size-sm: 0.875rem;
+  --dss-control-font-size-md: 1rem;
+  --dss-control-font-size-lg: 1.25rem;
+  --dss-control-padding-x-sm: 0.5rem;
+  --dss-control-padding-x-md: 0.75rem;
+  --dss-control-padding-x-lg: 1rem;
+  --dss-control-border: var(--cui-border-color, #b1b7c1);
+  --dss-control-bg: var(--cui-body-bg, #fff);
+  --dss-control-color: var(--cui-body-color, #212529);
+  --dss-label-color: var(--cui-body-color, #212529);
+}
+
+[data-coreui-theme="dark"],
+[data-bs-theme="dark"],
+.dark {
+  --dss-control-border: var(--cui-border-color, #3c4b64);
+  --dss-control-bg: var(--cui-body-bg, #212631);
+  --dss-control-color: var(--cui-body-color, #e6e8ec);
+  --dss-label-color: var(--cui-body-color, #e6e8ec);
+}
+
+.dss-form-group,
+.cFormGroup {
+  margin-bottom: 0.5rem !important;
+}
+
+.dss-form-state-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  margin-left: 0.65rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.dss-form-state-badge-disabled {
+  color: #495057;
+  background: #e9ecef;
+  border: 1px solid #ced4da;
+}
+
+.dss-form-state-badge-enabled {
+  color: #0f5132;
+  background: #d1e7dd;
+  border: 1px solid #75b798;
+}
+
+.dss-form-state-disabled .dss-form-state-section {
+  background: transparent;
+}
+
+.dss-form-state-disabled .dss-form-state-section .form-control:disabled,
+.dss-form-state-disabled .dss-form-state-section .form-select:disabled,
+.dss-form-state-disabled .dss-form-state-section textarea:disabled,
+.dss-form-state-disabled .dss-form-state-section input:disabled:not([type="checkbox"]):not([type="radio"]) {
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-color: #ced4da;
+  opacity: 1;
+}
+
+.dss-form-state-disabled .dss-form-state-section .form-check-input:disabled {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+  opacity: 1;
+}
+
+.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-select-container {
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-color: #ced4da;
+  opacity: 1;
+}
+
+.dss-form-state-disabled .dss-form-state-section dss-ng-select {
+  --dss-ng-select-bg: #f8f9fa;
+  --dss-ng-select-color: #6c757d;
+  --dss-ng-select-border: #ced4da;
+}
+
+.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value,
+.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value-label,
+.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .dss-ng-select-label,
+.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-input input,
+.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-clear-wrapper,
+.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-arrow {
+  color: #6c757d !important;
+}
+
+[data-coreui-theme="dark"] .dss-form-state-badge-disabled,
+[data-bs-theme="dark"] .dss-form-state-badge-disabled,
+.dark .dss-form-state-badge-disabled {
+  color: #c4c9d0;
+  background: #343a40;
+  border-color: #5c636a;
+}
+
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-control:disabled,
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-select:disabled,
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section textarea:disabled,
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section input:disabled:not([type="checkbox"]):not([type="radio"]),
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-control:disabled,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-select:disabled,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section textarea:disabled,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section input:disabled:not([type="checkbox"]):not([type="radio"]),
+.dark .dss-form-state-disabled .dss-form-state-section .form-control:disabled,
+.dark .dss-form-state-disabled .dss-form-state-section .form-select:disabled,
+.dark .dss-form-state-disabled .dss-form-state-section textarea:disabled,
+.dark .dss-form-state-disabled .dss-form-state-section input:disabled:not([type="checkbox"]):not([type="radio"]) {
+  color: #c4c9d0;
+  background-color: #49515a;
+  border-color: #5c636a;
+}
+
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-check-input:disabled,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-check-input:disabled,
+.dark .dss-form-state-disabled .dss-form-state-section .form-check-input:disabled {
+  background-color: #49515a;
+  border-color: #5c636a;
+}
+
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-select-container,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-select-container,
+.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-select-container {
+  color: #c4c9d0;
+  background-color: #49515a;
+  border-color: #5c636a;
+}
+
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section dss-ng-select,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section dss-ng-select,
+.dark .dss-form-state-disabled .dss-form-state-section dss-ng-select {
+  --dss-ng-select-bg: #49515a;
+  --dss-ng-select-color: #c4c9d0;
+  --dss-ng-select-border: #5c636a;
+}
+
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value,
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value-label,
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .dss-ng-select-label,
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-input input,
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-clear-wrapper,
+[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-arrow,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value-label,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .dss-ng-select-label,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-input input,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-clear-wrapper,
+[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-arrow,
+.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value,
+.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value-label,
+.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .dss-ng-select-label,
+.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-input input,
+.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-clear-wrapper,
+.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-arrow {
+  color: #c4c9d0 !important;
+}
+
+// Disabled fields keep a visible fill so users can distinguish them from
+// enabled fields, regardless of whether they use a form-state section wrapper.
+.dss-form-state-disabled {
+
+  .form-control:disabled,
+  .form-select:disabled,
+  textarea:disabled,
+  input:disabled:not([type="checkbox"]):not([type="radio"]),
+  .ng-select.ng-select-disabled .ng-select-container,
+  .dss-ng-select-readonly {
+    background-color: #f8f9fa !important;
+    opacity: 1;
+  }
+
+  .form-check-input:disabled {
+    background-color: #f8f9fa;
+    opacity: 1;
+  }
+
+  dss-ng-select {
+    --dss-ng-select-bg: #f8f9fa;
+  }
+
+  c-date-picker .date-picker.disabled {
+    --cui-date-picker-disabled-bg: #f8f9fa;
+  }
+}
+
+[data-coreui-theme="dark"] .dss-form-state-disabled,
+[data-bs-theme="dark"] .dss-form-state-disabled,
+.dark .dss-form-state-disabled {
+
+  .form-control:disabled,
+  .form-select:disabled,
+  textarea:disabled,
+  input:disabled:not([type="checkbox"]):not([type="radio"]),
+  .ng-select.ng-select-disabled .ng-select-container,
+  .dss-ng-select-readonly {
+    background-color: #49515a !important;
+  }
+
+  .form-check-input:disabled {
+    background-color: #49515a;
+  }
+
+  dss-ng-select {
+    --dss-ng-select-bg: #49515a;
+  }
+
+  c-date-picker .date-picker.disabled {
+    --cui-date-picker-disabled-bg: #49515a;
+  }
+}
+
+// Angular can disable individual controls without adding a disabled class to
+// the form. Target the rendered disabled state directly.
+.form-control:disabled,
+.form-select:disabled,
+textarea:disabled,
+input:disabled:not([type="checkbox"]):not([type="radio"]),
+.dss-ng-select-readonly,
+.ng-select.ng-select-disabled .ng-select-container {
+  background-color: #f3f4f5 !important;
+  opacity: 1;
+}
+
+.form-check-input:disabled:not(:checked) {
+  background-color: #f3f4f5 !important;
+  opacity: 1;
+}
+
+.date-picker.disabled {
+  --cui-date-picker-disabled-bg: #f3f4f5;
+}
+
+[data-coreui-theme="dark"],
+[data-bs-theme="dark"],
+.dark {
+
+  .form-control:disabled,
+  .form-select:disabled,
+  textarea:disabled,
+  input:disabled:not([type="checkbox"]):not([type="radio"]),
+  .dss-ng-select-readonly,
+  .ng-select.ng-select-disabled .ng-select-container {
+    background-color: #686d72 !important;
+  }
+
+  .form-check-input:disabled:not(:checked) {
+    // background-color: #747f8b !important;
+    background-color: #585a5c !important;
+  }
+
+  .date-picker.disabled {
+    --cui-date-picker-disabled-bg: #747f8b;
+  }
+}
+
+.dss-input-label,
+.dss-input-label-sm,
+.dss-input-label-md,
+.dss-input-label-lg,
+.dss-date-fin-label {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--dss-label-color);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.dss-control,
+.dss-control-sm,
+.dss-control-md,
+.dss-control-lg,
+.dss-form-group .form-control,
+.cFormGroup .form-control {
+  box-sizing: border-box;
+  border-color: var(--dss-control-border);
+  background-color: var(--dss-control-bg);
+  color: var(--dss-control-color);
+  line-height: 1.5;
+}
+
+.dss-control:focus,
+.dss-control-sm:focus,
+.dss-control-md:focus,
+.dss-control-lg:focus,
+.dss-form-group .form-control:focus,
+.cFormGroup .form-control:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.18);
+}
+
+.dss-control,
+.dss-control-sm,
+.dss-form-group .form-control-sm,
+.cFormGroup .form-control-sm {
+  height: var(--dss-control-height-sm);
+  min-height: var(--dss-control-height-sm);
+  padding: 0.25rem var(--dss-control-padding-x-sm);
+  font-size: var(--dss-control-font-size-sm);
+}
+
+.dss-control-md,
+.dss-form-group .form-control-md,
+.cFormGroup .form-control-md {
+  height: var(--dss-control-height-md);
+  min-height: var(--dss-control-height-md);
+  padding: 0.375rem var(--dss-control-padding-x-md);
+  font-size: var(--dss-control-font-size-md);
+}
+
+.dss-control-lg,
+.dss-form-group .form-control-lg,
+.cFormGroup .form-control-lg {
+  height: var(--dss-control-height-lg);
+  min-height: var(--dss-control-height-lg);
+  padding: 0.5rem var(--dss-control-padding-x-lg);
+  font-size: var(--dss-control-font-size-lg);
+}
+
+textarea.dss-control,
+textarea.dss-control-sm,
+.dss-form-group textarea.form-control,
+.dss-form-group textarea.form-control-sm,
+.cFormGroup textarea.form-control,
+.cFormGroup textarea.form-control-sm {
+  height: auto;
+  min-height: var(--dss-control-height-sm);
+}
+
+textarea.dss-control-md,
+.dss-form-group textarea.form-control-md,
+.cFormGroup textarea.form-control-md {
+  height: auto;
+  min-height: var(--dss-control-height-md);
+}
+
+textarea.dss-control-lg,
+.dss-form-group textarea.form-control-lg,
+.cFormGroup textarea.form-control-lg {
+  height: auto;
+  min-height: var(--dss-control-height-lg);
+}
+
+.cFormGroup .ng-select .ng-select-container {
+  min-height: var(--dss-control-height-sm);
+  height: var(--dss-control-height-sm);
+  border-color: var(--dss-control-border);
+  background-color: var(--dss-control-bg);
+  color: var(--dss-control-color);
+  font-size: var(--dss-control-font-size-sm);
+}
+
+.cFormGroup .ng-select.ng-select-focused .ng-select-container {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.18);
+}
+
+.dss-form-group .form-check {
+  align-items: center;
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0;
+  min-height: var(--dss-control-height-sm);
+  height: var(--dss-control-height-sm);
+  padding-left: 1.5em;
+}
+
+.dss-form-group .form-check-input {
+  flex: 0 0 auto;
+  margin-top: 0;
+}
+
+.dss-form-group .form-check-label {
+  color: var(--dss-control-color);
+  font-size: var(--dss-control-font-size-sm);
+}
+
+.dss-input-label+.form-check,
+.dss-input-label+.d-flex {
+  height: var(--dss-control-height-sm);
+  min-height: var(--dss-control-height-sm);
+}
+
+.dss-input-label-md+.form-check,
+.dss-input-label-md+.d-flex {
+  height: var(--dss-control-height-md);
+  min-height: var(--dss-control-height-md);
+}
+
+.dss-input-label-lg+.form-check,
+.dss-input-label-lg+.d-flex {
+  height: var(--dss-control-height-lg);
+  min-height: var(--dss-control-height-lg);
+}
+
+.dss-input-label-md+.form-check .form-check-label,
+.dss-input-label-md+.d-flex .form-check-label {
+  font-size: var(--dss-control-font-size-md);
+}
+
+.dss-input-label-lg+.form-check .form-check-label,
+.dss-input-label-lg+.d-flex .form-check-label {
+  font-size: var(--dss-control-font-size-lg);
+}
+
+.footer {
+  --cui-footer-min-height: 1rem !important;
+}
+
+.dss-card-vh-100 {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--cui-body-bg, #fff), var(--cui-body-bg, #fff)) padding-box,
+    linear-gradient(0deg, dodgerblue, lightskyblue) border-box;
+  border-radius: 0px !important;
+  margin-top: 5px;
+}
+
+[data-coreui-theme="dark"] .dss-card-vh-100,
+[data-bs-theme="dark"] .dss-card-vh-100,
+.dark .dss-card-vh-100 {
+  background:
+    linear-gradient(var(--cui-body-bg, #212529), var(--cui-body-bg, #212529)) padding-box,
+    linear-gradient(0deg, #004f9f, #006bb6) border-box;
+}
+
+.dss-card-body-scroll {
+  min-height: 0;
+  overflow: auto;
+  background: var(--cui-body-bg, #ffffff9d);
+}
+
+.dss-coreui-card {
+  border: 1px solid var(--cui-border-color, #d8dbe0);
+  background: var(--cui-body-bg, #fff);
+}
+
+.dss-coreui-card-header {
+  min-height: 38px;
+  padding: 0.25rem 0.5rem 0rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: rgba(var(--cui-info-rgb), var(--cui-bg-opacity)) !important;
+  border-bottom: 1px solid color-mix(in srgb, #853cca 45%, var(--cui-body-bg, #fff));
+  font-family: "Trebuchet MS", Haettenschweiler, sans-serif;
+  color: color-mix(in srgb, #853cca 72%, var(--cui-body-bg, #fff));
+}
+
+.dss-coreui-accordin-header {
+  //min-height: 38px;
+  //padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  //gap: 0.75rem;
+  background: rgba(var(--cui-info-rgb), var(--cui-bg-opacity)) !important;
+  //border-bottom: 1px solid color-mix(in srgb, #853cca 45% , var(--cui-body-bg, #fff));
+  font-family: "Trebuchet MS", Haettenschweiler, sans-serif;
+  color: color-mix(in srgb, #853cca 72%, var(--cui-body-bg, #fff));
+}
+
+.dss-table-grid-header .dss-table-grid-scroll th {
+  background-color: color-mix(in srgb,
+      #7c81bb 45%,
+      var(--cui-body-bg, #fff)) !important;
+  border-color: color-mix(in srgb, #7d7ff7 65%, var(--cui-body-bg, #fff));
+  color: #fff;
+  font-weight: 600;
+}
+
+[data-coreui-theme="dark"] .dss-table-grid-header .dss-table-grid-scroll th,
+[data-bs-theme="dark"] .dss-table-grid-header .dss-table-grid-scroll th,
+.dark .dss-table-grid-header .dss-table-grid-scroll th {
+  color: color-mix(in srgb, #fff 60%, var(--cui-body-bg, #212529));
+}
+
+:host-context([data-coreui-theme="dark"]) .dss-coreui-card-header,
+:host-context([data-bs-theme="dark"]) .dss-coreui-card-header,
+:host-context(.dark) .dss-coreui-card-header {
+  color: color-mix(in srgb, #d7b5ff 86%, var(--cui-body-bg, #212529));
+}
+
+.dss-coreui-detail-table {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 2px solid color-mix(in srgb, var(--cui-primary, #321fdb) 70%, transparent);
+}
+
+.dss-coreui-detail-table-scroll {
+  --dss-detail-table-body-height: 150px;
+  --dss-detail-table-border-color: #d8dbe0;
+  --dss-table-scrollbar-compensation: 10px;
+  height: var(--dss-detail-table-body-height);
+  overflow-x: auto;
+  overflow-y: scroll;
+}
+
+.dss-coreui-detail-table-scroll table,
+table.dss-coreui-detail-table-scroll {
+  min-width: 100%;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.dss-coreui-detail-table-scroll .table.table-bordered,
+table.dss-coreui-detail-table-scroll.table.table-bordered {
+  --bs-table-border-color: var(--dss-detail-table-border-color);
+  --cui-table-border-color: var(--dss-detail-table-border-color);
+  border: 1px solid var(--dss-detail-table-border-color);
+}
+
+.dss-coreui-detail-table-scroll thead,
+.dss-coreui-detail-table-scroll tfoot,
+.dss-coreui-detail-table-scroll thead tr,
+.dss-coreui-detail-table-scroll tfoot tr {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.dss-coreui-detail-table-scroll thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.dss-coreui-detail-table-scroll tbody {
+  height: auto;
+}
+
+.dss-coreui-detail-table-scroll tbody tr {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.dss-coreui-detail-table-scroll th,
+.dss-coreui-detail-table-scroll td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dss-coreui-detail-table-scroll .table.table-bordered> :not(caption)>*>*,
+table.dss-coreui-detail-table-scroll.table.table-bordered> :not(caption)>*>* {
+  border: 1px solid var(--dss-detail-table-border-color);
+}
+
+.dss-coreui-detail-table .table-hover tbody tr:hover>*,
+.dss-coreui-detail-table-scroll.table-hover tbody tr:hover>*,
+table.dss-coreui-detail-table-scroll.table-hover tbody tr:hover>* {
+  --bs-table-bg-state: #f8f9fb;
+  --cui-table-bg-state: #f8f9fb;
+  background-color: #f8f9fb;
+}
+
+.dss-coreui-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dss-coreui-card-body {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.82fr) minmax(360px, 1.18fr);
+  gap: 0;
+}
+
+.dss-coreui-audit-grid {
+  padding: 0.65rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(130px, 1fr));
+  gap: 0.75rem;
+}
+
+.dss-coreui-audit-grid span {
+  display: block;
+  color: var(--cui-secondary-color, #6c757d);
+  font-size: 0.8rem;
+}
+
+.dss-coreui-audit-grid strong {
+  display: block;
+  min-height: 1.4rem;
+  font-weight: 600;
+}
+
+.dss-coreui-section {
+  padding: 0.65rem;
+}
+
+.dss-coreui-section-main {
+  border-right: 1px solid var(--cui-border-color, #d8dbe0);
+}
+
+.dss-coreui-floating-accordion {
+  display: block;
+}
+
+.dss-coreui-floating-accordion .accordion-item {
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--cui-border-color, #d8dbe0);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.04);
+  overflow: visible;
+}
+
+.dss-coreui-floating-accordion c-accordion-item,
+.dss-coreui-floating-accordion .accordion-collapse,
+.dss-coreui-floating-accordion .collapse,
+.dss-coreui-floating-accordion .collapsing {
+  overflow: visible !important;
+}
+
+.dss-coreui-floating-accordion .accordion-item:last-child {
+  margin-bottom: 0;
+}
+
+.dss-coreui-floating-accordion .accordion-button {
+  min-height: 34px;
+  padding: 0.35rem 0.65rem;
+  font-weight: 600;
+  color: #4d4a4a;
+  background: rgba(var(--cui-info-rgb), var(--cui-bg-opacity)) !important;
+  border-bottom: 0;
+  box-shadow: none;
+}
+
+.dss-coreui-floating-accordion .accordion-button:not(.collapsed) {
+  color: #000;
+  background: rgba(var(--cui-info-rgb), var(--cui-bg-opacity)) !important;
+  border-bottom: 1px solid color-mix(in srgb, #5cab60 45%, transparent);
+}
+
+[data-coreui-theme="dark"] .dss-coreui-floating-accordion .accordion-button,
+[data-bs-theme="dark"] .dss-coreui-floating-accordion .accordion-button,
+.dark .dss-coreui-floating-accordion .accordion-button {
+  color: color-mix(in srgb, #fff 86%, var(--cui-body-bg, #212529));
+}
+
+.dss-coreui-floating-accordion .accordion-body {
+  padding: 0.65rem;
+  min-height: 300px;
+  overflow: visible;
+}
+
+.dss-coreui-inline-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.dss-coreui-company-table {
+  margin: 0 0.65rem 0.65rem;
+  --dss-table-body-height: 150px;
+}
+
+.dss-coreui-company-table td:first-child,
+.dss-coreui-company-table td:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dss-coreui-affiliate-entry {
+  padding: 0 0.65rem 0.65rem;
+}
+
+.dss-coreui-allow-all {
+  min-height: 31px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.dss-coreui-detail-table thead th,
+.dss-coreui-detail-table tfoot th,
+.dss-coreui-detail-table tfoot td {
+  color: #fff;
+  font-weight: 600;
+  background-color: #4f5d75;
+  border-color: #667085;
+}
+
+[data-coreui-theme="dark"] .dss-coreui-detail-table thead th,
+[data-bs-theme="dark"] .dss-coreui-detail-table thead th,
+.dark .dss-coreui-detail-table thead th {
+  color: color-mix(in srgb, #fff 60%, var(--cui-body-bg, #212529));
+}
+
+.dss-coreui-detail-table-scroll thead th,
+.dss-coreui-detail-table-scroll tfoot th,
+.dss-coreui-detail-table-scroll tfoot td,
+table.dss-coreui-detail-table-scroll.table.table-bordered thead th,
+table.dss-coreui-detail-table-scroll.table.table-bordered tfoot th,
+table.dss-coreui-detail-table-scroll.table.table-bordered tfoot td {
+  color: #fff;
+  font-weight: 600;
+  background-color: #4f5d75;
+  border: 1px solid #667085;
+}
+
+[data-coreui-theme="dark"] .dss-coreui-detail-table-scroll thead th,
+[data-bs-theme="dark"] .dss-coreui-detail-table-scroll thead th,
+.dark .dss-coreui-detail-table-scroll thead th {
+  color: color-mix(in srgb, #fff 60%, var(--cui-body-bg, #212529));
+}
+
+.dss-coreui-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.dss-coreui-check input[type="checkbox"] {
+  border-color: var(--cui-primary, #321fdb);
+}
+
+@media (max-width: 991.98px) {
+  .dss-coreui-card-body {
+    grid-template-columns: 1fr;
+  }
+
+  .dss-coreui-section-main {
+    border-right: 0;
+    border-bottom: 1px solid var(--cui-border-color, #d8dbe0);
+  }
+
+  .dss-coreui-audit-grid {
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .dss-coreui-card-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dss-coreui-allow-all {
+    align-items: stretch;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .dss-coreui-audit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dss-card-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #fff;
+  background-color: color-mix(in srgb, #853cca 45%, var(--cui-body-bg, #fff));
+  border-color: color-mix(in srgb, #853cca 65%, var(--cui-body-bg, #fff));
+}
+
+.dss-card-header-btn:hover,
+.dss-card-header-btn:focus-visible {
+  color: #fff;
+  background-color: color-mix(in srgb, #853cca 65%, var(--cui-body-bg, #fff));
+  border-color: color-mix(in srgb, #853cca 80%, var(--cui-body-bg, #fff));
+}
+
+:host-context([data-coreui-theme="dark"]) .dss-card-header-btn,
+:host-context([data-bs-theme="dark"]) .dss-card-header-btn,
+:host-context(.dark) .dss-card-header-btn {
+  color: #fff;
+  background-color: color-mix(in srgb,
+      #853cca 72%,
+      var(--cui-body-bg, #212529));
+  border-color: color-mix(in srgb, #d7b5ff 40%, #853cca);
+}
+
+.dss-validation-error {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  margin-left: 0.25rem;
+  background-color: #ef376e;
+  mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23000'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23000' stroke='none'/%3e%3c/svg%3e");
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: 12px 12px;
+  -webkit-mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23000'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23000' stroke='none'/%3e%3c/svg%3e");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: 12px 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dss-validation-error:focus-visible {
+  outline: 2px solid var(--cui-danger, #e55353);
+  outline-offset: 2px;
+}
+
+[data-coreui-theme="dark"] .dss-validation-error,
+[data-bs-theme="dark"] .dss-validation-error,
+.dark .dss-validation-error {
+  background-color: color-mix(in srgb, #ef376e 62%, #fff);
+}
+
+.dss-table-scroll-body {
+  overflow: hidden;
+
+  table {
+    table-layout: fixed;
+  }
+
+  thead,
+  tfoot,
+  tbody,
+  tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  tbody {
+    display: block;
+    height: var(--dss-detail-table-body-height,
+        var(--dss-table-body-height, 150px));
+    max-height: var(--dss-detail-table-body-height,
+        var(--dss-table-body-height, 150px));
+    overflow-y: auto;
+  }
+
+  th,
+  td {
+    height: var(--dss-table-row-height, 34px);
+    vertical-align: middle;
+  }
+}
+
+// Mobile table-to-card helper
+// Add dss-mobile-card-table to any table/wrapper and put data-label=Column on each td.
+// dss-table-grid already adds this class and labels automatically.
+@media (max-width: 575.98px) {
+  .dss-mobile-card-table {
+    overflow-x: hidden;
+  }
+
+  .dss-mobile-card-table c-smart-table,
+  .dss-mobile-card-table table,
+  table.dss-mobile-card-table,
+  .dss-mobile-card-table tbody,
+  table.dss-mobile-card-table tbody,
+  .dss-mobile-card-table tbody tr,
+  table.dss-mobile-card-table tbody tr,
+  .dss-mobile-card-table td,
+  table.dss-mobile-card-table td {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .dss-mobile-card-table c-smart-table-head,
+  .dss-mobile-card-table thead,
+  table.dss-mobile-card-table thead {
+    display: none !important;
+  }
+
+  .dss-mobile-card-table tbody,
+  table.dss-mobile-card-table tbody {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .dss-mobile-card-table tbody tr,
+  table.dss-mobile-card-table tbody tr {
+    background: var(--cui-body-bg, #fff);
+    border: 1px solid var(--cui-border-color, #d8dbe0);
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+    margin-bottom: 0.625rem;
+    overflow: hidden;
+  }
+
+  .dss-mobile-card-table td,
+  table.dss-mobile-card-table td {
+    align-items: start;
+    border-bottom: 1px solid var(--cui-border-color-translucent, #eef0f3) !important;
+    display: grid !important;
+    gap: 0.625rem;
+    grid-template-columns: minmax(6.5rem, 38%) minmax(0, 1fr);
+    height: auto !important;
+    min-height: 2.35rem;
+    padding: 0.45rem 0.625rem !important;
+    text-align: left !important;
+    white-space: normal !important;
+  }
+
+  .dss-mobile-card-table td:last-child,
+  table.dss-mobile-card-table td:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .dss-mobile-card-table td::before,
+  table.dss-mobile-card-table td::before {
+    color: var(--cui-secondary-color, #6c757d);
+    content: attr(data-label);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .dss-mobile-card-table td:not([data-label]),
+  table.dss-mobile-card-table td:not([data-label]) {
+    grid-template-columns: 1fr;
+  }
+
+  .dss-mobile-card-table td:not([data-label])::before,
+  table.dss-mobile-card-table td:not([data-label])::before {
+    content: none;
+  }
+
+  .dss-mobile-card-table td[style*="sticky"],
+  table.dss-mobile-card-table td[style*="sticky"] {
+    left: auto !important;
+    position: relative !important;
+  }
+
+  .dss-mobile-card-table td[data-label="Action"],
+  table.dss-mobile-card-table td[data-label="Action"] {
+    align-items: center;
+    display: flex !important;
+    flex-wrap: nowrap;
+  }
+
+  .dss-mobile-card-table td[data-label="Action"]::before,
+  table.dss-mobile-card-table td[data-label="Action"]::before {
+    flex: 0 0 min(38%, 8rem);
+  }
+
+  .dss-mobile-card-table td[data-label="Action"]>button,
+  table.dss-mobile-card-table td[data-label="Action"]>button,
+  .dss-mobile-card-table .dss-table-actions>button {
+    flex: 0 0 auto;
+    font-size: 0.75rem;
+    line-height: 1.1;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .dss-mobile-card-table .dss-table-actions {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .dss-table-grid-pagination {
+    align-items: stretch !important;
+    flex-direction: column;
+  }
+}
+
+// DSS form controls should never force their row/column wider than the viewport.
+c-row dss-input-text,
+c-row dss-input-num,
+c-row dss-ng-select,
+c-row dss-date-fin,
+.row dss-input-text,
+.row dss-input-num,
+.row dss-ng-select,
+.row dss-date-fin {
+  min-width: 0;
+  max-width: 100%;
+}
+
+c-col dss-input-text,
+c-col dss-input-num,
+c-col dss-ng-select,
+c-col dss-date-fin,
+[class*="col-"] dss-input-text,
+[class*="col-"] dss-input-num,
+[class*="col-"] dss-ng-select,
+[class*="col-"] dss-date-fin {
+  display: block;
+  width: 100%;
+}
+
+// Mobile form-control responsiveness helper
+// Keeps DSS inputs/selects/date pickers inside the viewport even when a fixed width is passed.
+@media (max-width: 575.98px) {
+
+  dss-input-text,
+  dss-input-num,
+  dss-ng-select,
+  dss-date-fin {
+    box-sizing: border-box;
+    display: block !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  dss-input-text .cFormGroup,
+  dss-input-num .cFormGroup,
+  dss-ng-select .cFormGroup,
+  dss-date-fin .cFormGroup,
+  dss-input-text c-input-group,
+  dss-input-num c-input-group,
+  dss-ng-select ng-select,
+  dss-date-fin c-date-picker,
+  dss-date-fin c-dropdown {
+    box-sizing: border-box;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  dss-input-text input,
+  dss-input-text textarea,
+  dss-input-num input,
+  dss-ng-select .ng-select,
+  dss-ng-select .ng-select-container,
+  dss-date-fin input,
+  dss-date-fin .date-picker,
+  dss-date-fin .input-group {
+    box-sizing: border-box;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  dss-ng-select .ng-value-container,
+  dss-ng-select .ng-value,
+  dss-ng-select .dss-ng-select-label,
+  dss-date-fin .form-control {
+    min-width: 0 !important;
+  }
+
+  dss-ng-select .ng-dropdown-panel,
+  dss-date-fin .dropdown-menu,
+  dss-date-fin .date-picker-dropdown {
+    max-width: calc(100vw - 1rem) !important;
+  }
+}
+
+body {
+  position: relative;
+}
+
+body>.ng-dropdown-panel {
+  z-index: 2050;
+  border: 1px solid var(--cui-border-color, #b1b7c1);
+  border-radius: 0.375rem;
+  background-color: var(--cui-body-bg, #fff);
+  color: var(--cui-body-color, #212529);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+body>.ng-dropdown-panel .ng-dropdown-panel-items {
+  max-height: min(260px, 45vh);
+  background-color: var(--cui-body-bg, #fff);
+}
+
+body>.ng-dropdown-panel .ng-option {
+  padding: 0.25rem 0.5rem;
+  border-bottom: 1px solid var(--cui-border-color-translucent, #e6e9ef);
+  background-color: var(--cui-body-bg, #fff);
+  color: var(--cui-body-color, #212529);
+  font-size: 0.875rem;
+}
+
+body>.ng-dropdown-panel .ng-option-marked {
+  background-color: var(--cui-tertiary-bg, #f2f6ff);
+}
+
+// Form controls inside table cells should not add vertical space below the row.
+td {
+
+  dss-ng-select .cFormGroup,
+  dss-input-text .cFormGroup,
+  dss-input-num .cFormGroup,
+  dss-date-fin .cFormGroup,
+  c-form-check,
+  .form-check {
+    margin-bottom: 0 !important;
+  }
+}

@@ -1,0 +1,158 @@
+<div class="dss-table-grid-card mt-1">
+  <!-- <c-card-body class="dss-table-grid-body"> -->
+    <div
+      class="dss-table-grid-scroll dss-mobile-card-table"
+      [class.has-body-scroll]="!!bodyHeight"
+      [style.--dss-table-body-height]="bodyHeight || null"
+      [style.--dss-table-scrollbar-width.px]="bodyHeight ? scrollbarWidth : null"
+    >
+    <c-smart-table
+      [columns]="columns"
+      [items]="usersData"
+      [header]="header"
+      [columnFilter]="columnFilter"
+      [columnFilterValue]="columnFilterValue"
+      (columnFilterValueChange)="SearchTextChanged($event)"
+      [columnSorter]="columnSorter"
+      [activePage]="1"
+      [itemsPerPage]="itemsPerPage"
+      [itemsPerPageSelect]="false"
+      [loading]="loading"
+      [noItemsLabel]="noItemsLabel"
+      [pagination]="false"
+      [tableProps]="tableProps"
+      [clickableRows]="clickableRows"
+      (rowClick)="onRowClick($event)"
+    >
+      <ng-template cTemplateId="columnFilter___actions">
+        <div class="dss-table-grid-filter-actions">
+          <ng-content select="[dssTableGridHeaderAction], [customHeader]"></ng-content>
+        </div>
+      </ng-template>
+
+      <ng-template
+        cTemplateId="tableData"
+        let-column="column"
+        let-columnName="columnName"
+        let-item="item"
+        let-tdContent="tdContent"
+      >
+        <td
+          [attr.data-label]="getColumnLabel(column, columnName)"
+          [ngClass]="getCellClasses(column, columnName, item)"
+          [ngStyle]="getCellStyles(column)"
+        >
+          @switch (columnName) {
+            @case ('__actions') {
+              <div class="dss-table-actions">
+                @if (showRecord) {
+                  <button cButton aria-label="Open record" title="Open record" color="primary" size="sm" variant="outline" type="button" (click)="$event.stopPropagation(); onRecord(item)">
+                    <svg cIcon name="cilDescription" size="sm"></svg>
+                  </button>
+                }
+                @if (showPrint) {
+                  <button cButton aria-label="Print" title="Print" color="secondary" size="sm" variant="outline" type="button" (click)="$event.stopPropagation(); onPrint(item)">
+                    <svg cIcon name="cilPrint" size="sm"></svg>
+                  </button>
+                }
+                @if (showEdit) {
+                  <button
+                    cButton
+                    aria-label="Edit"
+                    title="Edit"
+                    color="info"
+                    size="sm"
+                    variant="outline"
+                    type="button"
+                    (click)="$event.stopPropagation(); onEdit(item)"
+                  >
+                    <svg cIcon name="cilPencil" size="sm"></svg>
+                  </button>
+                }
+                @if (showDelete) {
+                  <button
+                    cButton
+                    aria-label="Delete"
+                    title="Delete"
+                    color="danger"
+                    size="sm"
+                    variant="outline"
+                    type="button"
+                    (click)="$event.stopPropagation(); onDelete(item)"
+                  >
+                    <svg cIcon name="cilTrash" size="sm"></svg>
+                  </button>
+                }
+                
+                 
+              </div>
+            }
+            @case ('status') {
+              <c-badge [color]="getBadge(getCellValue(item, columnName, tdContent, column))">
+                {{ getCellValue(item, columnName, tdContent, column) }}
+              </c-badge>
+            }
+            @case ('show') {
+              <button
+                cButton
+                color="primary"
+                size="sm"
+                variant="outline"
+                type="button"
+                (click)="$event.stopPropagation(); toggleDetails(item.id)"
+              >
+                {{ details_visible[item.id] ? 'Hide' : 'Show' }}
+              </button>
+            }
+            @default {
+              {{ getCellValue(item, columnName, tdContent, column) }}
+            }
+          }
+        </td>
+      </ng-template>
+
+      <ng-template cTemplateId="details" let-item="item">
+        <div [hidden]="!details_visible[item.id]">
+          <c-card-body class="border-top">
+            <div class="row g-2">
+              @for (key of getItem(item); track key) {
+                @if (!key.startsWith('_')) {
+                  <div class="col-sm-3">
+                    <strong>{{ key }}</strong>
+                    <div>{{ item[key] }}</div>
+                  </div>
+                }
+              }
+            </div>
+          </c-card-body>
+        </div>
+      </ng-template>
+    </c-smart-table>
+    </div>
+    @if (paginated) {
+      <div class="dss-table-grid-pagination d-flex align-items-center justify-content-between gap-2 mt-0">
+        <label class="d-flex align-items-center gap-2 mb-0">
+          <span>Items per page</span>
+          <select
+            class="form-select form-select-sm w-auto"
+            [value]="itemsPerPage"
+            (change)="onItemsPerPageChange($any($event.target).value)"
+          >
+            @for (option of itemsPerPageOptions; track option) {
+              <option [value]="option" [selected]="option === itemsPerPage">{{ option }}</option>
+            }
+          </select>
+        </label>
+        @if (showPagination) {
+        <c-smart-pagination
+          [activePage]="pageNumber"
+          [pages]="totalPages"
+          (activePageChange)="onPageChange($event)"
+        ></c-smart-pagination>
+        }
+      </div>
+    }
+  <!-- </c-card-body> -->
+</div>
+
+

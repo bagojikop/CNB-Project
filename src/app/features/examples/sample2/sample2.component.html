@@ -1,0 +1,21 @@
+<div class="card dss-card-vh-100" dssViewportHeight="140px">
+  <div class="card-body dss-card-body-scroll">
+    <dss-table-dashboard
+      #dashboardGrid
+      class="dss-table-grid-header"
+      [title]="dashboardTitle"
+      url="SalesInvoice/RecordList"
+      [isFilterVisible]="isFilterVisible"
+      
+      [handleAdd]="handleAdd"
+      [handleEdit]="handleEdit"
+      [handleDelete]="handleDelete"
+      [columns]="columns"
+      [autoLoad]="false"
+      [bordered]="true"
+      [paginated]="true"
+      [bodyHeight]="'calc(100vh - 350px)'"
+    >
+    </dss-table-dashboard>
+  </div>
+</div>

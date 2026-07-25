@@ -1,0 +1,144 @@
+:host {
+  --dss-table-grid-pagination-border: var(--cui-border-color, #d8dbe0);
+
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+}
+
+:host-context([data-coreui-theme="dark"]),
+:host-context([data-bs-theme="dark"]),
+:host-context(.dark) {
+  --dss-table-grid-pagination-border: var(--cui-border-color, #3c4b64);
+}
+.dss-table-grid-card,
+.dss-table-grid-body,
+.dss-table-grid-scroll {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dss-table-grid-body {
+  overflow: hidden;
+}
+
+.dss-table-grid-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+:host ::ng-deep .dss-table-grid-scroll table {
+  display: block;
+  min-width: 100%;
+  table-layout: fixed;
+  width: 100%;
+}
+
+:host ::ng-deep .dss-table-grid-scroll c-smart-table-head {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  z-index: 2;
+}
+
+:host ::ng-deep .dss-table-grid-scroll.has-body-scroll c-smart-table-head {
+  width: calc(100% - var(--dss-table-scrollbar-width, 0px));
+}
+
+:host ::ng-deep .dss-table-grid-scroll tbody {
+  display: block;
+  height: var(--dss-table-body-height, auto);
+  max-height: var(--dss-table-body-height, none);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
+:host ::ng-deep .dss-table-grid-scroll tbody tr,
+:host ::ng-deep .dss-table-grid-scroll c-smart-table-head tr {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+
+:host ::ng-deep .dss-table-grid-scroll th,
+:host ::ng-deep .dss-table-grid-scroll td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:host ::ng-deep .dss-table-grid-scroll th,
+:host ::ng-deep .dss-table-grid-scroll td {
+  font-size: 0.84rem;
+  line-height: 1.2;
+  padding-bottom: 0.25rem;
+  padding-top: 0.25rem;
+  vertical-align: middle;
+}
+
+:host ::ng-deep .dss-table-grid-scroll th {
+  background: var(--cui-body-bg, #fff);
+}
+
+:host ::ng-deep .dss-table-grid-scroll th[style*="sticky"],
+:host ::ng-deep .dss-table-grid-scroll td[style*="sticky"] {
+  background: var(--cui-body-bg, #fff);
+  box-shadow: 1px 0 0 var(--cui-border-color, #d8dbe0);
+}
+
+.dss-table-actions {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.dss-table-grid-filter-actions {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.dss-table-actions button {
+  align-items: center;
+  display: inline-flex;
+  height: 1.45rem;
+  justify-content: center;
+  padding: 0;
+  width: 1.45rem;
+}
+
+:host ::ng-deep .dss-table-actions-cell {
+  text-align: center;
+}
+
+.dss-table-grid-pagination {
+  border-top: 1px solid var(--dss-table-grid-pagination-border);
+  padding: 5px !important;
+  font-size: 0.85rem;
+  line-height: 1.15;
+  min-height: 1.65rem;
+}
+
+.dss-table-grid-pagination label {
+  margin-bottom: 0;
+}
+
+.dss-table-grid-pagination .form-select-sm {
+  font-size: 0.85rem;
+  min-height: 1.6rem;
+  padding-bottom: 0.15rem;
+  padding-top: 0.15rem;
+}
+
+:host ::ng-deep .dss-table-grid-pagination .page-link {
+  font-size: 0.85rem;
+  line-height: 1.15;
+  min-height: 1.6rem;
+  padding: 0.22rem 0.55rem;
+}
+:host ::ng-deep .dss-table-grid-pagination pagination,
+:host ::ng-deep .dss-table-grid-pagination .pagination {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+

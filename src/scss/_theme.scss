@@ -1,0 +1,96 @@
+@use "@coreui/coreui-pro/scss/variables" as *;
+@use "@coreui/coreui-pro/scss/mixins/transition" as *;
+@use "@coreui/coreui-pro/scss/mixins/color-mode" as *;
+
+body {
+  background-color: var(--#{$prefix}tertiary-bg);
+}
+
+.wrapper {
+  width: 100%;
+  padding-inline: var(--#{$prefix}sidebar-occupy-start, 0) var(--#{$prefix}sidebar-occupy-end, 0);
+  will-change: auto;
+  @include transition(padding .32s ease-in-out);
+}
+
+.header {
+  min-height: calc(4rem + 1px); // stylelint-disable-line function-disallowed-list
+}
+
+.sidebar-brand-full {
+  margin-left: 3px;
+}
+
+.sidebar-header {
+  .nav-underline-border {
+    --#{$prefix}nav-underline-border-link-padding-x: 1rem;
+    --#{$prefix}nav-underline-border-gap: 0;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    min-height: calc(4rem + 1px); // stylelint-disable-line function-disallowed-list
+  }
+}
+
+.sidebar-toggler {
+  margin-inline-start: auto;
+}
+
+.sidebar {
+  transition:
+    margin .32s ease-in-out,
+    transform .32s ease-in-out,
+    width .32s ease-in-out,
+    min-width .32s ease-in-out,
+    max-width .32s ease-in-out,
+    visibility .32s ease-in-out !important;
+  will-change: transform, width, margin;
+}
+
+.sidebar-brand-full,
+.sidebar-brand-narrow,
+.sidebar-nav,
+.sidebar-header {
+  transition:
+    opacity .22s ease-in-out,
+    transform .32s ease-in-out;
+}
+
+.sidebar-narrow,
+.sidebar-narrow-unfoldable:not(:hover) {
+  .sidebar-toggler {
+    display: none;
+  }
+}
+
+.card,
+.dropdown-menu,
+.footer,
+.sidebar {
+  box-shadow: rgb(50 50 93 / 2%) 0 2px 5px -1px, rgb(0 0 0 / 5%) 0 1px 3px -1px;
+}
+
+.sidebar-nav .nav-link:hover {
+  --#{$prefix}sidebar-nav-link-hover-bg: rgba(255, 255, 255, .0375);
+}
+
+.sidebar-nav .nav-link.active {
+  --#{$prefix}sidebar-nav-link-active-bg: rgba(255, 255, 255, .0375);
+}
+
+@include color-mode(dark) {
+  body {
+    background-color: var(--#{$prefix}dark-bg-subtle);
+  }
+
+    .sidebar {
+      background-color: var(--#{$prefix}body-bg) !important; // stylelint-disable-line
+      background-image: none !important; // stylelint-disable-line
+    }
+
+  .footer {
+    --cui-footer-bg: var(--cui-body-bg);
+  }
+}

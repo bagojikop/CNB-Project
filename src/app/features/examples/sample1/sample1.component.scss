@@ -1,0 +1,34 @@
+.group-box {
+  position: relative;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  margin-top: 18px;
+  background: #fff;
+}
+
+.group-title {
+  position: absolute;
+  top: -12px;
+  left: 14px;
+  background: #fff;
+  padding: 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.group-box .card-body {
+  padding: 18px 12px 10px;
+}
+
+[data-coreui-theme="dark"] .group-box,
+.dark-theme .group-box {
+  background: #212631;
+  border-color: #444;
+}
+
+[data-coreui-theme="dark"] .group-title,
+.dark-theme .group-title {
+  background: #212631;
+  color: #f1f1f1;
+}

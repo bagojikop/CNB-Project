@@ -1,0 +1,25 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+thead,
+tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+  
+th,
+td {
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+th {
+    color: #fff;
+    font-weight: 600;
+    background-color: color-mix(in srgb, #853cca 45%, var(--cui-body-bg, #fff));
+    border-color: color-mix(in srgb, #853cca 65%, var(--cui-body-bg, #fff));
+}

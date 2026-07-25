@@ -1,0 +1,13 @@
+     [{
+        "cd": 1,
+        "nm": "Quarterly"
+    },
+    {
+        "cd": 2,
+        "nm": "Half Year"
+    },
+    {
+        "cd": 3,
+        "nm": "Annual"
+    }
+]

@@ -1,0 +1,32 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "ignoreDeprecations": "5.0",
+    "rootDir": "./src",
+    "outDir": "./out-tsc/spec",
+    "types": [
+      "jasmine"
+    ]
+  },
+  "paths": {
+    "@shared/*": [
+      "src/app/shared/*"
+    ],
+    "@core/*": [
+      "src/app/core/*"
+    ],
+    "@features/*": [
+      "src/app/features/*"
+    ],
+    "@environments/*": [
+      "src/environments/*"
+    ]
+  },
+  "files": [
+    "src/test.ts"
+  ],
+  "include": [
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

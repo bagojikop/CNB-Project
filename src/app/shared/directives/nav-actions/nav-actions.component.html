@@ -1,0 +1,156 @@
+<div class="dss-nav-actions" role="toolbar" [attr.aria-label]="title || 'Navigation actions'">
+  @if (title) {
+  <div class="dss-nav-title">{{ title }}</div>
+  }
+
+  <div class="dss-nav-buttons px-3">
+    <button id="new" class="dss-nav-btn" type="button" [disabled]="userAccess.a === 0 || navactions.newBtnDisabled"
+      (click)="toDo('new')">
+      <span class="dss-nav-icon icon-new" aria-hidden="true">
+        <svg viewBox="0 0 16 16">
+          <path
+            d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 13.5 1h-11ZM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11Zm6.5 2a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3Z" />
+        </svg>
+      </span>
+      New
+    </button>
+
+    <button id="edit" class="dss-nav-btn" type="button" [disabled]="userAccess.e === 0 || navactions.editBtnDisabled"
+      (click)="toDo('edit')">
+      <span class="dss-nav-icon icon-edit" aria-hidden="true">
+        <svg viewBox="0 0 16 16">
+          <path
+            d="M15.5 1.9a.5.5 0 0 1 0 .7l-1 1-2-2 1-1a.5.5 0 0 1 .7 0l1.3 1.3Zm-2 2.4-2-2-6.8 6.8a.5.5 0 0 0-.1.2l-.8 2.4a.25.25 0 0 0 .3.3l2.4-.8a.5.5 0 0 0 .2-.1l6.8-6.8Z" />
+          <path
+            d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11A1.5 1.5 0 0 0 15 13.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11Z" />
+        </svg>
+      </span>
+      Edit
+    </button>
+
+    <span class="dss-nav-separator" aria-hidden="true">|</span>
+
+    <button id="save" class="dss-nav-btn" type="button" [disabled]="navactions.saveBtnDisabled || saveInProgress"
+      (click)="toDo('save')">
+      <span class="dss-nav-icon icon-save" aria-hidden="true">
+        <svg viewBox="0 0 16 16">
+          <path
+            d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16H2v-5.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V16h.5a1.5 1.5 0 0 0 1.5-1.5V2.9a1.5 1.5 0 0 0-.4-1L14.1.4a1.5 1.5 0 0 0-1-.4H13v5.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V0H1.5Z" />
+          <path
+            d="M4 0v5.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V0H4Zm-1 16h10v-5.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5V16Z" />
+        </svg>
+      </span>
+      Save
+    </button>
+
+    <button id="undo" class="dss-nav-btn" type="button" [disabled]="navactions.undoBtnDisabled" (click)="toDo('undo')">
+      <span class="dss-nav-icon icon-undo" aria-hidden="true">
+        <svg viewBox="0 0 16 16">
+          <path
+            d="M8 3a5 5 0 1 1-4.5 2.9.5.5 0 0 0-.9-.4A6 6 0 1 0 8 2v2.5a.25.25 0 0 1-.4.2L5.2 2.7a.25.25 0 0 1 0-.4L7.6.3a.25.25 0 0 1 .4.2V3Z" />
+        </svg>
+      </span>
+      Undo
+    </button>
+  
+
+ @if (PrintButtonEnabled) {
+   <span class="dss-nav-separator" aria-hidden="true">|</span>
+    <button id="print" class="dss-nav-btn" type="button" [disabled]="userAccess.p === 0 || navactions.printBtnDisabled"
+      (click)="toDo('print')">
+      <span class="dss-nav-icon icon-print" aria-hidden="true">
+        <svg viewBox="0 0 16 16">
+          <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5Zm6 8H5a1 1 0 0 0-1 1v4h8v-4a1 1 0 0 0-1-1Z" />
+          <path
+            d="M2 5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H2Z" />
+        </svg>
+      </span>
+      Print
+    </button>
+  
+    }
+    @if(AttachButtonEnabled)
+    {
+      <span class="dss-nav-separator" aria-hidden="true">|</span>
+       <button id="attach" class="dss-nav-btn" type="button" (click)="toDo('Attach')">
+          <span class="dss-nav-icon icon-attach" aria-hidden="true">
+            <svg viewBox="0 0 16 16">
+              <path
+                d="M6.4 11.8a3 3 0 0 1 0-4.2l4.1-4.1a2 2 0 1 1 2.8 2.8L8.9 10.7a1 1 0 0 1-1.4-1.4l4-4a.5.5 0 1 0-.7-.7l-4 4a2 2 0 0 0 2.8 2.8L14 7a3 3 0 1 0-4.2-4.2L5.7 6.9a4 4 0 0 0 5.7 5.7l3.3-3.3a.5.5 0 1 0-.7-.7l-3.3 3.3a3 3 0 0 1-4.3 0Z" />
+            </svg>
+          </span>
+          Attachment
+        </button>
+    }
+    @if(MoreButtonEnabled)
+    {
+        <span class="dss-nav-separator" aria-hidden="true">|</span>
+    <div class="dss-more">
+      <button id="more" class="dss-nav-btn dss-more-btn" type="button" aria-label="More actions"
+        [attr.aria-expanded]="dropdownOpen" (click)="dropdownOpen = !dropdownOpen">
+        <span class="dss-nav-icon icon-more" aria-hidden="true">
+          <svg viewBox="0 0 16 16">
+            <path
+              d="M2 4h12a.75.75 0 0 0 0-1.5H2A.75.75 0 0 0 2 4Zm0 4.75h12a.75.75 0 0 0 0-1.5H2a.75.75 0 0 0 0 1.5Zm0 4.75h7a.75.75 0 0 0 0-1.5H2a.75.75 0 0 0 0 1.5Z" />
+          </svg>
+        </span>
+        More
+      </button>
+
+      @if (dropdownOpen) {
+      <div class="dss-more-menu">
+        <button class="dss-more-item" type="button" (click)="toDo('eWay'); dropdownOpen = false">
+          <span class="dss-nav-icon icon-eway" aria-hidden="true">
+            <svg viewBox="0 0 16 16">
+              <path
+                d="M1 3.5A1.5 1.5 0 0 1 2.5 2h7A1.5 1.5 0 0 1 11 3.5V5h1.7a1.5 1.5 0 0 1 1.2.6l1.8 2.4c.2.3.3.6.3.9V11h-1.1a2 2 0 0 0-3.8 0H6.9a2 2 0 0 0-3.8 0H1V3.5Zm10 2.5v2h3.5l-1.4-1.8A.5.5 0 0 0 12.7 6H11ZM5 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
+            </svg>
+          </span>
+          E-Way Bill
+        </button>
+
+        <button class="dss-more-item" type="button" (click)="toDo('eInv'); dropdownOpen = false">
+          <span class="dss-nav-icon icon-einv" aria-hidden="true">
+            <svg viewBox="0 0 16 16">
+              <path
+                d="M4 1h8a1 1 0 0 1 1 1v13l-2-1-2 1-2-1-2 1-2-1V2a1 1 0 0 1 1-1Zm1 3.5a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5Zm0 3a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5Zm0 3a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H5Z" />
+            </svg>
+          </span>
+          e-Invoice
+        </button>
+
+       
+
+        <button class="dss-more-item" type="button" (click)="toDo('close'); dropdownOpen = false">
+          <span class="dss-nav-icon icon-exit" aria-hidden="true">
+            <svg viewBox="0 0 16 16">
+              <path
+                d="M10 2.5a.5.5 0 0 0-.5-.5h-6A1.5 1.5 0 0 0 2 3.5v9A1.5 1.5 0 0 0 3.5 14h6a.5.5 0 0 0 0-1h-6a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h6a.5.5 0 0 0 .5-.5Z" />
+              <path
+                d="M11.9 5.1a.5.5 0 0 0-.7.7L12.9 7.5H6.5a.5.5 0 0 0 0 1h6.4l-1.7 1.7a.5.5 0 0 0 .7.7l2.6-2.6a.5.5 0 0 0 0-.7l-2.6-2.5Z" />
+            </svg>
+          </span>
+          Exit
+        </button>
+      </div>
+      }
+    </div>
+
+
+    
+    }
+    
+    <span class="dss-nav-separator" aria-hidden="true">|</span>
+
+    <button id="close" class="dss-nav-btn" type="button" (click)="toDo('close')">
+      <span class="dss-nav-icon icon-close" aria-hidden="true">
+        <svg viewBox="0 0 16 16">
+          <path
+            d="M2 0h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2Zm3.4 4.6a.5.5 0 1 0-.8.8L7.3 8l-2.7 2.6a.5.5 0 0 0 .8.8L8 8.7l2.6 2.7a.5.5 0 0 0 .8-.8L8.7 8l2.7-2.6a.5.5 0 0 0-.8-.8L8 7.3 5.4 4.6Z" />
+        </svg>
+      </span>
+      Close
+    </button>
+
+  </div>
+</div>

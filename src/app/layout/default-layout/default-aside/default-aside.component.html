@@ -1,0 +1,48 @@
+<c-sidebar
+  #aside1="cSidebar"
+  class="d-print-none hide border-start"
+  colorScheme="light"
+  id="aside1"
+  overlaid
+  placement="end"
+  size="lg"
+>
+  <c-sidebar-header class="bg-body-secondary border-bottom justify-content-between px-3">
+    <div class="fw-semibold text-body-secondary text-uppercase small">Your Module's</div>
+    <button
+      aria-label="Close aside"
+      cButtonClose
+      cSidebarToggle="aside1"
+      toggle="visible"
+    ></button>
+  </c-sidebar-header>
+
+  <div class="overflow-auto" style="height: calc(100vh - 90px);">
+    <div [flush]="true" cListGroup>
+      @if (modulesLoading) {
+        <a cListGroupItem class="text-body-secondary">Loading modules...</a>
+      } @else if (modulesError && enabledMenuModules.length === 0) {
+        <a cListGroupItem class="text-danger">{{ modulesError }}</a>
+      } @else {
+        @for (module of enabledMenuModules; track module.mode; let last = $last) {
+          <button
+            type="button"
+            cListGroupItem
+            cSidebarToggle="aside1"
+            toggle="visible"
+            class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3"
+            [class.active]="activeMode === module.mode"
+            [cBorder]="{
+              start: { color: module.color, width: 4 },
+              bottom: last ? true : 0
+            }"
+            (click)="selectModule(module)"
+          >
+            <svg cIcon [name]="module.icon"></svg>
+            <span class="fw-semibold">{{ module.label }}</span>
+          </button>
+        }
+      }
+    </div>
+  </div>
+</c-sidebar>

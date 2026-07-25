@@ -1,0 +1,65 @@
+﻿<section
+  class="rdlc-viewer"
+  [style.width]="width"
+  [style.min-height]="minHeight"
+  [attr.aria-busy]="loading"
+>
+  @if (showToolbar) {
+    <header class="rdlc-viewer__toolbar">
+      <div class="rdlc-viewer__title">
+        <span class="rdlc-viewer__icon" aria-hidden="true">▤</span>
+        <strong>{{ title }}</strong>
+      </div>
+      <div class="rdlc-viewer__actions">
+        <button cButton color="secondary" variant="outline" size="sm" type="button" (click)="refresh()" [disabled]="loading || !reportUrl">
+          Refresh
+        </button>
+        <button cButton color="primary" variant="outline" size="sm" type="button" (click)="openInNewTab()" [disabled]="!reportUrl">
+          Open
+        </button>
+        @if (showClose) {
+          <button cButton color="secondary" size="sm" type="button" (click)="close()">
+            {{ closeLabel }}
+          </button>
+        }
+      </div>
+    </header>
+  }
+
+  <div class="rdlc-viewer__body" [style.height]="height" [style.min-height]="minHeight">
+    @if (loading) {
+      <div class="rdlc-viewer__state" role="status" aria-live="polite">
+        <c-spinner color="info" aria-hidden="true" />
+        <strong>Preparing report...</strong>
+        <span>Please wait while the report is loaded.</span>
+      </div>
+    }
+
+    @if (loadError) {
+      <div class="rdlc-viewer__state rdlc-viewer__state--error" role="alert">
+        <strong>Report could not be displayed</strong>
+        <span>Check the report server connection and try again.</span>
+        <button cButton color="danger" size="sm" type="button" (click)="refresh()">Try again</button>
+      </div>
+    }
+
+    @if (trustedUrl) {
+      <iframe
+        class="rdlc-viewer__frame"
+        [class.rdlc-viewer__frame--loading]="loading || loadError"
+        [src]="trustedUrl"
+        [title]="title"
+        loading="eager"
+        referrerpolicy="strict-origin-when-cross-origin"
+        (load)="onLoad()"
+        (error)="onError()"
+      ></iframe>
+    } @else if (!loading) {
+      <div class="rdlc-viewer__state">
+        <strong>No report selected</strong>
+        <span>Provide a report URL to display the preview.</span>
+      </div>
+    }
+  </div>
+</section>
+

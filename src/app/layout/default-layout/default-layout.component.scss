@@ -1,0 +1,144 @@
+:host::ng-deep {
+  .ng-scrollbar {
+    --scrollbar-padding: 1px;
+    --scrollbar-size: 5px;
+    --scrollbar-thumb-color: var(--cui-gray-500, #aab3c5);
+    --scrollbar-thumb-hover-color: var(--cui-gray-400, #cfd4de);
+    --scrollbar-hover-size: calc(var(--scrollbar-size) * 1.5);
+    --scrollbar-border-radius: 5px;
+  }
+
+  .ng-scroll-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  //.sidebar-nav {
+  //  scrollbar-color: var(--cui-gray-500, #444) transparent;
+  //}
+
+  .sidebar-nav .nav-group-items {
+    margin-left: 1.35rem;
+    padding-left: 0.75rem;
+    position: relative;
+  }
+
+  .sidebar-nav .nav-group-items::before {
+    background: rgba(255, 255, 255, 0.28);
+    bottom: 0.875rem;
+    content: "";
+    left: 0;
+    position: absolute;
+    top: 0.375rem;
+    width: 1px;
+  }
+
+  .sidebar-nav .nav-group-items .nav-link {
+    font-size: 0.8125rem;
+    line-height: 1.25;
+    min-height: 2rem;
+    color: rgb(201, 210, 211);
+    padding-left: 1.5rem;
+    position: relative;
+  }
+
+  .sidebar-nav .nav-group-items .nav-link::before {
+    background: rgba(255, 255, 255, 0.28);
+    content: "";
+    height: 1px;
+    left: -0.75rem;
+    position: absolute;
+    top: 50%;
+    width: 0.75rem;
+  }
+
+  .sidebar-nav .nav-group-items .nav-icon {
+    margin-inline-end: 0.5rem;
+  }
+}
+
+.dss-sidebar-brand {
+  cursor: pointer;
+  justify-content: center;
+  text-decoration: none;
+  width: 100%;
+}
+
+.dss-sidebar-brand-full {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  justify-content: center;
+  min-width: 0;
+}
+
+.dss-sidebar-logo-full {
+  flex: 0 0 auto;
+  height: 34px;
+  width: 82px;
+}
+
+.dss-sidebar-logo-narrow {
+  height: 30px;
+  width: 44px;
+}
+
+.dss-sidebar-brand-text {
+  color: #b148db;
+  font-family: Calibri, "Gill Sans", "Gill Sans MT", "Trebuchet MS", sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+}
+
+.sidebar-module-title {
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+  display: flex;
+  flex: 0 0 auto;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 42px;
+  text-align: center;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+
+.body.flex-grow-1 {
+  position: relative;
+}
+
+.api-loading-backdrop {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.65);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: absolute;
+  z-index: 1050;
+}
+
+.c-container {
+   margin: 5px !important;
+  
+}
+
+// ng-scrollbar css variables
+//.cui-scrollbar {
+//  --scrollbar-border-radius: 7px;
+//  --scrollbar-padding: 1px;
+//  --scrollbar-viewport-margin: 0;
+//  --scrollbar-track-color: transparent;
+//  --scrollbar-wrapper-color: transparent;
+//  --scrollbar-thumb-color: rgba(0, 0, 0, 0.2);
+//  --scrollbar-thumb-hover-color: var(--scrollbar-thumb-color);
+//  --scrollbar-size: 5px;
+//  --scrollbar-hover-size: var(--scrollbar-size);
+//  --scrollbar-thumb-transition: height ease-out 150ms, width ease-out 150ms;
+//  --scrollbar-track-transition: height ease-out 150ms, width ease-out 150ms;
+//}
