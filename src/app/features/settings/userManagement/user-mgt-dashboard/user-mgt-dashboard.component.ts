@@ -1,5 +1,11 @@
 import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   CaseStyle,
@@ -8,6 +14,7 @@ import {
 import { createUserManagementForm } from './user-mgt-edit.factory';
 import { crudService } from '@shared-services/crudService';
 import { userMgt } from '@shared-interfaces/settings/user';
+import { DialogsService } from '@shared-services/messageBox';
 
 @Component({
   selector: 'app-user-mgt-dashboard',
@@ -21,27 +28,39 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
   private crudService = inject(crudService);
   private readonly router = inject(Router);
   private fb = inject(FormBuilder);
+  private dialog = inject(DialogsService);
   readonly userInputs = createUserManagementForm(this.fb);
   visible: boolean = false;
-  jsonData = <userMgt[]>[];
+  readonly handleAdd = () => this.addNew();
+  readonly handleEdit = (item?: any) => this.onGridEdit(item);
+  readonly handleDelete = (item?: any) => this.onGridDelete(item);
+
+  form = this.fb.group({
+    jsonData: this.fb.array([]),
+  });
+
+  get jsonData(): FormArray {
+    return this.form.get('jsonData') as FormArray;
+  }
+
   columns = [
     {
       key: 'username',
       label: 'Username',
       type: 'string',
-      _style: { width: '10%' },
+      _style: { width: '40%' },
     },
     {
       key: 'email',
       label: 'Email',
       type: 'string',
-      _style: { width: '10%' },
+      _style: { width: '40%' },
     },
     {
-      key: 'role',
+      key: 'roleName',
       label: 'Role',
       type: 'string',
-      _style: { width: '10%' },
+      _style: { width: '20%' },
     },
   ];
 
@@ -52,22 +71,41 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     },
     {
       cd: 2,
-      nm: 'user',
+      nm: 'User',
     },
   ];
-
-  handleAdd = () => this.addNew();
-  handleEdit = () => this.Edit();
 
   ngOnInit(): void {
     this.crudService.STORAGE_KEY.set('UserMgt');
   }
 
   ngAfterViewInit(): void {
-    this.jsonData = this.crudService.getAll() as userMgt[];
+    const data = this.crudService.getAll() as userMgt[];
 
-    this.jsonData.map((el) => {
-      el.role = el.role == '1' ? 'Admin' : 'User';
+    this.jsonData.clear();
+
+    data.forEach((user) => {
+      this.jsonData.push(this.createUserMgtForm(user));
+    });
+  }
+
+  change(event: any) {
+    this.userInputs
+      .get('roleName')
+      ?.setValue(event.cd === 1 ? 'Admin' : 'User');
+  }
+  createUserMgtForm(user?: userMgt) {
+    return this.fb.group({
+      id: [user?.id],
+      username: [user?.username],
+
+      password: [user?.password],
+
+      email: [user?.email],
+
+      role: [user?.role],
+
+      roleName: [user?.roleName],
     });
   }
 
@@ -80,13 +118,83 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     this.visible = false;
   }
 
-  Edit() {}
+  async saveModalData() {
+    if (this.userInputs.invalid) {
+      this.dialog.swal({
+        dialog: 'error',
+        message: 'Please Fill Required Fields',
+      });
+      return;
+    }
 
-  saveModalData() {
-    var data = this.userInputs.getRawValue();
-    this.crudService.add(data);
+    const user = this.userInputs.value as userMgt;
+
+    const users = this.crudService.getAll() as userMgt[];
+
+    const index = user.id
+      ? users.findIndex((x) => Number(x.id) === Number(user.id))
+      : -1;
+
+    //onEdit
+    if (index >= 0) {
+      debugger;
+      // Update FormArray
+      this.jsonData.at(index).patchValue(user);
+      this.crudService.update(user);
+      // Update localStorage array
+      users[index] = user;
+
+      //onSave
+    } else {
+      debugger;
+      // New record
+      user.id = users.length ? (users[users.length - 1].id ?? 0) + 1 : 1;
+
+      this.jsonData.push(this.createUserMgtForm(user));
+
+      users.push(user);
+      this.crudService.add(user);
+    }
+
+    this.dialog.swal({
+      dialog: 'success',
+      message: 'Record Save Successfully',
+    });
 
     this.userInputs.reset();
     this.visible = false;
+  }
+
+  onGridEdit(item: any) {
+    debugger;
+
+    this.userInputs.patchValue({
+      ...item,
+      id: item.___id,
+    });
+    this.visible = true;
+  }
+
+  onGridDelete(item: userMgt) {
+    this.dialog
+      .swal({
+        dialog: 'confirm',
+        message: 'Do you want to Delete this record',
+      })
+      .then((res) => {
+        console.log(res);
+
+        if (res) {
+          const index = this.jsonData.controls.findIndex(
+            (control) => control.value.id === item.id,
+          );
+
+          if (index !== -1) {
+            this.jsonData.removeAt(index);
+          }
+
+          this.crudService.delete(item.id!);
+        }
+      });
   }
 }

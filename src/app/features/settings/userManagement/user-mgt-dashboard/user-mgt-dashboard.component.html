@@ -5,14 +5,15 @@
       class="dss-table-grid-header"
       [title]="dashboardTitle"
       [isFilterVisible]="false"
-      [items]="jsonData"
+      [items]="jsonData.value"
       [columns]="columns"
       [autoLoad]="false"
       [bordered]="true"
       [paginated]="true"
       [actions]="true"
       [handleAdd]="handleAdd"
-      [handleEdit]=""
+      [handleEdit]="handleEdit"
+      [handleDelete]="handleDelete"
       [bodyHeight]="'calc(100vh - 350px)'"
     >
     </dss-table-dashboard>
@@ -48,11 +49,12 @@
         ></dss-input-text>
 
         <dss-ng-select
-          id="userRole"
+          id="userRolenm"
           label="Role"
           bindLabel="nm"
           bindValue="cd"
           formControlName="role"
+          (change)="change($event)"
           [items]="userRole"
         >
         </dss-ng-select>
@@ -61,13 +63,6 @@
   </c-modal-body>
   <c-modal-footer>
     <button (click)="close()" cButton color="secondary">CLOSE</button>
-    <button
-      cButton
-      color="success"
-      [disabled]="userInputs.invalid"
-      (click)="saveModalData()"
-    >
-      SUBMIT
-    </button>
+    <button cButton color="success" (click)="saveModalData()">SUBMIT</button>
   </c-modal-footer>
 </c-modal>

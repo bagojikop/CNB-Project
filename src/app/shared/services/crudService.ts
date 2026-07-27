@@ -19,7 +19,10 @@ export class crudService {
   update(data: any): void {
     const list = this.getAll();
 
-    const index = list.findIndex((x) => x.batchId === data.batchId);
+    const index =
+      this.STORAGE_KEY() == 'UserMgt'
+        ? list.findIndex((x) => x.id === data.id)
+        : list.findIndex((x) => x.batchId === data.batchId);
 
     if (index !== -1) {
       list[index] = data;
@@ -27,8 +30,12 @@ export class crudService {
     }
   }
 
-  delete(batchId: number): void {
-    const list = this.getAll().filter((x) => x.batchId !== batchId);
+  delete(id: number): void {
+    const list =
+      this.STORAGE_KEY() == 'UserMgt'
+        ? this.getAll().filter((x) => x.id !== id)
+        : this.getAll().filter((x) => x.batchId !== id);
+
     localStorage.setItem(this.STORAGE_KEY(), JSON.stringify(list));
   }
 

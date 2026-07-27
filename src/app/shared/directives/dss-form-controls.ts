@@ -10,13 +10,21 @@ import { NavactionsComponent } from './nav-actions/nav-actions.component';
 import { DssTableGridComponent } from './dss-table-grid/dss-table-grid';
 import { DssViewportHeightDirective } from './dss-viewport-height/dss-viewport-height.directive';
 
-import { ButtonModule, GridModule, ModalModule, Tabs2Module } from '@coreui/angular-pro';
+import {
+  ButtonModule,
+  GridModule,
+  ModalModule,
+  Tabs2Module,
+} from '@coreui/angular-pro';
 
 import { DssDocumentPreviewComponent } from './dss-document-preview/dss-document-preview.component';
 import { DssTableDashboardComponent } from './dss-table-dashboard/dss-table-dashboard';
 import { DatePipe } from '@angular/common';
-import { IconDirective, IconModule, IconSetService } from '@coreui/icons-angular';
-
+import {
+  IconDirective,
+  IconModule,
+  IconSetService,
+} from '@coreui/icons-angular';
 
 export const DSS_FORM_CONTROLS = [
   DssDateFinComponent,
@@ -36,8 +44,6 @@ export const DSS_FORM_CONTROLS = [
   GridModule,
   ModalModule,
   IconModule,
-
-
 ] as const;
 
 export {
@@ -54,5 +60,5 @@ export {
   NavType,
   Tabs2Module,
   DssDocumentPreviewComponent,
-  CaseStyle
+  CaseStyle,
 };

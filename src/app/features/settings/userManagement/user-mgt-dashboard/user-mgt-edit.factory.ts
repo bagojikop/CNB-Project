@@ -3,7 +3,9 @@ import { userMgt } from '@shared-interfaces/settings/user';
 
 export function createUserManagementForm(fb: FormBuilder) {
   return fb.group({
-    userName: fb.nonNullable.control<userMgt['username']>('', [
+    id: fb.control<userMgt['id'] | null>(null),
+
+    username: fb.nonNullable.control<userMgt['username']>('', [
       Validators.required,
     ]),
 
@@ -14,5 +16,8 @@ export function createUserManagementForm(fb: FormBuilder) {
     email: fb.control<userMgt['email']>('', [Validators.email]),
 
     role: fb.control<userMgt['role'] | null>(null, [Validators.required]),
+    roleName: fb.control<userMgt['roleName'] | null>(null, [
+      Validators.required,
+    ]),
   });
 }
