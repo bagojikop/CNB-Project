@@ -1,83 +1,144 @@
- 
 <form [formGroup]="dashboardForm" class="h-100" novalidate>
   @if (dashboardTitle) {
-    <div class="card h-100">
-      <div class="card-header dss-dashboard-card-header d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2">
-        <h5 class="dss-dashboard-title mb-0">{{ dashboardTitle }}</h5>
+  <div class="card h-100">
+    <div
+      class="card-header dss-dashboard-card-header d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2"
+    >
+      <h5 class="dss-dashboard-title mb-0">{{ dashboardTitle }}</h5>
 
-        <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-sm-end gap-2">
-          <div class="btn-group btn-group-sm dss-dashboard-filter-control" role="group" aria-label="Transaction scope">
-            <button
-              cButton
-              size="sm"
-              type="button"
-              [color]="scope === 'me' ? 'primary' : 'secondary'"
-              [variant]="scope === 'me' ? undefined : 'outline'"
-              (click)="setScope('me')"
-            >
-              Me
-            </button>
-            <button
-              cButton
-              size="sm"
-              type="button"
-              [color]="scope === 'public' ? 'primary' : 'secondary'"
-              [variant]="scope === 'public' ? undefined : 'outline'"
-              (click)="setScope('public')"
-            >
-              Public
-            </button>
-          </div>
-
+      <div
+        class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-sm-end gap-2"
+      >
+        <div
+          class="btn-group btn-group-sm dss-dashboard-filter-control"
+          role="group"
+          aria-label="Transaction scope"
+        >
           <button
             cButton
-            class="dss-dashboard-filter-control d-inline-flex align-items-center justify-content-center gap-1"
-            color="secondary"
-            variant="outline"
             size="sm"
             type="button"
-            title="Filter"
-            aria-label="Filter"
-            (click)="openFilter()"
+            [color]="scope === 'me' ? 'primary' : 'secondary'"
+            [variant]="scope === 'me' ? undefined : 'outline'"
+            (click)="setScope('me')"
           >
-            <svg cIcon name="cilFilter" size="sm"></svg>
-            <span>{{ filterButtonLabel }}</span>
+            Me
           </button>
-
-          @if (showNewButton) {
-            <button cButton class="d-inline-flex align-items-center justify-content-center gap-1" color="primary" size="sm" type="button" (click)="onAdd()">
-              <span aria-hidden="true">+</span>
-              <span>{{ newButtonLabel }}</span>
-            </button>
-          }
-
-          <ng-content select="[dssTableDashboardAction]"></ng-content>
+          <button
+            cButton
+            size="sm"
+            type="button"
+            [color]="scope === 'public' ? 'primary' : 'secondary'"
+            [variant]="scope === 'public' ? undefined : 'outline'"
+            (click)="setScope('public')"
+          >
+            Public
+          </button>
         </div>
-      </div>
 
-      <div class="card-body d-flex flex-column" [attr.style]="dashboardBodyStyle">
-        <ng-container *ngTemplateOutlet="gridTemplate"></ng-container>
+        <button
+          cButton
+          class="dss-dashboard-filter-control d-inline-flex align-items-center justify-content-center gap-1"
+          color="secondary"
+          variant="outline"
+          size="sm"
+          type="button"
+          title="Filter"
+          aria-label="Filter"
+          (click)="openFilter()"
+        >
+          <svg cIcon name="cilFilter" size="sm"></svg>
+          <span>{{ filterButtonLabel }}</span>
+        </button>
+
+        @if (showNewButton) {
+        <button
+          cButton
+          class="d-inline-flex align-items-center justify-content-center gap-1"
+          color="primary"
+          size="sm"
+          type="button"
+          (click)="onAdd()"
+        >
+          <span aria-hidden="true">+</span>
+          <span>{{ newButtonLabel }}</span>
+        </button>
+        } @if (showShowButton) {
+        <button
+          cButton
+          class="d-inline-flex align-items-center justify-content-center gap-1"
+          color="info"
+          variant="outline"
+          size="sm"
+          type="button"
+          (click)="onShow($event)"
+        >
+          <span>Show</span>
+        </button>
+        }
+
+        <ng-content select="[dssTableDashboardAction]"></ng-content>
       </div>
     </div>
+
+    <div class="card-body d-flex flex-column" [attr.style]="dashboardBodyStyle">
+      <ng-container *ngTemplateOutlet="gridTemplate"></ng-container>
+    </div>
+  </div>
   } @else {
-    <ng-container *ngTemplateOutlet="gridTemplate"></ng-container>
+  <ng-container *ngTemplateOutlet="gridTemplate"></ng-container>
   }
 
-  <c-modal class="dss-filter-modal" [visible]="modalVisible" (visibleChange)="onModalVisibleChange($event)" alignment="center" backdrop="static">
+  <c-modal
+    class="dss-filter-modal"
+    [visible]="modalVisible"
+    (visibleChange)="onModalVisibleChange($event)"
+    alignment="center"
+    backdrop="static"
+  >
     <c-modal-header class="dss-filter-modal-header">
-      <h5 cModalTitle class="dss-filter-modal-title mb-0">{{ resolvedFilterTitle }}</h5>
-      <button class="btn-close" type="button" aria-label="Close" (click)="closeFilter()"></button>
+      <h5 cModalTitle class="dss-filter-modal-title mb-0">
+        {{ resolvedFilterTitle }}
+      </h5>
+      <button
+        class="btn-close"
+        type="button"
+        aria-label="Close"
+        (click)="closeFilter()"
+      ></button>
     </c-modal-header>
 
     <c-modal-body class="dss-filter-modal-body">
       <div class="dss-filter-mode mb-3">
         <div class="dss-filter-label mb-2">Search By</div>
-        <div class="btn-group btn-group-sm" role="group" aria-label="Filter mode">
-          <input id="filterRange" class="btn-check" type="radio" formControlName="filterMode" value="range" (change)="setFilterMode('range')" />
-          <label class="btn btn-outline-primary" for="filterRange">Date Range</label>
+        <div
+          class="btn-group btn-group-sm"
+          role="group"
+          aria-label="Filter mode"
+        >
+          <input
+            id="filterRange"
+            class="btn-check"
+            type="radio"
+            formControlName="filterMode"
+            value="range"
+            (change)="setFilterMode('range')"
+          />
+          <label class="btn btn-outline-primary" for="filterRange"
+            >Date Range</label
+          >
 
-          <input id="filterTransactionNo" class="btn-check" type="radio" formControlName="filterMode" value="transactionNo" (change)="setFilterMode('transactionNo')" />
-          <label class="btn btn-outline-primary" for="filterTransactionNo">Transaction No</label>
+          <input
+            id="filterTransactionNo"
+            class="btn-check"
+            type="radio"
+            formControlName="filterMode"
+            value="transactionNo"
+            (change)="setFilterMode('transactionNo')"
+          />
+          <label class="btn btn-outline-primary" for="filterTransactionNo"
+            >Transaction No</label
+          >
         </div>
       </div>
 
@@ -86,7 +147,9 @@
           <div class="dss-filter-panel h-100">
             <div class="dss-filter-panel-title mb-2">Date Range</div>
             <div class="mb-2">
-              <label class="form-label fw-semibold small" for="fromDate">From Date</label>
+              <label class="form-label fw-semibold small" for="fromDate"
+                >From Date</label
+              >
               <input
                 id="fromDate"
                 class="form-control form-control-sm"
@@ -95,7 +158,9 @@
               />
             </div>
             <div>
-              <label class="form-label fw-semibold small" for="toDate">To Date</label>
+              <label class="form-label fw-semibold small" for="toDate"
+                >To Date</label
+              >
               <input
                 id="toDate"
                 class="form-control form-control-sm"
@@ -122,9 +187,34 @@
     </c-modal-body>
 
     <c-modal-footer class="dss-filter-modal-footer gap-2">
-      <button cButton color="secondary" variant="outline" size="sm" type="button" (click)="resetFilter()">Reset</button>
-      <button cButton color="secondary" size="sm" type="button" (click)="closeFilter()">Cancel</button>
-      <button cButton color="primary" size="sm" type="button" (click)="submitFilter()">Submit</button>
+      <button
+        cButton
+        color="secondary"
+        variant="outline"
+        size="sm"
+        type="button"
+        (click)="resetFilter()"
+      >
+        Reset
+      </button>
+      <button
+        cButton
+        color="secondary"
+        size="sm"
+        type="button"
+        (click)="closeFilter()"
+      >
+        Cancel
+      </button>
+      <button
+        cButton
+        color="primary"
+        size="sm"
+        type="button"
+        (click)="submitFilter()"
+      >
+        Submit
+      </button>
     </c-modal-footer>
   </c-modal>
 </form>
@@ -167,22 +257,26 @@
       (print)="onPrint($event)"
       (rowClick)="rowClick.emit($event)"
     >
-      <ng-content select="[dssTableGridHeaderAction], [customHeader]"></ng-content>
+      <ng-content
+        select="[dssTableGridHeaderAction], [customHeader]"
+      ></ng-content>
     </dss-table-grid>
 
     @if (showEmptyMessage) {
-      <div class="dss-table-dashboard-empty position-absolute start-50 translate-middle-x d-flex flex-column align-items-center justify-content-center gap-2 text-center px-3">
-        <div class="small text-body-secondary">{{ resolvedEmptyMessage }}</div>
-        @if (resolvedEmptyActionLabel) {
-          <button class="btn btn-primary btn-sm" type="button" (click)="onEmptyAction()">
-            {{ resolvedEmptyActionLabel }}
-          </button>
-        }
-      </div>
+    <div
+      class="dss-table-dashboard-empty position-absolute start-50 translate-middle-x d-flex flex-column align-items-center justify-content-center gap-2 text-center px-3"
+    >
+      <div class="small text-body-secondary">{{ resolvedEmptyMessage }}</div>
+      @if (resolvedEmptyActionLabel) {
+      <button
+        class="btn btn-primary btn-sm"
+        type="button"
+        (click)="onEmptyAction()"
+      >
+        {{ resolvedEmptyActionLabel }}
+      </button>
+      }
+    </div>
     }
   </div>
 </ng-template>
-
-
-
-

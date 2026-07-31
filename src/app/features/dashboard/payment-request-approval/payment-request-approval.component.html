@@ -1,0 +1,414 @@
+<div class="card dss-card-vh-100" dssViewportHeight="140px">
+  <div class="card-body dss-card-body-scroll">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Payment Request Approval</h5>
+      <span class="badge bg-primary">{{ getPendingCount() }} Pending</span>
+    </div>
+
+    <!-- Form-like Card View -->
+    <div class="row">
+      @for (item of approvalData; track item.id) {
+        <div class="col-12 mb-3">
+          <div class="payment-card card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <span
+                  class="badge me-2"
+                  [ngClass]="
+                    item.paymentType === 'Bulk' ? 'bg-info' : 'bg-secondary'
+                  "
+                >
+                  {{ item.paymentType }}
+                </span>
+                <strong>Batch: {{ item.batchId }}</strong>
+              </div>
+              <div>
+                <span
+                  class="badge me-2"
+                  [ngClass]="getStatusClass(item.status)"
+                >
+                  {{ item.status }}
+                </span>
+                <button
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="onShow(item)"
+                >
+                  <i class="bi bi-eye"></i> View Details
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="detail-group">
+                    <label>Party Name</label>
+                    <p class="fw-bold">{{ item.partyName }}</p>
+                  </div>
+                  <div class="detail-group">
+                    <label>Total Amount</label>
+                    <p class="text-primary fw-bold">
+                      {{ item.totalAmount | currency: "INR" : "symbol" }}
+                    </p>
+                  </div>
+                  <div class="detail-group">
+                    <label>Request Date</label>
+                    <p>{{ item.requestDate }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="detail-group">
+                    <label>Payment Against</label>
+                    <p>{{ item.paymentAgainst }}</p>
+                  </div>
+                  <div class="detail-group">
+                    <label>Bank Name</label>
+                    <p>{{ item.bankName }}</p>
+                  </div>
+                  <div class="detail-group">
+                    <label>Requested By</label>
+                    <p>{{ item.requestedBy }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Approval Modal -->
+    <!-- Approval Modal -->
+    @if (showDetails && selectedItem) {
+      <div class="modal-overlay">
+        <div class="modal-content modal-lg">
+          <div class="modal-header">
+            <h5 class="modal-title">Payment Request Details</h5>
+            <button
+              type="button"
+              class="btn-close"
+              (click)="closeDetails()"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="detail-group">
+                  <label>Batch No.</label>
+                  <p>
+                    <strong>{{ selectedItem.batchId }}</strong>
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Payment Type</label>
+                  <p>
+                    <span
+                      class="badge"
+                      [ngClass]="
+                        selectedItem.paymentType === 'Bulk'
+                          ? 'bg-info'
+                          : 'bg-secondary'
+                      "
+                    >
+                      {{ selectedItem.paymentType }}
+                    </span>
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Party Name</label>
+                  <p>
+                    <strong>{{ selectedItem.partyName }}</strong>
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Total Amount</label>
+                  <p class="text-primary fw-bold">
+                    {{ selectedItem.totalAmount | currency: "INR" : "symbol" }}
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Request Date</label>
+                  <p>{{ selectedItem.requestDate }}</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="detail-group">
+                  <label>Payment Against</label>
+                  <p>
+                    <strong>{{ selectedItem.paymentAgainst }}</strong>
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Bank Name</label>
+                  <p>{{ selectedItem.bankName }}</p>
+                </div>
+                <div class="detail-group">
+                  <label>Account No.</label>
+                  <p>{{ selectedItem.accountNo }}</p>
+                </div>
+                <div class="detail-group">
+                  <label>Requested By</label>
+                  <p>{{ selectedItem.requestedBy }}</p>
+                </div>
+                <div class="detail-group">
+                  <label>Status</label>
+                  <p>
+                    <span
+                      class="badge"
+                      [ngClass]="getStatusClass(selectedItem.status)"
+                    >
+                      {{ selectedItem.status }}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-danger"
+              (click)="rejectSinglePayment(selectedItem)"
+            >
+              <i class="bi bi-x-circle"></i> Reject All
+            </button>
+            <button
+              class="btn btn-success"
+              (click)="approveSinglePayment(selectedItem)"
+              [disabled]="isApproveAllDisabled(selectedItem)"
+            >
+              <i class="bi bi-check-circle"></i> Approve All
+            </button>
+            <button class="btn btn-secondary" (click)="closeDetails()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (showDetails && selectedItem) {
+      <div class="modal-overlay">
+        <div class="modal-content modal-xl">
+          <div class="modal-header">
+            <h5 class="modal-title">Payment Request Details</h5>
+            <button
+              type="button"
+              class="btn-close"
+              (click)="closeDetails()"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="detail-group">
+                  <label>Batch No.</label>
+                  <p>
+                    <strong>{{ selectedItem.batchId }}</strong>
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Payment Type</label>
+                  <p>
+                    <span
+                      class="badge"
+                      [ngClass]="
+                        selectedItem.paymentType === 'Bulk'
+                          ? 'bg-info'
+                          : 'bg-secondary'
+                      "
+                    >
+                      {{ selectedItem.paymentType }}
+                    </span>
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Party Name</label>
+                  <p>
+                    <strong>{{ selectedItem.partyName }}</strong>
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Total Amount</label>
+                  <p class="text-primary fw-bold">
+                    {{ selectedItem.totalAmount | currency: "INR" : "symbol" }}
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Request Date</label>
+                  <p>{{ selectedItem.requestDate }}</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="detail-group">
+                  <label>Payment Against</label>
+                  <p>
+                    <strong>{{ selectedItem.paymentAgainst }}</strong>
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Bank Name</label>
+                  <p>{{ selectedItem.bankName }}</p>
+                </div>
+                <div class="detail-group">
+                  <label>Account No.</label>
+                  <p>{{ selectedItem.accountNo }}</p>
+                </div>
+                <div class="detail-group">
+                  <label>Requested By</label>
+                  <p>{{ selectedItem.requestedBy }}</p>
+                </div>
+                <div class="detail-group">
+                  <label>Status</label>
+                  <p>
+                    <span
+                      class="badge"
+                      [ngClass]="getStatusClass(selectedItem.status)"
+                    >
+                      {{ selectedItem.status }}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bulk Items List with Checkboxes -->
+            @if (
+              selectedItem.paymentType === "Bulk" &&
+              selectedItem.bulkItems &&
+              selectedItem.bulkItems.length > 0
+            ) {
+              <div class="mt-4">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-3"
+                >
+                  <h6 class="mb-0">
+                    Bulk Payment Items ({{ selectedItem.bulkItems.length }})
+                  </h6>
+                  <div class="d-flex gap-2">
+                    <span class="badge bg-info"
+                      >{{ getSelectedCount() }} Selected</span
+                    >
+                    <button
+                      class="btn btn-sm btn-success"
+                      (click)="approveSelectedBulk()"
+                      [disabled]="getSelectedCount() === 0"
+                    >
+                      <i class="bi bi-check2-all"></i> Approve Selected
+                    </button>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table
+                    class="table table-bordered table-hover table-sm"
+                    style="width: 100%; table-layout: fixed"
+                  >
+                    <thead
+                      class="table-light"
+                      style="position: sticky; top: 0; z-index: 2"
+                    >
+                      <tr>
+                        <th style="width: 5%">
+                          <input
+                            type="checkbox"
+                            class="form-check-input"
+                            [(ngModel)]="selectAllBulk"
+                            (change)="toggleSelectAll($event)"
+                          />
+                        </th>
+                        <th style="width: 5%">#</th>
+                        <th style="width: 25%">Name</th>
+                        <th style="width: 15%">Amount</th>
+                        <th style="width: 15%">Account</th>
+                        <th style="width: 10%">Status</th>
+                        <th style="width: 25%">Reason for Approval</th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      style="
+                        display: block;
+                        max-height: 200px;
+                        overflow-y: auto;
+                      "
+                    >
+                      @for (
+                        bulkItem of selectedItem.bulkItems;
+                        track bulkItem.id;
+                        let i = $index
+                      ) {
+                        <tr
+                          [class.table-success]="bulkItem.status === 'Approved'"
+                        >
+                          <td style="width: 5%">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              [checked]="isBulkSelected(bulkItem.id)"
+                              (change)="toggleBulkSelection(bulkItem.id)"
+                              [disabled]="bulkItem.status === 'Approved'"
+                            />
+                          </td>
+                          <td style="width: 5%">{{ i + 1 }}</td>
+                          <td style="width: 25%">
+                            <strong>{{
+                              bulkItem.employeeName ||
+                                bulkItem.farmerName ||
+                                bulkItem.name
+                            }}</strong>
+                          </td>
+                          <td style="width: 15%">
+                            {{ bulkItem.amount | currency: "INR" : "symbol" }}
+                          </td>
+                          <td style="width: 15%">{{ bulkItem.account }}</td>
+                          <td style="width: 10%">
+                            <span
+                              class="badge"
+                              [ngClass]="
+                                bulkItem.status === 'Approved'
+                                  ? 'bg-success'
+                                  : 'bg-warning'
+                              "
+                            >
+                              {{ bulkItem.status }}
+                            </span>
+                          </td>
+                          <td style="width: 25%">
+                            <input
+                              type="text"
+                              class="form-control form-control-sm"
+                              placeholder="Enter reason..."
+                              [(ngModel)]="bulkItem.approvalReason"
+                              [disabled]="bulkItem.status === 'Approved'"
+                            />
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-danger"
+              (click)="rejectSinglePayment(selectedItem)"
+            >
+              <i class="bi bi-x-circle"></i> Reject All
+            </button>
+            <button
+              class="btn btn-success"
+              (click)="approveSinglePayment(selectedItem)"
+              [disabled]="isApproveAllDisabled(selectedItem)"
+            >
+              <i class="bi bi-check-circle"></i> Approve All
+            </button>
+            <button class="btn btn-secondary" (click)="closeDetails()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

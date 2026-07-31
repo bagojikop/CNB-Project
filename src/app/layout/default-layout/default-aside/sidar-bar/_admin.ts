@@ -16,6 +16,36 @@ export const adminNavItems: INavData[] = [
         url: '/settings-form/userMgtDashboard',
         icon: 'cil-User',
       },
+      {
+        name: 'VAN Creation',
+        url: '/settings-form/userMgtDashboard',
+        icon: 'cil-globe-alt',
+      },
+      {
+        name: 'Balance Inquiry',
+        url: '/settings-form/userMgtDashboard',
+        icon: 'cil-credit-card',
+      },
+      {
+        name: 'VAN Statement',
+        url: '/settings-form/userMgtDashboard',
+        icon: 'cil-file',
+      },
+      {
+        name: 'Modify VAN',
+        url: '/settings-form/userMgtDashboard',
+        icon: 'cil-pencil',
+      },
+      {
+        name: 'Retrieve VAN',
+        url: '/settings-form/userMgtDashboard',
+        icon: 'cil-cloud-download',
+      },
+      {
+        name: 'Push Checker Maker',
+        url: '/settings-form/userMgtDashboard',
+        icon: 'cil-sync',
+      },
     ],
   },
 ];

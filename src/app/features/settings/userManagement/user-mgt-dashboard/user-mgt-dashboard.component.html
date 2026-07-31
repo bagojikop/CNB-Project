@@ -5,7 +5,7 @@
       class="dss-table-grid-header"
       [title]="dashboardTitle"
       [isFilterVisible]="false"
-      [items]="jsonData.value"
+      [items]="jsonData()"
       [columns]="columns"
       [autoLoad]="false"
       [bordered]="true"
@@ -31,12 +31,26 @@
         <dss-input-text
           label="Username"
           formControlName="username"
+          icon="cilUser"
           class="mb-3"
           [caseStyle]="caseStyle.TITLECASE"
         ></dss-input-text>
 
         <dss-input-text
+          label="mobileNo"
+          formControlName="mobileNo"
+          class="mb-3"
+          type="text"
+          icon="cilMobile"
+          inputmode="numeric"
+          minlength="10"
+          maxlength="10"
+          currency="true"
+        ></dss-input-text>
+
+        <dss-input-text
           label="Email"
+          icon="cibMailRu"
           formControlName="email"
           class="mb-3"
         ></dss-input-text>
@@ -44,6 +58,7 @@
         <dss-input-text
           label="Password"
           type="password"
+          icon="cilLockLocked"
           formControlName="password"
           class="mb-3"
         ></dss-input-text>
@@ -51,6 +66,7 @@
         <dss-ng-select
           id="userRolenm"
           label="Role"
+          icon="cilShieldAlt"
           bindLabel="nm"
           bindValue="cd"
           formControlName="role"
@@ -62,7 +78,11 @@
     </form>
   </c-modal-body>
   <c-modal-footer>
-    <button (click)="close()" cButton color="secondary">CLOSE</button>
-    <button cButton color="success" (click)="saveModalData()">SUBMIT</button>
+    <button (click)="close()" cButton type="button" color="secondary">
+      CLOSE
+    </button>
+    <button cButton color="success" type="button" (click)="saveModalData()">
+      SUBMIT
+    </button>
   </c-modal-footer>
 </c-modal>

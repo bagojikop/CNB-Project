@@ -1,8 +1,9 @@
 export interface userMgt {
-  id?: number;
+  id?: string;
   username: string;
   password: string;
   email?: string;
   role: string;
   roleName: string;
+  mobileNo: string;
 }

@@ -3,7 +3,10 @@ import { Router } from '@angular/router';
 import { DSS_FORM_CONTROLS } from '@shared-directives/dss-form-controls';
 import { configuration } from '@shared-interfaces/settings/configuration';
 import { otpForm } from '@shared-directives/dss-otp-dialog/otp-dialog.component';
-import { crudService } from '@shared-services/crudService';
+
+import { ConfigService } from '@shared-services/user.service';
+import { DialogsService } from '@shared-services/messageBox';
+import { MyProvider } from '@shared-services/provider';
 
 @Component({
   selector: 'app-conf-dashboard',
@@ -14,7 +17,9 @@ import { crudService } from '@shared-services/crudService';
 export class ConfDashboardComponent implements AfterViewInit {
   private readonly router = inject(Router);
   dashboardTitle: string = 'Account Details';
-  private configService = inject(crudService);
+  private configSrc = inject(ConfigService);
+  private readonly dialogSrc = inject(DialogsService);
+  readonly provider = inject(MyProvider);
   readonly handleAdd = () => this.newCred();
   readonly handleEdit = (item?: any) => this.onGridEdit(item);
   readonly handleDelete = (item?: any) => this.onGridDelete(item);
@@ -67,7 +72,7 @@ export class ConfDashboardComponent implements AfterViewInit {
       sort: 'desc',
     },
     {
-      key: 'credDate',
+      key: 'credUser',
       label: 'Created User',
       type: 'date',
       dateFormat: 'dd/MM/yyyy',
@@ -77,17 +82,22 @@ export class ConfDashboardComponent implements AfterViewInit {
     },
   ];
 
-  ngOnInit(): void {
-    this.configService.STORAGE_KEY.set('jsonData');
-  }
-
   newCred() {
     this.router.navigate(['settings-form/confDetails']);
   }
 
   ngAfterViewInit(): void {
-    const data = this.configService.getAll();
-    this.jsonData = data ? (data as configuration[]) : [];
+    this.configSrc.getAll().subscribe({
+      next: (res) => {
+        this.jsonData = res as configuration[];
+      },
+      error: (err) => {
+        this.dialogSrc.swal({
+          dialog: 'error',
+          message: err.message,
+        });
+      },
+    });
   }
 
   onGridEdit(item: configuration) {
@@ -101,7 +111,7 @@ export class ConfDashboardComponent implements AfterViewInit {
     this.varifyOtp = true;
     this.actions = 'delete';
     this.idx = this.jsonData.findIndex(
-      (x) => x.batchId === (item as configuration).batchId,
+      (x) => x.id === (item as configuration).id,
     );
   }
 
@@ -111,7 +121,20 @@ export class ConfDashboardComponent implements AfterViewInit {
         state: { action: 'view', data: this.Credtials },
       });
     } else {
-      this.configService.delete(this.Credtials.batchId);
+      this.configSrc.delete(this.Credtials.id).subscribe({
+        next: (res) => {
+          this.dialogSrc.swal({
+            dialog: 'success',
+            message: 'record Delete Successfully',
+          });
+        },
+        error: (err) => {
+          this.dialogSrc.swal({
+            dialog: 'error',
+            message: err.message,
+          });
+        },
+      });
     }
   }
 }

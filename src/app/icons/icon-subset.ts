@@ -119,6 +119,11 @@ import {
   cibMastercard,
   cilLockLocked,
   cilLink,
+  cilMobile,
+  cibMailRu,
+  cilShieldAlt,
+  cilGlobeAlt,
+  cilSync,
 } from '@coreui/icons';
 
 import { signet } from './signet';
@@ -243,15 +248,24 @@ export const iconSubset = {
   cilPlus,
   cilMinus,
   cibEyeem,
-
+  cilMobile,
   cilWindow,
   cilBuilding,
   cibMastercard,
+  cilGlobeAlt,
   cilFork,
+  cilShieldAlt,
+  cibMailRu,
+  cilSync,
 };
 
 export enum IconSubset {
   cilLink = 'cilLink',
+  cilSync = 'cilSync',
+  cibMailRu = 'cibMailRu',
+  cilGlobeAlt = 'cilGlobeAlt',
+  cilShieldAlt = 'cilShieldAlt',
+  cilMobile = 'cilMobile',
   cilLockLocked = 'cilLockLocked',
   cilNoteAdd = 'cilNoteAdd',
   cibMastercard = 'cibMastercard',

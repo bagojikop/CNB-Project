@@ -13,9 +13,15 @@ export function createUserManagementForm(fb: FormBuilder) {
       Validators.required,
     ]),
 
+    mobileNo: fb.nonNullable.control<userMgt['mobileNo']>('', [
+      Validators.required,
+      Validators.pattern(/^[0-9]+$/),
+    ]),
+
     email: fb.control<userMgt['email']>('', [Validators.email]),
 
     role: fb.control<userMgt['role'] | null>(null, [Validators.required]),
+
     roleName: fb.control<userMgt['roleName'] | null>(null, [
       Validators.required,
     ]),

@@ -1,0 +1,71 @@
+{
+  "users": [
+    {
+      "id": "Ieg06s3b7WA",
+      "username": "Sss",
+      "password": "asbcd",
+      "email": "ss@gmail.com",
+      "role": 2,
+      "roleName": "User"
+    },
+    {
+      "id": "vO4SEjNRC-8",
+      "username": "Rakesh",
+      "password": "abcd",
+      "email": "Rk@gmail.com",
+      "role": 1,
+      "roleName": "Admin"
+    },
+    {
+      "id": "RNObNNEsCFs",
+      "username": "Rr",
+      "password": "abcd",
+      "email": "abcd@gmai",
+      "role": 2,
+      "roleName": "User"
+    },
+    {
+      "id": "3P1BycazlWE",
+      "username": "Ww",
+      "password": "abcd",
+      "email": "abcd@gmail.com",
+      "role": 2,
+      "roleName": "User"
+    },
+    {
+      "id": "kaTkXs4owhw",
+      "username": "Abcd",
+      "password": "abcd",
+      "mobileNo": "7083234537",
+      "email": "anildevaki1@gmail.com",
+      "role": 2,
+      "roleName": "User"
+    }
+  ],
+  "configuration": [
+    {
+      "id": "BMfdOG9Dj08",
+      "firmId": "111111",
+      "credDate": "2026-07-28",
+      "credUser": "admin",
+      "branchId": "22222222222",
+      "firmName": "ABCD",
+      "accountNo": "11111111111111",
+      "accountName": "ABCD",
+      "IFSC_Code": "",
+      "customerId": "11111111",
+      "clientId": "11111111",
+      "clientSecretKey": "111111",
+      "symmetric_key": "111111111",
+      "webhook_address": "http://google.com",
+      "static_ip": "https://192.6.35.56",
+      "modalForm": {
+        "txn_password": "213123123",
+        "mobile_otp": "123123123",
+        "mobile_no": "917083234537",
+        "encrypted_psw": "aijLMXaakjL+9F+LkIyeng=="
+      }
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

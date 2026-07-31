@@ -3,13 +3,15 @@ import { cinfDetlFormValue } from './conf-detail.module';
 
 export function createConfigurationForm(fb: FormBuilder) {
   return fb.group({
-    batchId: fb.nonNullable.control<cinfDetlFormValue['batchId']>(0),
+    id: fb.nonNullable.control<cinfDetlFormValue['id']>(''),
 
     firmId: fb.nonNullable.control<cinfDetlFormValue['firmId']>('', [
       Validators.required,
     ]),
 
     credDate: fb.control<cinfDetlFormValue['credDate'] | null>(null),
+
+    credUser: fb.control<cinfDetlFormValue['credUser'] | null>(null),
 
     branchId: fb.nonNullable.control<cinfDetlFormValue['branchId']>('', [
       Validators.required,

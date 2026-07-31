@@ -1,5 +1,15 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { AfterViewInit, Component, EventEmitter, HostBinding, Input, Output, ViewChild, inject, input } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  HostBinding,
+  Input,
+  Output,
+  ViewChild,
+  inject,
+  input,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonDirective, IItem, ModalModule } from '@coreui/angular-pro';
@@ -11,7 +21,9 @@ import { DssTableDashboardStateService } from './dss-table-dashboard-state.servi
 
 export type DssTableDashboardScope = 'me' | 'public';
 export type DssTableDashboardFilterMode = 'range' | 'transactionNo';
-export type DssTableDashboardActionHandler = (item?: any) => boolean | void | Promise<boolean | void>;
+export type DssTableDashboardActionHandler = (
+  item?: any,
+) => boolean | void | Promise<boolean | void>;
 
 export interface DssTableDashboardActions {
   add?: boolean;
@@ -24,9 +36,16 @@ export interface DssTableDashboardActions {
 @Component({
   selector: 'dss-table-dashboard',
   standalone: true,
-  imports: [NgTemplateOutlet, ReactiveFormsModule, DssTableGridComponent, ButtonDirective, IconDirective, ModalModule],
+  imports: [
+    NgTemplateOutlet,
+    ReactiveFormsModule,
+    DssTableGridComponent,
+    ButtonDirective,
+    IconDirective,
+    ModalModule,
+  ],
   templateUrl: './dss-table-dashboard.html',
-  styleUrl: './dss-table-dashboard.scss'
+  styleUrl: './dss-table-dashboard.scss',
 })
 export class DssTableDashboardComponent implements AfterViewInit {
   @ViewChild('grid') private grid?: DssTableGridComponent;
@@ -58,6 +77,7 @@ export class DssTableDashboardComponent implements AfterViewInit {
   }
   @Input() scope: DssTableDashboardScope = 'me';
   @Input() showNewButton = true;
+  @Input() showShowButton = false;
   @Input() newButtonLabel = 'New';
   @Input() filterButtonLabel = 'Filter';
   @Input() filterTitle = '';
@@ -66,7 +86,9 @@ export class DssTableDashboardComponent implements AfterViewInit {
   @Input() handleDelete?: DssTableDashboardActionHandler;
   @Input() handleRecord?: DssTableDashboardActionHandler;
   @Input() handlePrint?: DssTableDashboardActionHandler;
-  @Input() set actions(value: DssTableDashboardActions | boolean | null | undefined) {
+  @Input() set actions(
+    value: DssTableDashboardActions | boolean | null | undefined,
+  ) {
     if (typeof value === 'boolean') {
       this.showNewButton = value;
       this.showActions = value;
@@ -78,8 +100,11 @@ export class DssTableDashboardComponent implements AfterViewInit {
     if (!value) return;
 
     this.showNewButton = value.add ?? this.showNewButton;
-    this.showActions = (value.edit ?? this.showEdit) || (value.delete ?? this.showDelete)
-      || (value.record ?? this.showRecord) || (value.print ?? this.showPrint);
+    this.showActions =
+      (value.edit ?? this.showEdit) ||
+      (value.delete ?? this.showDelete) ||
+      (value.record ?? this.showRecord) ||
+      (value.print ?? this.showPrint);
     this.showEdit = value.edit ?? this.showEdit;
     this.showDelete = value.delete ?? this.showDelete;
     this.showRecord = value.record ?? this.showRecord;
@@ -114,10 +139,10 @@ export class DssTableDashboardComponent implements AfterViewInit {
   @Input() emptyMessage = '';
   @Input() emptyActionLabel = '';
 
-
   @Output() scopeChange = new EventEmitter<DssTableDashboardScope>();
   @Output() filterClick = new EventEmitter<void>();
   @Output() newClick = new EventEmitter<void>();
+  @Output() showClick = new EventEmitter<void>();
   @Output() edit = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
   @Output() record = new EventEmitter<any>();
@@ -131,14 +156,17 @@ export class DssTableDashboardComponent implements AfterViewInit {
   dashboardApiParams = {} as Record<string, unknown>;
 
   readonly dashboardForm = this.fb.group({
-    filterMode: this.fb.nonNullable.control<DssTableDashboardFilterMode>('range'),
-    fromDate: this.fb.nonNullable.control(this.toInputDate(this.addMonths(new Date(), -3))),
+    filterMode:
+      this.fb.nonNullable.control<DssTableDashboardFilterMode>('range'),
+    fromDate: this.fb.nonNullable.control(
+      this.toInputDate(this.addMonths(new Date(), -3)),
+    ),
     toDate: this.fb.nonNullable.control(this.toInputDate(new Date())),
     challan: this.fb.control<string | null>({ value: null, disabled: true }),
     isComboInv: this.fb.nonNullable.control(false),
     isApproval: this.fb.nonNullable.control(false),
     vchType: this.fb.control<number | null>(4),
-    salesType: this.fb.control<number | null>(1)
+    salesType: this.fb.control<number | null>(1),
   });
 
   ngAfterViewInit(): void {
@@ -190,7 +218,6 @@ export class DssTableDashboardComponent implements AfterViewInit {
   }
 
   async loadData(remember = true): Promise<void> {
-
     this.dashboardApiParams = this.buildApiParams();
     this.hasLoaded = true;
 
@@ -229,7 +256,6 @@ export class DssTableDashboardComponent implements AfterViewInit {
     this.modalVisible = visible;
   }
 
-
   setScope(scope: DssTableDashboardScope): void {
     if (this.scope !== scope) {
       this.scope = scope;
@@ -242,9 +268,15 @@ export class DssTableDashboardComponent implements AfterViewInit {
     }
   }
 
-  onRecord(item: any): void { this.handleRecord?.(item); this.record.emit(item); }
+  onRecord(item: any): void {
+    this.handleRecord?.(item);
+    this.record.emit(item);
+  }
 
-  onPrint(item: any): void { this.handlePrint?.(item); this.print.emit(item); }
+  onPrint(item: any): void {
+    this.handlePrint?.(item);
+    this.print.emit(item);
+  }
 
   onEmptyAction(): void {
     this.loadData();
@@ -252,11 +284,14 @@ export class DssTableDashboardComponent implements AfterViewInit {
   }
 
   async submitFilter(): Promise<void> {
-    if (this.dashboardForm.controls.filterMode.value === 'transactionNo' && !this.dashboardForm.controls.challan.value?.trim()) {
+    if (
+      this.dashboardForm.controls.filterMode.value === 'transactionNo' &&
+      !this.dashboardForm.controls.challan.value?.trim()
+    ) {
       await this.dialogs.swal({
         dialog: 'warning',
         title: 'Transaction No Required',
-        message: 'Please enter transaction no.'
+        message: 'Please enter transaction no.',
       });
       return;
     }
@@ -280,7 +315,6 @@ export class DssTableDashboardComponent implements AfterViewInit {
       fromDate: this.toInputDate(this.addMonths(new Date(), -3)),
       toDate: this.toInputDate(new Date()),
       challan: null,
-
     });
     this.updateFilterControlState();
   }
@@ -293,6 +327,10 @@ export class DssTableDashboardComponent implements AfterViewInit {
     if (!handled) {
       this.newClick.emit();
     }
+  }
+
+  onShow(event: any): void {
+    this.showClick.emit(event);
   }
 
   async onEdit(item: any): Promise<void> {
@@ -312,7 +350,8 @@ export class DssTableDashboardComponent implements AfterViewInit {
   }
 
   private updateFilterControlState(): void {
-    const isRangeFilter = this.dashboardForm.controls.filterMode.value === 'range';
+    const isRangeFilter =
+      this.dashboardForm.controls.filterMode.value === 'range';
     const options = { emitEvent: false };
 
     if (isRangeFilter) {
@@ -332,22 +371,20 @@ export class DssTableDashboardComponent implements AfterViewInit {
       fromDate: this.toInputDate(this.addMonths(new Date(), -3)),
       toDate: this.toInputDate(new Date()),
       challan: '',
-
     };
 
     const isRangeFilter = value.filterMode === 'range';
     const transactionNo = value.challan?.trim() ?? '';
 
     return {
-      ...this.apiParams || {},
+      ...(this.apiParams || {}),
       firm_id: Number(this.company?.firm_id ?? 0),
       branch_id: String(this.company?.branch_id ?? ''),
       div_id: Number(this.company?.div_id ?? 0),
       from_date: isRangeFilter ? value.fromDate : '',
       to_date: isRangeFilter ? value.toDate : '',
       challan: isRangeFilter ? '' : transactionNo,
-      username: this.scope === 'me' ? this.user?.username ?? '' : '',
-
+      username: this.scope === 'me' ? (this.user?.username ?? '') : '',
     };
   }
 
@@ -380,7 +417,10 @@ export class DssTableDashboardComponent implements AfterViewInit {
     return 'dss-table-dashboard:auto-load:' + routeKey + ':' + dashboardKey;
   }
 
-  private async runHandler(handler: DssTableDashboardActionHandler | undefined, item?: any): Promise<boolean> {
+  private async runHandler(
+    handler: DssTableDashboardActionHandler | undefined,
+    item?: any,
+  ): Promise<boolean> {
     if (!handler) return false;
 
     await handler(item);
@@ -401,22 +441,3 @@ export class DssTableDashboardComponent implements AfterViewInit {
     return `${year}-${month}-${day}`;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

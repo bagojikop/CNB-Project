@@ -1,0 +1,343 @@
+* {
+  box-sizing: border-box;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+body {
+  background: #f2f5f9;
+  padding: 1.5rem 0.75rem;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+.demo-wrapper {
+  max-width: 1140px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ----- CARD SECTION – SMALL SIZE, CUSTOMER DELIGHT ----- */
+.bank-cards-section {
+  padding: 0.1rem;
+}
+
+.bank-card {
+  border-radius: 16px;
+  border: none;
+  border-left: 4px solid;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  cursor: pointer;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  height: 100%;
+  min-height: 148px; /* small height */
+  display: flex;
+  flex-direction: column;
+}
+
+/* subtle glass overlay */
+.bank-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  pointer-events: none;
+  transition: all 0.35s ease;
+  border-radius: 16px;
+}
+
+/* soft glow */
+.bank-card::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  right: -60%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.06) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  transition: all 0.5s ease;
+}
+
+.bank-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.07) !important;
+}
+
+.bank-card:hover::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.02) 80%
+  );
+}
+
+.bank-card:hover::after {
+  transform: scale(1.6);
+  opacity: 0.7;
+}
+
+.bank-card:hover .icon-wrapper {
+  transform: scale(1.04) rotate(-2deg);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.bank-card:hover .action-link {
+  color: #2563eb;
+  transform: translateX(3px);
+}
+
+.bank-card:hover .hover-arrow {
+  transform: translateX(5px);
+  opacity: 1;
+}
+
+.bank-card:hover .card-progress {
+  height: 3px;
+  opacity: 0.9;
+}
+
+.bank-card:hover .card-badge {
+  transform: scale(1.03);
+}
+
+/* color-specific hover shadows – soft & satisfying */
+.bank-card.warning:hover {
+  box-shadow: 0 14px 32px rgba(255, 193, 7, 0.15) !important;
+}
+.bank-card.success:hover {
+  box-shadow: 0 14px 32px rgba(40, 167, 69, 0.15) !important;
+}
+.bank-card.info:hover {
+  box-shadow: 0 14px 32px rgba(23, 162, 184, 0.15) !important;
+}
+.bank-card.primary:hover {
+  box-shadow: 0 14px 32px rgba(13, 110, 253, 0.15) !important;
+}
+.bank-card.secondary:hover {
+  box-shadow: 0 14px 32px rgba(108, 117, 125, 0.15) !important;
+}
+.bank-card.danger:hover {
+  box-shadow: 0 14px 32px rgba(220, 53, 69, 0.15) !important;
+}
+
+.bank-card .card-content {
+  flex: 1;
+}
+
+.bank-card .card-badge {
+  display: inline-block;
+  padding: 0.1rem 0.6rem;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  min-width: 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  letter-spacing: 0.2px;
+  line-height: 1.6;
+}
+
+.bank-card .card-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #6c7a8a;
+  margin-bottom: 0.1rem;
+  margin-top: 0.4rem !important;
+}
+
+.bank-card .card-stats {
+  font-size: 0.68rem;
+  color: #6c7a8a;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+}
+
+.bank-card .card-stats .trend-indicator .trend-up {
+  color: #2b8c4a;
+  font-weight: 700;
+  margin-right: 1px;
+}
+
+.bank-card .icon-wrapper {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+}
+
+.bank-card .icon-wrapper .icon-lg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.04));
+}
+
+.bank-card .card-footer-action {
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.03);
+  margin-top: 0.2rem;
+}
+
+.bank-card .card-footer-action .action-link {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #6c7a8a;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  letter-spacing: 0.2px;
+}
+
+.bank-card .card-footer-action .action-link .hover-arrow {
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateX(-3px);
+  font-size: 0.7rem;
+}
+
+.bank-card .card-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  opacity: 0.5;
+  transition: all 0.4s ease;
+  border-radius: 0 0 0 16px;
+}
+
+/* SMALL SIZE: compact padding & spacing */
+.bank-card .card-body {
+  padding: 0.85rem 0.9rem 0.6rem 0.9rem !important;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 575.98px) {
+  .demo-wrapper {
+    align-items: flex-start !important;
+  }
+}
+
+/* extra small screens */
+@media (max-width: 576px) {
+  .bank-cards-section {
+    padding: 0.05rem;
+  }
+  .bank-card {
+    min-height: 130px;
+  }
+  .bank-card:hover {
+    transform: translateY(-3px) scale(1.01);
+  }
+  .bank-card .card-badge {
+    font-size: 0.75rem;
+    padding: 0.05rem 0.5rem;
+    min-width: 26px;
+  }
+  .bank-card .icon-wrapper {
+    width: 34px;
+    height: 34px;
+  }
+  .bank-card .icon-wrapper .icon-lg {
+    width: 16px;
+    height: 16px;
+  }
+  .bank-card .card-body {
+    padding: 0.6rem 0.7rem 0.5rem 0.7rem !important;
+  }
+  .bank-card .card-title {
+    font-size: 0.6rem;
+  }
+  .bank-card .card-stats {
+    font-size: 0.6rem;
+  }
+  .bank-card .card-footer-action .action-link {
+    font-size: 0.6rem;
+  }
+}
+
+/* fade-in animation – satisfying entrance */
+.bank-card {
+  animation: cardFadeIn 0.45s ease forwards;
+  opacity: 0;
+}
+@keyframes cardFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.bank-card:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.bank-card:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.bank-card:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.bank-card:nth-child(4) {
+  animation-delay: 0.11s;
+}
+.bank-card:nth-child(5) {
+  animation-delay: 0.14s;
+}
+.bank-card:nth-child(6) {
+  animation-delay: 0.17s;
+}
+
+.action-link {
+  display: inline-flex !important;
+  align-items: center;
+}
+.hover-arrow {
+  display: inline-block;
+}
+
+.text-muted {
+  color: #6c7a8a !important;
+}
+
+/* reduce gutter for small cards */
+.g-3 {
+  --bs-gutter-y: 0.7rem;
+  --bs-gutter-x: 0.7rem;
+}

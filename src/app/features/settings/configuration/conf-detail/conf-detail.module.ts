@@ -3,8 +3,9 @@ import { configuration } from '@shared-interfaces/settings/configuration';
 export type cinfDetlFormValue = Pick<
   configuration,
   | 'IFSC_Code'
-  | 'batchId'
+  | 'id'
   | 'credDate'
+  | 'credUser'
   | 'accountName'
   | 'accountNo'
   | 'clientId'
