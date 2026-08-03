@@ -1,0 +1,139 @@
+<div class="van-creation-dashboard">
+  <h2>VAN Creation Dashboard</h2>
+
+  <form [formGroup]="form">
+    <div class="mode-selector">
+      <label>
+        <input type="radio" formControlName="mode" value="custom" />
+        Custom
+      </label>
+      <label>
+        <input type="radio" formControlName="mode" value="random" />
+        Random
+      </label>
+    </div>
+
+    @if (mode === "custom") {
+      <div class="form-section" formGroupName="custom">
+        <dss-input-text
+          label="Account Number"
+          formControlName="accountNo"
+          required="true"
+          sizing="lg"
+          minlength="15"
+          [disabled]="saveUndoButtonIsDisable"
+        ></dss-input-text>
+
+        <div class="form-row">
+          <dss-date-fin
+            label="Start Date"
+            sizing="lg"
+            formControlName="startDate"
+          ></dss-date-fin>
+
+          <dss-date-fin
+            label="End Date"
+            sizing="lg"
+            formControlName="endDate"
+          ></dss-date-fin>
+        </div>
+
+        <div
+          class="form-group van-list card mb-3"
+          formArrayName="virtualAccountDetails"
+        >
+          <div class="d-flex justify-content-between p-2 border-bottom">
+            <label class="card-title ms-2 mt-1"
+              >VAN Numbers <span class="req">*</span></label
+            >
+            <button
+              cButton
+              class="btn btn-primary btn-sm mb-1 text-white"
+              type="button"
+              (click)="addVanNumber()"
+              [disabled]="saveUndoButtonIsDisable"
+            >
+              Add VAN
+            </button>
+          </div>
+
+          <div
+            class="card-body mb-3"
+            style="height: 200px; overflow-y: auto; padding-bottom: 50px"
+          >
+            <div
+              *ngFor="
+                let vanCtrl of virtualAccountDetails.controls;
+                let i = index;
+                trackBy: trackByIndex
+              "
+              [formGroupName]="i"
+              class="van-item mb-2"
+            >
+              <dss-input-text
+                type="text"
+                sizing="md"
+                formControlName="vanNumber"
+                placeholder="Enter VAN number"
+                [disabled]="saveUndoButtonIsDisable"
+                class="flex-grow-1"
+              />
+              <button
+                cButton
+                color="danger"
+                type="button"
+                style="height: 38.5px !important"
+                (click)="removeVanNumber(i)"
+                [disabled]="saveUndoButtonIsDisable"
+                *ngIf="virtualAccountDetails.length > 1"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (mode === "random") {
+      <div formGroupName="random" style="min-height: 490px">
+        <dss-input-text
+          label="Account Number"
+          formControlName="accountNo"
+          required="true"
+          sizing="lg"
+          minlength="15"
+        ></dss-input-text>
+
+        <div class="form-row mb-4">
+          <dss-date-fin
+            label="Start Date"
+            sizing="lg"
+            formControlName="startDate"
+          ></dss-date-fin>
+
+          <dss-date-fin
+            label="End Date"
+            sizing="lg"
+            formControlName="endDate"
+          ></dss-date-fin>
+        </div>
+
+        <dss-input-num
+          label="Number of VANs"
+          sizing="lg"
+          formControlName="countVAN"
+        ></dss-input-num>
+      </div>
+    }
+
+    <button
+      cButton
+      color="success"
+      class="btn mt-3 btn-block w-100 btn-lg"
+      (click)="onSubmit()"
+    >
+      Create VANs
+    </button>
+  </form>
+</div>

@@ -18,12 +18,12 @@ export const adminNavItems: INavData[] = [
       },
       {
         name: 'VAN Creation',
-        url: '/settings-form/userMgtDashboard',
+        url: '/settings-form/vanCreationDashboard',
         icon: 'cil-globe-alt',
       },
       {
         name: 'Balance Inquiry',
-        url: '/settings-form/userMgtDashboard',
+        url: '/settings-form/BalanceInquiry',
         icon: 'cil-credit-card',
       },
       {

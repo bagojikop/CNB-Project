@@ -124,6 +124,7 @@ import {
   cilShieldAlt,
   cilGlobeAlt,
   cilSync,
+  cilTag,
 } from '@coreui/icons';
 
 import { signet } from './signet';
@@ -250,6 +251,7 @@ export const iconSubset = {
   cibEyeem,
   cilMobile,
   cilWindow,
+  cilTag,
   cilBuilding,
   cibMastercard,
   cilGlobeAlt,
