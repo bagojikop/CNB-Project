@@ -19,6 +19,7 @@ import { configuration } from '@shared-interfaces/settings/configuration';
 
 import { ConfigService } from '@shared-services/user.service';
 import { DialogsService } from '@shared-services/messageBox';
+import { DataRefreshService } from '@shared-services/data-refresh.service';
 
 @Component({
   selector: 'app-conf-detail',
@@ -34,6 +35,7 @@ export class ConfDetailComponent implements AfterViewInit {
   private location = inject(Location);
   private dialogSrc = inject(DialogsService);
   private configSrc = inject(ConfigService);
+  private readonly refreshService = inject(DataRefreshService);
   readonly configInputs = createConfigurationForm(this.fb);
   readonly modalForm = createModalForm(this.fb);
   private datePipe = inject(DatePipe);
@@ -101,6 +103,8 @@ export class ConfDetailComponent implements AfterViewInit {
             dialog: 'success',
             message: 'Record Update Successfully',
           });
+          this.refreshService.trigger();
+          this.location.back();
         },
         error: (err) => {
           this.dialogSrc.swal({
@@ -116,6 +120,8 @@ export class ConfDetailComponent implements AfterViewInit {
             dialog: 'success',
             message: 'Record Save Successfully',
           });
+          this.refreshService.trigger();
+          this.location.back();
         },
         error: (err) => {
           this.dialogSrc.swal({

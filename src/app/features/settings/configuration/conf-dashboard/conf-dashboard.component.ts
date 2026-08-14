@@ -7,6 +7,7 @@ import { otpForm } from '@shared-directives/dss-otp-dialog/otp-dialog.component'
 import { ConfigService } from '@shared-services/user.service';
 import { DialogsService } from '@shared-services/messageBox';
 import { MyProvider } from '@shared-services/provider';
+import { DataRefreshService } from '@shared-services/data-refresh.service';
 
 @Component({
   selector: 'app-conf-dashboard',
@@ -19,6 +20,7 @@ export class ConfDashboardComponent implements AfterViewInit {
   dashboardTitle: string = 'Account Details';
   private configSrc = inject(ConfigService);
   private readonly dialogSrc = inject(DialogsService);
+  private readonly refreshService = inject(DataRefreshService);
   readonly provider = inject(MyProvider);
   readonly handleAdd = () => this.newCred();
   readonly handleEdit = (item?: any) => this.onGridEdit(item);
@@ -87,6 +89,14 @@ export class ConfDashboardComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.loadData();
+
+    this.refreshService.refresh$.subscribe(() => {
+      this.loadData();
+    });
+  }
+
+  private loadData(): void {
     this.configSrc.getAll().subscribe({
       next: (res) => {
         this.jsonData = res as configuration[];

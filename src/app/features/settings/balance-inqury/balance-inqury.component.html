@@ -1,241 +1,238 @@
-<div class="balance-container">
-  <!-- Header -->
-  <div class="balance-card">
-    <div class="balance-header">
-      <div class="header-left">
-        <i class="bi bi-wallet2"></i>
-        <span>Balance Inquiry</span>
+<div class="balance-wrapper">
+  <!-- Banking Header -->
+  <div class="bank-header">
+    <div class="bank-brand">
+      <div class="bank-icon">
+        <i class="bi bi-bank"></i>
       </div>
-      <div class="header-right" *ngIf="balanceData">
-        <span class="status-badge success">
-          <i class="bi bi-check-circle-fill"></i>
-          {{ balanceData.status }}
-        </span>
-        <span class="request-id">Request ID: {{ balanceData.requestId }}</span>
+      <div>
+        <h1>Balance Inquiry</h1>
+        <p>View account balances across branches</p>
       </div>
     </div>
+    <div class="bank-status" *ngIf="balanceData && balanceData.length > 0">
+      <span class="status-pill success">
+        <i class="bi bi-check-circle-fill"></i>
+        {{ balanceData.length }} Accounts Found
+      </span>
+    </div>
+  </div>
 
-    <!-- Search Form -->
-    <form [formGroup]="balanceForm" (ngSubmit)="fetchBalance()">
-      <div class="input-wrapper" formGroupName="encryptData">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Enter Account Number"
-          formControlName="accountNumber"
-          [disabled]="isLoading"
-          autofocus
-        />
-        <button
-          type="submit"
-          class="btn-search"
-          [disabled]="balanceForm.invalid || isLoading"
+  <!-- Search Panel -->
+  <div class="search-panel">
+    <form
+      [formGroup]="balanceForm"
+      (ngSubmit)="fetchBalance()"
+      class="search-form"
+    >
+      <div class="search-grid">
+        <div class="search-field">
+          <label>
+            <i class="bi bi-building"></i>
+            <span>Branch</span>
+          </label>
+          <select
+            formControlName="branch"
+            [disabled]="isLoading"
+            class="field-control"
+          >
+            <option value="">All Branches</option>
+            <option *ngFor="let branch of branches" [value]="branch">
+              {{ branch }}
+            </option>
+          </select>
+        </div>
+
+        <div class="search-field">
+          <label>
+            <i class="bi bi-hash"></i>
+            <span>Account Number</span>
+          </label>
+          <input
+            type="text"
+            formControlName="accountNumber"
+            placeholder="Enter account number"
+            [disabled]="isLoading"
+            class="field-control"
+          />
+        </div>
+
+        <div class="search-field action-field">
+          <button type="submit" class="btn-primary">
+            @if (!isLoading) {
+              <i class="bi bi-search"></i> Search
+            }
+            @if (isLoading) {
+              <span class="spinner-light"></span> Searching...
+            }
+          </button>
+        </div>
+      </div>
+
+      <div class="error-group">
+        <span
+          class="field-error"
+          *ngIf="
+            balanceForm.get('accountNumber')?.invalid &&
+            balanceForm.get('accountNumber')?.touched
+          "
         >
-          @if (!isLoading) {
-            <span>🔍</span>
-          }
-          @if (isLoading) {
-            <span class="spinner"></span>
-          }
-        </button>
+          <i class="bi bi-exclamation-circle"></i>
+          Please enter a valid account number (10-20 digits)
+        </span>
+        <span
+          class="field-error"
+          *ngIf="
+            balanceForm.get('branch')?.invalid &&
+            balanceForm.get('branch')?.touched
+          "
+        >
+          <i class="bi bi-exclamation-circle"></i>
+          Please select a branch
+        </span>
       </div>
-
-      <small
-        class="error-text"
-        *ngIf="
-          balanceForm.get('encryptData.accountNumber')?.invalid &&
-          balanceForm.get('encryptData.accountNumber')?.touched
-        "
-      >
-        <i class="bi bi-exclamation-circle"></i>
-        Please enter valid account number (10-20 digits)
-      </small>
     </form>
-
-    <!-- Response Message -->
-    <div class="response-message" *ngIf="balanceData">
-      <i class="bi bi-check-circle-fill"></i>
-      <span>{{ balanceData.message }}</span>
-      <span class="timestamp">{{
-        balanceData.responseTime | date: "medium"
-      }}</span>
-    </div>
   </div>
 
-  <!-- Balance Details -->
-  <div class="details-grid" *ngIf="balanceData">
-    <!-- Account Details -->
-    <div class="detail-card account-details">
-      <div class="card-header">
-        <i class="bi bi-person-badge"></i>
-        <h4>Account Details</h4>
+  <!-- Results -->
+  <div class="results-panel" *ngIf="balanceData && balanceData.length > 0">
+    <div class="results-header">
+      <div class="results-title">
+        <i class="bi bi-table"></i>
+        <h3>Account Balances</h3>
       </div>
-      <div class="card-body">
-        <div class="detail-item">
-          <label>Account Number</label>
-          <span class="value">{{
-            balanceData.accountDetails.accountNumber
-          }}</span>
-        </div>
-        <div class="detail-item">
-          <label>Account Name</label>
-          <span class="value">{{
-            balanceData.accountDetails.accountName
-          }}</span>
-        </div>
-        <div class="detail-item">
-          <label>Account Type</label>
-          <span class="value">{{
-            balanceData.accountDetails.accountType
-          }}</span>
-        </div>
-        <div class="detail-item">
-          <label>Currency</label>
-          <span class="value currency">{{
-            balanceData.accountDetails.currency
-          }}</span>
-        </div>
-        <div class="detail-item">
-          <label>Branch</label>
-          <span class="value">{{ balanceData.accountDetails.branchName }}</span>
-        </div>
-        <div class="detail-item">
-          <label>IFSC Code</label>
-          <span class="value ifsc">{{
-            balanceData.accountDetails.ifscCode
-          }}</span>
-        </div>
-      </div>
+      <span class="results-count">{{ balanceData.length }} records</span>
     </div>
 
-    <!-- Balance Summary -->
-    <div class="detail-card balance-summary">
-      <div class="card-header">
-        <i class="bi bi-coin"></i>
-        <h4>Balance Summary</h4>
-      </div>
-      <div class="card-body">
-        <div class="balance-item primary">
-          <div class="balance-label">
-            <i class="bi bi-wallet"></i>
-            <span>Available Balance</span>
-          </div>
-          <div class="balance-amount">
-            {{ balanceData.accountDetails.currency }}
-            {{ balanceData.balanceDetails.availableBalance | number: "1.2-2" }}
-          </div>
-        </div>
-        <div class="balance-item secondary">
-          <div class="balance-label">
-            <i class="bi bi-book"></i>
-            <span>Ledger Balance</span>
-          </div>
-          <div class="balance-amount">
-            {{ balanceData.accountDetails.currency }}
-            {{ balanceData.balanceDetails.ledgerBalance | number: "1.2-2" }}
-          </div>
-        </div>
-        <div class="balance-item">
-          <div class="balance-label">
-            <i class="bi bi-clock"></i>
-            <span>Uncleared Balance</span>
-          </div>
-          <div class="balance-amount">
-            {{ balanceData.accountDetails.currency }}
-            {{ balanceData.balanceDetails.unclearedBalance | number: "1.2-2" }}
-          </div>
-        </div>
-        <div class="balance-item">
-          <div class="balance-label">
-            <i class="bi bi-lock"></i>
-            <span>Hold Amount</span>
-          </div>
-          <div class="balance-amount">
-            {{ balanceData.accountDetails.currency }}
-            {{ balanceData.balanceDetails.holdAmount | number: "1.2-2" }}
-          </div>
-        </div>
-        <div class="balance-item">
-          <div class="balance-label">
-            <i class="bi bi-shield-check"></i>
-            <span>Minimum Balance</span>
-          </div>
-          <div class="balance-amount">
-            {{ balanceData.accountDetails.currency }}
-            {{ balanceData.balanceDetails.minimumBalance | number: "1.2-2" }}
-          </div>
-        </div>
-      </div>
+    <div class="table-responsive">
+      <table class="bank-table">
+        <thead>
+          <tr>
+            <th style="width: 5%">#</th>
+            <th style="width: 10%">Account</th>
+            <th style="width: 40%">Name</th>
+            <th style="width: 7%">Type</th>
+            <th style="width: 8%">Currency</th>
+            <th style="width: 10%" class="text-right">Available</th>
+            <th style="width: 10%" class="text-right">Ledger</th>
+            <th style="width: 11%">IFSC</th>
+          </tr>
+        </thead>
+        <tbody
+          style="
+            height: calc(50vh - 230px);
+            min-height: 150px;
+            overflow-y: scroll;
+          "
+        >
+          <tr *ngFor="let item of pagedData; let i = index">
+            <td style="width: 5%">
+              {{ (currentPage - 1) * pageSize + i + 1 }}
+            </td>
+            <td style="width: 10%">
+              <span class="account-number">{{
+                item.accountDetails.accountNumber
+              }}</span>
+            </td>
+            <td style="width: 40%">{{ item.accountDetails.accountName }}</td>
+            <td style="width: 7%; text-align: center">
+              <span class="badge-type">{{
+                item.accountDetails.accountType
+              }}</span>
+            </td>
+            <td style="width: 8%">{{ item.accountDetails.currency }}</td>
+            <td class="text-right amount" style="width: 10%">
+              <span class="balance-positive" style="font-size: small">
+                {{ item.accountDetails.currency }}
+                {{ item.balanceDetails.availableBalance | number: "1.2-2" }}
+              </span>
+            </td>
+            <td class="text-right amount" style="width: 10%">
+              {{ item.accountDetails.currency }}
+              {{ item.balanceDetails.ledgerBalance | number: "1.2-2" }}
+            </td>
+
+            <td style="width: 11%">
+              <span class="ifsc-code">{{ item.accountDetails.ifscCode }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- Overdraft Details -->
-    <div class="detail-card overdraft-details">
-      <div class="card-header">
-        <i class="bi bi-credit-card"></i>
-        <h4>Overdraft Details</h4>
+    <!-- Pagination Controls -->
+    <div class="pagination-controls">
+      <div class="pagination-info">
+        <span>
+          Showing {{ (currentPage - 1) * pageSize + 1 }} -
+          {{ getMin(currentPage * pageSize, filteredData.length) }}
+          of {{ filteredData.length }} entries
+        </span>
       </div>
-      <div class="card-body">
-        <div class="detail-item">
-          <label>Overdraft Limit</label>
-          <span class="value">
-            {{ balanceData.accountDetails.currency }}
-            {{ balanceData.balanceDetails.overdraftLimit | number: "1.2-2" }}
-          </span>
+
+      <div class="pagination-actions">
+        <div class="page-size-selector">
+          <label for="pageSize">Rows per page:</label>
+          <select
+            id="pageSize"
+            [value]="pageSize"
+            (change)="changePageSize(+$event.target.value)"
+            class="page-size-select"
+          >
+            <option *ngFor="let size of pageSizeOptions" [value]="size">
+              {{ size }}
+            </option>
+          </select>
         </div>
-        <div class="detail-item">
-          <label>Utilized Overdraft</label>
-          <span class="value used">
-            {{ balanceData.accountDetails.currency }}
-            {{ balanceData.balanceDetails.utilizedOverdraft | number: "1.2-2" }}
+
+        <div class="page-nav">
+          <button
+            class="page-btn"
+            [disabled]="currentPage === 1"
+            (click)="goToPage(1)"
+          >
+            <i class="bi bi-chevron-double-left"></i>
+          </button>
+          <button
+            class="page-btn"
+            [disabled]="currentPage === 1"
+            (click)="goToPage(currentPage - 1)"
+          >
+            <i class="bi bi-chevron-left"></i>
+          </button>
+
+          <span class="page-indicator">
+            Page {{ currentPage }} of {{ totalPages }}
           </span>
-        </div>
-        <div class="detail-item">
-          <label>Available Overdraft</label>
-          <span class="value available">
-            {{ balanceData.accountDetails.currency }}
-            {{
-              balanceData.balanceDetails.overdraftLimit -
-                balanceData.balanceDetails.utilizedOverdraft | number: "1.2-2"
-            }}
-          </span>
-        </div>
-        <div class="progress-container">
-          <label>Overdraft Utilization</label>
-          <div class="progress-bar">
-            <div
-              class="progress-fill"
-              [style.width.%]="
-                (balanceData.balanceDetails.utilizedOverdraft /
-                  balanceData.balanceDetails.overdraftLimit) *
-                100
-              "
-              [class.warning]="
-                balanceData.balanceDetails.utilizedOverdraft /
-                  balanceData.balanceDetails.overdraftLimit >
-                0.7
-              "
-              [class.danger]="
-                balanceData.balanceDetails.utilizedOverdraft /
-                  balanceData.balanceDetails.overdraftLimit >
-                0.9
-              "
-            ></div>
-          </div>
-          <span class="percentage">
-            {{
-              (balanceData.balanceDetails.utilizedOverdraft /
-                balanceData.balanceDetails.overdraftLimit) *
-                100 | number: "1.0-0"
-            }}%
-          </span>
+
+          <button
+            class="page-btn"
+            [disabled]="currentPage === totalPages"
+            (click)="goToPage(currentPage + 1)"
+          >
+            <i class="bi bi-chevron-right"></i>
+          </button>
+          <button
+            class="page-btn"
+            [disabled]="currentPage === totalPages"
+            (click)="goToPage(totalPages)"
+          >
+            <i class="bi bi-chevron-double-right"></i>
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- No Data State -->
-  <div class="no-data" *ngIf="!balanceData && !isLoading">
-    <i class="bi bi-search"></i>
-    <p>Enter an account number to check balance</p>
+  <!-- Empty State -->
+  <div
+    class="empty-state"
+    *ngIf="(!balanceData || balanceData.length === 0) && !isLoading"
+  >
+    <div class="empty-icon">
+      <i class="bi bi-search"></i>
+    </div>
+    <h4>No results found</h4>
+    <p>Select a branch and enter an account number to check balance</p>
   </div>
 </div>

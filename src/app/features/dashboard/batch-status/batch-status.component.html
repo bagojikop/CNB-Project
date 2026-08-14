@@ -1,0 +1,149 @@
+<div class="batch-status-container">
+  <h2>Batch Status</h2>
+  
+  <form [formGroup]="batchStatusForm" (ngSubmit)="onSubmit()" class="batch-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="batchId">Batch ID <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="batchId" 
+          formControlName="batchId" 
+          placeholder="Enter batch ID"
+          [class.invalid]="f['batchId'].invalid && (f['batchId'].dirty || f['batchId'].touched || submitted)"
+        >
+        <div *ngIf="f['batchId'].invalid && (f['batchId'].dirty || f['batchId'].touched || submitted)" class="error-message">
+          <span *ngIf="f['batchId'].errors?.['required']">Batch ID is required</span>
+          <span *ngIf="f['batchId'].errors?.['minlength']">Batch ID must be at least 5 characters</span>
+          <span *ngIf="f['batchId'].errors?.['maxlength']">Batch ID must be at most 20 characters</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="status">Status <span class="required">*</span></label>
+        <select id="status" formControlName="status" [class.invalid]="f['status'].invalid && submitted">
+          <option value="">Select Status</option>
+          <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+        </select>
+        <div *ngIf="f['status'].invalid && submitted" class="error-message">
+          <span>Status is required</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="totalAmount">Total Amount <span class="required">*</span></label>
+        <input 
+          type="number" 
+          id="totalAmount" 
+          formControlName="totalAmount" 
+          placeholder="Enter total amount"
+          [class.invalid]="f['totalAmount'].invalid && submitted"
+        >
+        <div *ngIf="f['totalAmount'].invalid && submitted" class="error-message">
+          <span *ngIf="f['totalAmount'].errors?.['required']">Total amount is required</span>
+          <span *ngIf="f['totalAmount'].errors?.['min']">Total amount must be greater than or equal to 0</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="transactionCount">Transaction Count <span class="required">*</span></label>
+        <input 
+          type="number" 
+          id="transactionCount" 
+          formControlName="transactionCount" 
+          placeholder="Enter transaction count"
+          [class.invalid]="f['transactionCount'].invalid && submitted"
+        >
+        <div *ngIf="f['transactionCount'].invalid && submitted" class="error-message">
+          <span *ngIf="f['transactionCount'].errors?.['required']">Transaction count is required</span>
+          <span *ngIf="f['transactionCount'].errors?.['min']">Transaction count must be greater than or equal to 0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="processedDate">Processed Date</label>
+        <input type="date" id="processedDate" formControlName="processedDate">
+      </div>
+
+      <div class="form-group">
+        <label for="bankReferenceNo">Bank Reference No</label>
+        <input type="text" id="bankReferenceNo" formControlName="bankReferenceNo" placeholder="Enter bank reference no">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="statusMessage">Status Message</label>
+        <input type="text" id="statusMessage" formControlName="statusMessage" placeholder="Enter status message">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="errorCode">Error Code</label>
+        <input type="text" id="errorCode" formControlName="errorCode" placeholder="Enter error code">
+      </div>
+
+      <div class="form-group">
+        <label for="errorMessage">Error Message</label>
+        <input type="text" id="errorMessage" formControlName="errorMessage" placeholder="Enter error message">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Check Status</button>
+      <button type="button" class="btn-secondary" (click)="batchStatusForm.reset(); submitted = false; batchStatusResult = null">Reset</button>
+    </div>
+  </form>
+
+  <div *ngIf="batchStatusResult" class="status-result">
+    <h3>Batch Status Details</h3>
+    <div class="result-card">
+      <div class="result-item">
+        <span class="label">Batch ID:</span>
+        <span class="value">{{ batchStatusResult.batchId }}</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Status:</span>
+        <span class="value status-badge" [ngClass]="{
+          'status-pending': batchStatusResult.status === 'Pending',
+          'status-in-progress': batchStatusResult.status === 'In Progress',
+          'status-completed': batchStatusResult.status === 'Completed',
+          'status-failed': batchStatusResult.status === 'Failed'
+        }">{{ batchStatusResult.status }}</span>
+      </div>
+      <div class="result-item" *ngIf="batchStatusResult.statusMessage">
+        <span class="label">Status Message:</span>
+        <span class="value">{{ batchStatusResult.statusMessage }}</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Total Amount:</span>
+        <span class="value">{{ batchStatusResult.totalAmount | currency }}</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Transaction Count:</span>
+        <span class="value">{{ batchStatusResult.transactionCount }}</span>
+      </div>
+      <div class="result-item" *ngIf="batchStatusResult.processedDate">
+        <span class="label">Processed Date:</span>
+        <span class="value">{{ batchStatusResult.processedDate | date:'mediumDate' }}</span>
+      </div>
+      <div class="result-item" *ngIf="batchStatusResult.bankReferenceNo">
+        <span class="label">Bank Reference No:</span>
+        <span class="value">{{ batchStatusResult.bankReferenceNo }}</span>
+      </div>
+      <div class="result-item" *ngIf="batchStatusResult.errorCode">
+        <span class="label">Error Code:</span>
+        <span class="value">{{ batchStatusResult.errorCode }}</span>
+      </div>
+      <div class="result-item" *ngIf="batchStatusResult.errorMessage">
+        <span class="label">Error Message:</span>
+        <span class="value">{{ batchStatusResult.errorMessage }}</span>
+      </div>
+    </div>
+  </div>
+</div>

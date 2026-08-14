@@ -1,0 +1,384 @@
+<fieldset>
+  <div class="card dss-card-vh-100" dssViewportHeight="140px">
+    <div class="card-header bg-white border-bottom-0">
+      <div
+        class="d-flex justify-content-between align-items-center flex-wrap gap-2"
+      >
+        <h6 class="card-title mb-0 fw-bold text-primary">
+          <i class="bi bi-bank2 me-2"></i>VAN Expiry Status
+        </h6>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <span
+            class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold"
+          >
+            <i class="bi bi-clock me-1"></i>Expiring in 15 days
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body dss-card-body-scroll p-0">
+      @if (expiryForm) {
+        <form [formGroup]="expiryForm">
+          <!-- Desktop Table View -->
+          <div class="table-responsive d-none d-md-block">
+            <table
+              class="table table-hover table-striped align-middle mb-0"
+              style="font-size: 0.9rem"
+            >
+              <thead class="table-header-blue">
+                <tr>
+                  <th style="width: 12%">Account No</th>
+                  <th style="width: 50%">Employee Name</th>
+                  <th style="width: 12%">VAN Number</th>
+                  <th style="width: 10%">Start Date</th>
+                  <th style="width: 10%">End Date</th>
+                  <td style="width: 6%">Action</td>
+                </tr>
+              </thead>
+              <tbody style="overflow-y: scroll; height: calc(100vh - 300px)">
+                <ng-container formArrayName="rows">
+                  @for (row of paginatedRows.controls; track $index) {
+                    <tr
+                      [formGroupName]="$index + (currentPage - 1) * pageSize"
+                      class="hover-shadow"
+                    >
+                      <td class="py-2" style="width: 12%">
+                        {{ row.get("accountNo")?.value }}
+                      </td>
+                      <td class="py-2" style="width: 50%">
+                        {{ row.get("empName")?.value }}
+                      </td>
+                      <td class="py-2" style="width: 12%">
+                        {{ row.get("vanNumber")?.value }}
+                      </td>
+                      <td class="py-2" style="width: 10%">
+                        {{ row.get("startDate")?.value }}
+                      </td>
+                      <td class="py-2" style="width: 10%">
+                        {{ row.get("endDate")?.value }}
+                      </td>
+                      <td class="py-2" style="width: 6%">
+                        <button
+                          cButton
+                          color="outline-primary"
+                          size="sm"
+                          (click)="
+                            openEditModal($index + (currentPage - 1) * pageSize)
+                          "
+                          class="btn-action"
+                          style="border-radius: 8px; padding: 0.3rem 0.7rem"
+                        >
+                          <svg cIcon name="cilPen" size="sm" class="me-1"></svg>
+                          Edit
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </ng-container>
+
+                @if (!expiryRows.length) {
+                  <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                      <i
+                        class="bi bi-inbox"
+                        style="
+                          font-size: 2rem;
+                          display: block;
+                          margin-bottom: 0.5rem;
+                        "
+                      ></i>
+                      No expiring VANs found
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Card View -->
+          <div class="d-block d-md-none px-3 py-3">
+            <ng-container formArrayName="rows">
+              @for (row of paginatedRows.controls; track $index) {
+                <div
+                  [formGroupName]="$index + (currentPage - 1) * pageSize"
+                  class="card mb-3 shadow-sm border-0"
+                >
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-start mb-3"
+                    >
+                      <span
+                        class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold"
+                        >VAN #{{
+                          $index + 1 + (currentPage - 1) * pageSize
+                        }}</span
+                      >
+                      <button
+                        cButton
+                        color="outline-primary"
+                        size="sm"
+                        (click)="
+                          openEditModal($index + (currentPage - 1) * pageSize)
+                        "
+                        class="btn btn-outline-primary btn-sm"
+                        style="border-radius: 8px; padding: 0.25rem 0.75rem"
+                      >
+                        <svg cIcon name="cilPen" size="sm" class="me-1"></svg>
+                        Edit
+                      </button>
+                    </div>
+
+                    <div class="row mb-2">
+                      <div class="col-5 text-muted fw-semibold small">
+                        <i class="bi bi-person-badge me-1"></i>Account No:
+                      </div>
+                      <div class="col-7 fw-medium">
+                        {{ row.get("accountNo")?.value }}
+                      </div>
+                    </div>
+
+                    <div class="row mb-2">
+                      <div class="col-5 text-muted fw-semibold small">
+                        <i class="bi bi-person me-1"></i>Employee Name:
+                      </div>
+                      <div class="col-7">{{ row.get("empName")?.value }}</div>
+                    </div>
+
+                    <div class="row mb-2">
+                      <div class="col-5 text-muted fw-semibold small">
+                        <i class="bi bi-credit-card me-1"></i>VAN Number:
+                      </div>
+                      <div class="col-7 fw-semibold text-primary">
+                        {{ row.get("vanNumber")?.value }}
+                      </div>
+                    </div>
+
+                    <div class="row mb-2">
+                      <div class="col-5 text-muted fw-semibold small">
+                        <i class="bi bi-calendar-check me-1"></i>Start Date:
+                      </div>
+                      <div class="col-7">
+                        {{ row.get("startDate")?.value | date: "dd/MM/yyyy" }}
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-5 text-muted fw-semibold small">
+                        <i class="bi bi-calendar-x me-1"></i>End Date:
+                      </div>
+                      <div class="col-7">
+                        <span
+                          class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill fw-semibold"
+                        >
+                          <i
+                            class="bi bi-exclamation-triangle-fill me-1"
+                            style="font-size: 0.6rem"
+                          ></i>
+                          {{ row.get("endDate")?.value | date: "dd/MM/yyyy" }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </ng-container>
+
+            @if (!expiryRows.length) {
+              <div class="text-center text-muted py-5">
+                <i
+                  class="bi bi-inbox"
+                  style="font-size: 2rem; display: block; margin-bottom: 0.5rem"
+                ></i>
+                No expiring VANs found
+              </div>
+            }
+          </div>
+        </form>
+      } @else {
+        <div class="text-center text-muted py-5">Loading data...</div>
+      }
+    </div>
+
+    <!-- Card Footer with Pagination -->
+    @if (expiryRows && expiryRows.length > 0) {
+      <div class="card-footer bg-white border-top-0 py-3 px-3">
+        <div
+          class="d-flex justify-content-between align-items-center flex-wrap gap-2"
+        >
+          <div class="text-muted small">
+            Showing
+            <span class="fw-semibold text-dark">{{
+              (currentPage - 1) * pageSize + 1
+            }}</span>
+            to
+            <span class="fw-semibold text-dark">{{
+              Math.min(currentPage * pageSize, expiryRows.length)
+            }}</span>
+            of
+            <span class="fw-semibold text-dark">{{ expiryRows.length }}</span>
+            entries
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button
+              cButton
+              color="outline-secondary"
+              size="sm"
+              (click)="changePage(currentPage - 1)"
+              [disabled]="currentPage === 1"
+              class="btn-pagination"
+              style="border-radius: 8px; padding: 0.3rem 0.9rem"
+            >
+              <i class="bi bi-chevron-left me-1"></i> Previous
+            </button>
+            <span
+              class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold"
+            >
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+            <button
+              cButton
+              color="outline-secondary"
+              size="sm"
+              (click)="changePage(currentPage + 1)"
+              [disabled]="currentPage === totalPages"
+              class="btn-pagination"
+              style="border-radius: 8px; padding: 0.3rem 0.9rem"
+            >
+              Next <i class="bi bi-chevron-right ms-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</fieldset>
+
+<c-modal
+  alignment="center"
+  [visible]="isModalVisible"
+  backdrop="static"
+  style="--cui-modal-width: 560px"
+>
+  <c-modal-header
+    style="
+      border-bottom: 2px solid #e8edf2;
+      background: #f8fafc;
+      padding: 1.25rem 1.5rem;
+      border-radius: 12px 12px 0 0;
+    "
+  >
+    <h5
+      cModalTitle
+      style="
+        color: #1a2332;
+        font-weight: 700;
+        font-size: 1.15rem;
+        letter-spacing: -0.01em;
+        margin: 0;
+      "
+    >
+      Edit VAN Details
+    </h5>
+
+    <button
+      cButtonClose
+      (click)="closeModal()"
+      style="opacity: 0.6; padding: 0.5rem"
+    ></button>
+  </c-modal-header>
+
+  <c-modal-body style="padding: 2rem 1.75rem; background: #ffffff">
+    @if (editForm) {
+      <form [formGroup]="editForm">
+        <div class="row g-3">
+          <div class="col-12">
+            <dss-input-text
+              label="Account No"
+              formControlName="accountNo"
+              sizing="md"
+            ></dss-input-text>
+          </div>
+
+          <div class="col-12">
+            <dss-input-text
+              label="Employee Name"
+              formControlName="empName"
+              sizing="md"
+            ></dss-input-text>
+          </div>
+
+          <div class="col-12">
+            <dss-input-text
+              label="VAN Number"
+              formControlName="vanNumber"
+              sizing="md"
+            ></dss-input-text>
+          </div>
+
+          <div class="col-6">
+            <dss-date-fin
+              label="Start Date"
+              formControlName="startDate"
+              sizing="md"
+            ></dss-date-fin>
+          </div>
+
+          <div class="col-6">
+            <dss-date-fin
+              label="End Date"
+              formControlName="endDate"
+              sizing="md"
+            ></dss-date-fin>
+          </div>
+        </div>
+      </form>
+    }
+  </c-modal-body>
+
+  <c-modal-footer
+    style="
+      border-top: 1px solid #e8edf2;
+      background: #f8fafc;
+      padding: 1rem 1.75rem;
+      border-radius: 0 0 12px 12px;
+      gap: 0.75rem;
+    "
+  >
+    <button
+      cButton
+      color="secondary"
+      (click)="closeModal()"
+      style="
+        border-radius: 8px;
+        padding: 0.55rem 1.5rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        background: #f1f3f5;
+        border: 1px solid #d0d7e2;
+        color: #4a5a6e;
+        transition: background 0.2s;
+      "
+    >
+      Close
+    </button>
+
+    <button
+      cButton
+      color="primary"
+      (click)="saveEdit()"
+      style="
+        border-radius: 8px;
+        padding: 0.55rem 1.75rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        background: #3b82f6;
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        transition: box-shadow 0.2s;
+      "
+    >
+      Save
+    </button>
+  </c-modal-footer>
+</c-modal>

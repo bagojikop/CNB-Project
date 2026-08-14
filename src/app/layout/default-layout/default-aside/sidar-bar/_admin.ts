@@ -27,23 +27,23 @@ export const adminNavItems: INavData[] = [
         icon: 'cil-credit-card',
       },
       {
-        name: 'VAN Statement',
-        url: '/settings-form/userMgtDashboard',
+        name: 'Account Statement',
+        url: '/settings-form/accStatement',
         icon: 'cil-file',
       },
       {
         name: 'Modify VAN',
-        url: '/settings-form/userMgtDashboard',
+        url: '/settings-form/vanModify',
         icon: 'cil-pencil',
       },
       {
         name: 'Retrieve VAN',
-        url: '/settings-form/userMgtDashboard',
+        url: '/settings-form/vanRetrieve',
         icon: 'cil-cloud-download',
       },
       {
         name: 'Push Checker Maker',
-        url: '/settings-form/userMgtDashboard',
+        url: '/settings-form/pushCheckerMaker',
         icon: 'cil-sync',
       },
     ],

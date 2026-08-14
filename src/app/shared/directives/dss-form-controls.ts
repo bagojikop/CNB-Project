@@ -11,9 +11,13 @@ import { DssTableGridComponent } from './dss-table-grid/dss-table-grid';
 import { DssViewportHeightDirective } from './dss-viewport-height/dss-viewport-height.directive';
 
 import {
+  BadgeModule,
   ButtonModule,
+  CardModule,
+  FormCheckComponent,
   GridModule,
   ModalModule,
+  TableModule,
   Tabs2Module,
 } from '@coreui/angular-pro';
 
@@ -25,15 +29,21 @@ import {
   IconModule,
   IconSetService,
 } from '@coreui/icons-angular';
+import { DssInputWithPrefixComponent } from './dss-input-with-prefix/dss-input-with-prefix.component';
 
 export const DSS_FORM_CONTROLS = [
   DssDateFinComponent,
   DssInputNumComponent,
   DssInputNumPipe,
   DssInputTextComponent,
+  DssInputWithPrefixComponent,
   DssTableGridComponent,
   NgCustomSelectComponent,
   CaseStyleDirective,
+  TableModule,
+  BadgeModule,
+  CardModule,
+  FormCheckComponent,
   DssViewportHeightDirective,
   NavactionsComponent,
   DatePipe,
@@ -50,9 +60,15 @@ export {
   DssDateFinComponent,
   DssInputNumComponent,
   DssInputNumPipe,
+  TableModule,
+  FormCheckComponent,
+  BadgeModule,
+  CardModule,
+  DssInputWithPrefixComponent,
   DssInputTextComponent,
   DssTableGridComponent,
   NgCustomSelectComponent,
+  ButtonModule,
   CaseStyleDirective,
   DssViewportHeightDirective,
   NavactionsComponent,

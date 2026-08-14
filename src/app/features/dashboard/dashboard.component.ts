@@ -58,6 +58,7 @@ export class DashboardComponent {
       icon: 'cilClock',
       color: 'warning',
     },
+
     {
       id: 2,
       title: 'Payment Received by VAN',
@@ -90,6 +91,13 @@ export class DashboardComponent {
       id: 6,
       title: 'Batch Status',
       count: 8,
+      icon: 'cilList',
+      color: 'danger',
+    },
+    {
+      id: 7,
+      title: 'VAN Expiry Status',
+      count: 10,
       icon: 'cilList',
       color: 'danger',
     },
@@ -130,6 +138,26 @@ export class DashboardComponent {
     switch (card.id) {
       case 1:
         this.glob_Routing('/dashboard/dashboard-form/payment-request-Approval');
+        break;
+
+      case 2:
+        this.glob_Routing('/dashboard/dashboard-form/paymentReceivedByVAN');
+        break;
+
+      case 4:
+        this.glob_Routing('/dashboard/dashboard-form/paymentStatus');
+        break;
+
+      case 5:
+        this.glob_Routing('/dashboard/dashboard-form/qrStatement');
+        break;
+
+      case 6:
+        this.glob_Routing('/dashboard/dashboard-form/batchStatus');
+        break;
+
+      case 7:
+        this.glob_Routing('/dashboard/dashboard-form/VANExpiryStatus');
         break;
     }
   }

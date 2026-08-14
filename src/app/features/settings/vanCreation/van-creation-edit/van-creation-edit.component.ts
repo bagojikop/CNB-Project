@@ -82,13 +82,18 @@ export class VanCreationEditComponent implements OnInit {
     var data: any = this.location.getState();
     console.log('received ID:', data);
 
+    // Listen to countVAN changes to auto-generate VAN numbers
+    this.customGroup.get('countVAN')?.valueChanges.subscribe((count) => {
+      if (count && count > 0) {
+        this.generateVANNumbers();
+      }
+    });
+
     if (data && data.id) {
       this.form.disable();
 
-      this.form.get('custom.startDate')?.enable();
       this.form.get('custom.endDate')?.enable();
 
-      this.form.get('random.startDate')?.enable();
       this.form.get('random.endDate')?.enable();
 
       this.saveUndoButtonIsDisable = true;
@@ -130,6 +135,28 @@ export class VanCreationEditComponent implements OnInit {
           });
         },
       });
+    }
+  }
+
+  // Generate unique VAN numbers based on count
+  generateVANNumbers(): void {
+    const count = this.customGroup.get('countVAN')?.value;
+    if (!count || count < 1) {
+      return;
+    }
+
+    // Clear existing VAN details
+    this.virtualAccountDetails.clear();
+
+    // Generate unique VAN numbers
+    const timestamp = Date.now().toString().slice(-6);
+    for (let i = 0; i < count; i++) {
+      const vanNumber = `VAN${timestamp}${String(i + 1).padStart(3, '0')}`;
+      this.virtualAccountDetails.push(
+        this.fb.group({
+          vanNumber: [vanNumber, Validators.required],
+        }),
+      );
     }
   }
 
@@ -194,6 +221,17 @@ export class VanCreationEditComponent implements OnInit {
     return index;
   }
 
+  // Generate random VAN numbers for random mode
+  generateRandomVANs(count: number): any[] {
+    const vans = [];
+    const timestamp = Date.now().toString().slice(-6);
+    for (let i = 0; i < count; i++) {
+      const vanNumber = `VAN${timestamp}${String(i + 1).padStart(3, '0')}`;
+      vans.push({ vanNumber });
+    }
+    return vans;
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -222,6 +260,11 @@ export class VanCreationEditComponent implements OnInit {
       };
     } else {
       const random = this.randomGroup.value;
+      const count = Number(random.countVAN) || 0;
+
+      // Generate VAN numbers for random mode
+      const randomVans = this.generateRandomVANs(count);
+
       payload = {
         id: id || '',
         Request: {
@@ -230,7 +273,8 @@ export class VanCreationEditComponent implements OnInit {
               accountNo: random.accountNo,
               startDate: random.startDate,
               endDate: random.endDate,
-              countVAN: String(random.countVAN),
+              countVAN: String(count),
+              virtualAccountDetails: randomVans,
             },
           },
         },

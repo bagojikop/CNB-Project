@@ -1,7 +1,32 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { NgClass, CommonModule } from '@angular/common';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+export interface SinglePaymentAPI {
+  Request: {
+    body: {
+      encryptData: SinglePayment;
+    };
+  };
+}
+
+export interface SinglePayment {
+  Authorization: string;
+  key: string;
+  customerID: string;
+  srcAcctNumber: string;
+  txnPassword: string;
+  branchCode: string;
+  destAcctNumber: string;
+  ifscCode: string;
+  txnAmount: string;
+  benefName: string;
+  userRefNo: string;
+  narration: string;
+  valueDate: string;
+  TrnType: string;
+}
 
 @Component({
   selector: 'app-payment-request-approval',
@@ -10,6 +35,11 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './payment-request-approval.component.scss',
 })
 export class PaymentRequestApprovalComponent {
+  // Filter and pagination properties
+  selectedPaymentType: string = 'all';
+  currentPage: number = 1;
+  itemsPerPage: number = 3;
+
   approvalData: any[] = [
     {
       id: 1,
@@ -145,12 +175,16 @@ export class PaymentRequestApprovalComponent {
   showDetails = false;
   selectedBulkItems: Set<number> = new Set();
   selectAllBulk = false;
+  dropdownRef: any = null;
 
   onShow(item: any) {
-    this.selectedItem = item;
-    this.selectedBulkItems = new Set();
-    this.selectAllBulk = false;
-    this.showDetails = true;
+    // Only show details for Bulk payments
+    if (item.paymentType === 'Bulk') {
+      this.selectedItem = item;
+      this.selectedBulkItems = new Set();
+      this.selectAllBulk = false;
+      this.showDetails = true;
+    }
   }
 
   closeDetails() {
@@ -214,11 +248,97 @@ export class PaymentRequestApprovalComponent {
     }
   }
 
+  // Get filtered data based on selected payment type
+  get filteredData(): any[] {
+    if (this.selectedPaymentType === 'all') {
+      return this.approvalData;
+    }
+    return this.approvalData.filter(
+      (item) =>
+        item.paymentType.toLowerCase() ===
+        this.selectedPaymentType.toLowerCase(),
+    );
+  }
+
+  // Get total pages
+  get totalPages(): number {
+    return Math.ceil(this.filteredData.length / this.itemsPerPage);
+  }
+
+  // Get paginated data for current page
+  get paginatedData(): any[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredData.slice(startIndex, endIndex);
+  }
+
+  // Change page
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  // Previous page
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  // Next page
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  // Handle payment type filter change
+  onPaymentTypeChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.selectedPaymentType = select.value;
+    this.currentPage = 1; // Reset to first page when filter changes
+  }
+
   getPendingCount(): number {
     return this.approvalData.filter((x) => x.status === 'Pending').length;
   }
 
   approveSinglePayment(item: any) {
+    // Build the SinglePaymentAPI request payload
+    const singlePaymentRequest: SinglePaymentAPI = {
+      Request: {
+        body: {
+          encryptData: {
+            Authorization: item.authorization || 'AUTH123456',
+            key: item.key || 'KEY789012',
+            customerID: item.customerID || 'CUST001',
+            srcAcctNumber: item.srcAcctNumber || '1234567890',
+            txnPassword: item.txnPassword || '******',
+            branchCode: item.branchCode || 'BR001',
+            destAcctNumber: item.destAcctNumber || '0987654321',
+            ifscCode: item.ifscCode || 'SBIN0001234',
+            txnAmount: item.totalAmount?.toString() || '0',
+            benefName: item.partyName || 'Beneficiary',
+            userRefNo: item.userRefNo || item.batchId || 'REF001',
+            narration: item.narration || item.paymentAgainst || 'Payment',
+            valueDate:
+              item.valueDate ||
+              item.requestDate ||
+              new Date().toISOString().split('T')[0],
+            TrnType: item.TrnType || 'SINGLE',
+          },
+        },
+      },
+    };
+
+    // Log the request for debugging
+    console.log(
+      'Approving Single Payment Request:',
+      JSON.stringify(singlePaymentRequest, null, 2),
+    );
+
+    // Simulate API call
     const index = this.approvalData.findIndex((d) => d.id === item.id);
     if (index !== -1) {
       this.approvalData[index].status = 'Approved';
@@ -228,6 +348,39 @@ export class PaymentRequestApprovalComponent {
   }
 
   rejectSinglePayment(item: any) {
+    // Build the SinglePaymentAPI request payload for rejection
+    const singlePaymentRequest: SinglePaymentAPI = {
+      Request: {
+        body: {
+          encryptData: {
+            Authorization: item.authorization || 'AUTH123456',
+            key: item.key || 'KEY789012',
+            customerID: item.customerID || 'CUST001',
+            srcAcctNumber: item.srcAcctNumber || '1234567890',
+            txnPassword: item.txnPassword || '******',
+            branchCode: item.branchCode || 'BR001',
+            destAcctNumber: item.destAcctNumber || '0987654321',
+            ifscCode: item.ifscCode || 'SBIN0001234',
+            txnAmount: item.totalAmount?.toString() || '0',
+            benefName: item.partyName || 'Beneficiary',
+            userRefNo: item.userRefNo || item.batchId || 'REF001',
+            narration: `REJECTED: ${item.narration || item.paymentAgainst || 'Payment'}`,
+            valueDate:
+              item.valueDate ||
+              item.requestDate ||
+              new Date().toISOString().split('T')[0],
+            TrnType: item.TrnType || 'SINGLE',
+          },
+        },
+      },
+    };
+
+    // Log the request for debugging
+    console.log(
+      'Rejecting Single Payment Request:',
+      JSON.stringify(singlePaymentRequest, null, 2),
+    );
+
     const index = this.approvalData.findIndex((d) => d.id === item.id);
     if (index !== -1) {
       this.approvalData[index].status = 'Rejected';
@@ -260,5 +413,93 @@ export class PaymentRequestApprovalComponent {
       selectedItem?.paymentType === 'Bulk' &&
       selectedItem?.bulkItems?.some((item: any) => item.status !== 'Approved')
     );
+  }
+
+  // Dropdown toggle methods
+  toggleDropdown(dropdown: any): void {
+    dropdown.isOpen = !dropdown.isOpen;
+    // Close other dropdowns if needed
+    if (dropdown.isOpen) {
+      document.querySelectorAll('.dropdown-menu.show').forEach((el) => {
+        if (el !== dropdown.querySelector('.dropdown-menu')) {
+          el.classList.remove('show');
+        }
+      });
+      // Add click outside listener
+      setTimeout(() => {
+        document.addEventListener(
+          'click',
+          this.handleClickOutside.bind(this, dropdown),
+        );
+      }, 0);
+    } else {
+      document.removeEventListener(
+        'click',
+        this.handleClickOutside.bind(this, dropdown),
+      );
+    }
+  }
+
+  handleClickOutside(dropdown: any, event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const dropdownElement =
+      dropdown._elementRef?.nativeElement || dropdown.parentElement;
+    if (dropdownElement && !dropdownElement.contains(target)) {
+      this.closeDropdown(dropdown);
+      document.removeEventListener(
+        'click',
+        this.handleClickOutside.bind(this, dropdown),
+      );
+    }
+  }
+
+  closeDropdown(dropdown: any): void {
+    dropdown.isOpen = false;
+    document.removeEventListener(
+      'click',
+      this.handleClickOutside.bind(this, dropdown),
+    );
+  }
+
+  holdSinglePayment(item: any): void {
+    // Build the SinglePaymentAPI request payload for hold
+    const singlePaymentRequest: SinglePaymentAPI = {
+      Request: {
+        body: {
+          encryptData: {
+            Authorization: item.authorization || 'AUTH123456',
+            key: item.key || 'KEY789012',
+            customerID: item.customerID || 'CUST001',
+            srcAcctNumber: item.srcAcctNumber || '1234567890',
+            txnPassword: item.txnPassword || '******',
+            branchCode: item.branchCode || 'BR001',
+            destAcctNumber: item.destAcctNumber || '0987654321',
+            ifscCode: item.ifscCode || 'SBIN0001234',
+            txnAmount: item.totalAmount?.toString() || '0',
+            benefName: item.partyName || 'Beneficiary',
+            userRefNo: item.userRefNo || item.batchId || 'REF001',
+            narration: `HOLD: ${item.narration || item.paymentAgainst || 'Payment'}`,
+            valueDate:
+              item.valueDate ||
+              item.requestDate ||
+              new Date().toISOString().split('T')[0],
+            TrnType: item.TrnType || 'SINGLE',
+          },
+        },
+      },
+    };
+
+    // Log the request for debugging
+    console.log(
+      'Holding Single Payment Request:',
+      JSON.stringify(singlePaymentRequest, null, 2),
+    );
+
+    const index = this.approvalData.findIndex((d) => d.id === item.id);
+    if (index !== -1) {
+      this.approvalData[index].status = 'Hold';
+      console.log('Payment Held:', item);
+    }
+    this.closeDropdown(this.dropdownRef);
   }
 }

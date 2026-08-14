@@ -24,7 +24,7 @@ export function createConfigurationForm(fb: FormBuilder) {
 
     accountNo: fb.nonNullable.control<cinfDetlFormValue['accountNo']>('', [
       Validators.required,
-      Validators.maxLength(14),
+      Validators.maxLength(12),
       Validators.minLength(14),
     ]),
 

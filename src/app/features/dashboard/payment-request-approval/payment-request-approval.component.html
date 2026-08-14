@@ -2,12 +2,24 @@
   <div class="card-body dss-card-body-scroll">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h5 class="mb-0">Payment Request Approval</h5>
-      <span class="badge bg-primary">{{ getPendingCount() }} Pending</span>
+
+      <div class="d-flex align-items-center gap-3">
+        <select
+          class="form-select form-select-sm"
+          style="width: auto"
+          (change)="onPaymentTypeChange($event)"
+        >
+          <option value="all">All</option>
+          <option value="single">Single</option>
+          <option value="bulk">Bulk</option>
+        </select>
+        <span class="badge bg-primary">{{ getPendingCount() }} Pending</span>
+      </div>
     </div>
 
     <!-- Form-like Card View -->
     <div class="row">
-      @for (item of approvalData; track item.id) {
+      @for (item of paginatedData; track item.id) {
         <div class="col-12 mb-3">
           <div class="payment-card card">
             <div
@@ -24,19 +36,83 @@
                 </span>
                 <strong>Batch: {{ item.batchId }}</strong>
               </div>
-              <div>
+              <div class="d-flex align-items-center gap-2">
                 <span
                   class="badge me-2"
                   [ngClass]="getStatusClass(item.status)"
                 >
                   {{ item.status }}
                 </span>
-                <button
-                  class="btn btn-sm btn-outline-primary"
-                  (click)="onShow(item)"
-                >
-                  <i class="bi bi-eye"></i> View Details
-                </button>
+                <!-- View Details Button (Bulk only) -->
+                @if (item.paymentType === "Bulk") {
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    (click)="onShow(item)"
+                  >
+                    <i class="bi bi-eye"></i> View Details
+                  </button>
+                }
+                <!-- More Actions Dropdown (Single only) -->
+                @if (item.paymentType === "Single") {
+                  <div
+                    class="dropdown d-inline-block"
+                    #dropdown=""
+                    (click)="$event.stopPropagation()"
+                  >
+                    <button
+                      class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                      type="button"
+                      (click)="toggleDropdown(dropdown)"
+                      [disabled]="item.status !== 'Pending'"
+                    >
+                      <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul
+                      class="dropdown-menu dropdown-menu-end"
+                      [class.show]="dropdown.isOpen"
+                      style="
+                        position: absolute;
+                        inset: 0px 0px auto auto;
+                        transform: translate(0px, -5px);
+                        z-index: 1050;
+                      "
+                    >
+                      <li>
+                        <button
+                          class="dropdown-item text-success"
+                          (click)="
+                            approveSinglePayment(item); closeDropdown(dropdown)
+                          "
+                          [disabled]="item.status !== 'Pending'"
+                        >
+                          <i class="bi bi-check-circle-fill me-2"></i> Approve
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          class="dropdown-item text-danger"
+                          (click)="
+                            rejectSinglePayment(item); closeDropdown(dropdown)
+                          "
+                          [disabled]="item.status !== 'Pending'"
+                        >
+                          <i class="bi bi-x-circle-fill me-2"></i> Reject
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          class="dropdown-item text-warning"
+                          (click)="
+                            holdSinglePayment(item); closeDropdown(dropdown)
+                          "
+                          [disabled]="item.status !== 'Pending'"
+                        >
+                          <i class="bi bi-clock-fill me-2"></i> Hold
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                }
               </div>
             </div>
             <div class="card-body">
@@ -75,12 +151,51 @@
             </div>
           </div>
         </div>
+      } @empty {
+        <div class="col-12">
+          <div class="alert alert-info text-center">
+            No payment requests found for the selected filter.
+          </div>
+        </div>
       }
     </div>
 
-    <!-- Approval Modal -->
-    <!-- Approval Modal -->
-    @if (showDetails && selectedItem) {
+    <!-- Pagination Controls -->
+    @if (totalPages > 1) {
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="text-muted small">
+          Showing {{ (currentPage - 1) * itemsPerPage + 1 }} -
+          {{
+            currentPage * itemsPerPage > filteredData.length
+              ? filteredData.length
+              : currentPage * itemsPerPage
+          }}
+          of {{ filteredData.length }} items
+        </div>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="previousPage()">
+                Previous
+              </button>
+            </li>
+            @for (page of [].constructor(totalPages); track $index) {
+              <li class="page-item" [class.active]="currentPage === $index + 1">
+                <button class="page-link" (click)="goToPage($index + 1)">
+                  {{ $index + 1 }}
+                </button>
+              </li>
+            }
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="nextPage()">Next</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    }
+
+    <!-- Approval Modal (Only for Bulk payments) -->
+    @if (showDetails && selectedItem && selectedItem.paymentType === "Bulk") {
       <div class="modal-overlay">
         <div class="modal-content modal-lg">
           <div class="modal-header">
@@ -95,7 +210,11 @@
             <div class="row">
               <div class="col-md-6">
                 <div class="detail-group">
-                  <label>Batch No.</label>
+                  <label>{{
+                    selectedItem.paymentType === "Single"
+                      ? "Reference No."
+                      : "Batch No."
+                  }}</label>
                   <p>
                     <strong>{{ selectedItem.batchId }}</strong>
                   </p>

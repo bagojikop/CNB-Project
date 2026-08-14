@@ -99,7 +99,7 @@ export class AuthService {
     //   password: 'zakkas@@',
     // });
 
-    return this.userSrc.getByAuth('Sss', 'asbcd');
+    return this.userSrc.getByAuth('Rakesh', 'abcd');
   }
 
   logout(): void {

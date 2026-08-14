@@ -77,7 +77,7 @@ export class DssTableDashboardComponent implements AfterViewInit {
   }
   @Input() scope: DssTableDashboardScope = 'me';
   @Input() showNewButton = true;
-  @Input() showShowButton = false;
+  @Input() showShowButton: boolean = false;
   @Input() newButtonLabel = 'New';
   @Input() filterButtonLabel = 'Filter';
   @Input() filterTitle = '';

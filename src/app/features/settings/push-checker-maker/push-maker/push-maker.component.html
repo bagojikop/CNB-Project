@@ -1,0 +1,449 @@
+<div class="container-fluid p-0">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div></div>
+    <div>
+      <span class="badge bg-primary rounded-pill px-3 py-2 me-2">
+        Total Batches: {{ batchList.length }}
+      </span>
+      <button
+        type="button"
+        class="btn btn-success px-4"
+        (click)="acceptAllBatches()"
+        [disabled]="!hasAnyBatchSelected()"
+      >
+        <i class="bi bi-check2-all me-2"></i>Accept All Selected
+      </button>
+    </div>
+  </div>
+
+  <!-- Batches Table -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-white py-1">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small"
+            >{{ batchList.length }} batches available</span
+          >
+        </div>
+        <div class="d-flex gap-2">
+          <span
+            class="badge bg-success rounded-pill px-3 py-2"
+            *ngIf="getSelectedBatchCount() > 0"
+          >
+            Selected: {{ getSelectedBatchCount() }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 20px">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  (change)="toggleAllBatches($event)"
+                  [checked]="isAllBatchesSelected()"
+                />
+              </th>
+              <th style="width: 20px">#</th>
+              <th style="width: 10%">Batch Request ID</th>
+              <th style="width: 20%">Authorization</th>
+              <th style="width: 20%">Customer ID</th>
+              <th style="width: 15%" class="text-end">Total Amount</th>
+              <th style="width: 7%" class="text-center">Transactions</th>
+              <th style="width: 12%">Date</th>
+              <th style="width: 40px" class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody style="height: calc(100vh - 34em); overflow-y: scroll">
+            @if (paginatedBatchList.length > 0) {
+              @for (
+                batch of paginatedBatchList;
+                track batch.BatchRequestID;
+                let i = $index
+              ) {
+                <tr [class.table-active]="selectedBatchIndex === i">
+                  <td style="width: 20px">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      [checked]="selectedBatches[i]"
+                      (change)="toggleBatchSelection(i, $event)"
+                    />
+                  </td>
+                  <td
+                    class="text-center fw-semibold text-muted"
+                    style="width: 20px"
+                  >
+                    {{ i + 1 }}
+                  </td>
+                  <td style="width: 10%">
+                    <span class="fw-semibold">{{ batch.BatchRequestID }}</span>
+                  </td>
+                  <td style="width: 20%">{{ batch.Authorization }}</td>
+                  <td style="width: 20%">{{ batch.CustomerID }}</td>
+                  <td
+                    class="text-end fw-semibold text-success"
+                    style="width: 15%"
+                  >
+                    ₹ {{ batch.TotAmt | number: "1.2-2" }}
+                  </td>
+                  <td class="text-center" style="width: 7%">
+                    <span class="badge bg-info rounded-pill px-3 py-2">
+                      {{ batch.TxnDtls.Txn.length }}
+                    </span>
+                  </td>
+                  <td style="width: 12%">{{ batch.DatTxn }}</td>
+                  <td class="text-center" style="width: 40px">
+                    <div class="d-flex gap-1 justify-content-center">
+                      <button
+                        type="button"
+                        class="btn btn-outline-primary btn-sm"
+                        (click)="viewBatchTransactions(i)"
+                        title="View Transactions"
+                      >
+                        <i class="bi bi-eye"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        (click)="removeBatch(i)"
+                        [disabled]="batchList.length <= 1"
+                        title="Remove Batch"
+                      >
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            } @else {
+              <tr>
+                <td colspan="9" class="text-center py-2 text-muted">
+                  <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                  <p class="mb-0">No batches available</p>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Summary Footer -->
+    <div class="card-footer bg-white">
+      <div class="row g-3">
+        <div class="col-md-4 col-sm-6">
+          <div class="text-center">
+            <span class="text-muted d-block small">Total Batches</span>
+            <h5 class="mb-0 fw-bold">{{ batchList.length }}</h5>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+          <div class="text-center">
+            <span class="text-muted d-block small">Selected Batches</span>
+            <h5 class="mb-0 fw-bold text-primary">
+              {{ getSelectedBatchCount() }}
+            </h5>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+          <div class="text-center">
+            <span class="text-muted d-block small"
+              >Total Amount (All Batches)</span
+            >
+            <h5 class="mb-0 fw-bold text-success">
+              ₹ {{ getGrandTotalAmount() | number: "1.2-2" }}
+            </h5>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="card-footer bg-white border-top" *ngIf="totalItems > 0">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="text-muted small">
+          Showing {{ startIndex }} - {{ endIndex }} of {{ totalItems }} entries
+        </div>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="changePage(currentPage - 1)"
+                >Previous</a
+              >
+            </li>
+            <li
+              class="page-item"
+              *ngFor="let page of visiblePages"
+              [class.active]="page === currentPage"
+              [class.disabled]="page === -1"
+            >
+              <a class="page-link" (click)="page !== -1 && changePage(page)">
+                {{ page === -1 ? "…" : page }}
+              </a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" (click)="changePage(currentPage + 1)"
+                >Next</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Batch Transactions Modal -->
+<div
+  class="modal fade"
+  [class.show]="showBatchModal"
+  [style.display]="showBatchModal ? 'block' : 'none'"
+  tabindex="-1"
+>
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-list-task me-2"></i>Transactions for
+          {{ selectedBatchForModal?.BatchRequestID || "" }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          (click)="closeBatchModal()"
+        ></button>
+      </div>
+      <div class="modal-body p-4">
+        <!-- Batch Summary inside modal -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-3 col-sm-6">
+            <div class="bg-light p-3 rounded-3 text-center">
+              <span class="text-muted d-block small">Authorization</span>
+              <h6 class="mb-0 fw-bold">
+                {{ selectedBatchForModal?.Authorization || "-" }}
+              </h6>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="bg-light p-3 rounded-3 text-center">
+              <span class="text-muted d-block small">Customer ID</span>
+              <h6 class="mb-0 fw-bold">
+                {{ selectedBatchForModal?.CustomerID || "-" }}
+              </h6>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="bg-light p-3 rounded-3 text-center">
+              <span class="text-muted d-block small">Total Amount</span>
+              <h6 class="mb-0 fw-bold text-success">
+                ₹ {{ selectedBatchForModal?.TotAmt || 0 | number: "1.2-2" }}
+              </h6>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="bg-light p-3 rounded-3 text-center">
+              <span class="text-muted d-block small">Transaction Date</span>
+              <h6 class="mb-0 fw-bold">
+                {{ selectedBatchForModal?.DatTxn || "-" }}
+              </h6>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transactions Table inside modal -->
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 50px">#</th>
+                <th style="width: 10%">Txn. Ref</th>
+                <th style="width: 15%">Debit Account</th>
+                <th style="width: 25%">Sender Name</th>
+                <th style="width: 10%" class="text-end">Amount</th>
+                <th style="width: 10%">Type</th>
+                <th style="width: 25%">Beneficiary</th>
+              </tr>
+            </thead>
+            <tbody style="height: calc(50vh - 25rem); overflow-y: scroll">
+              @if (selectedBatchForModal?.TxnDtls?.Txn?.length > 0) {
+                @for (
+                  txn of selectedBatchForModal?.TxnDtls?.Txn || [];
+                  track txn.TxnRefNo;
+                  let i = $index
+                ) {
+                  <tr>
+                    <td
+                      class="text-center fw-semibold text-muted"
+                      style="width: 50px"
+                    >
+                      {{ i + 1 }}
+                    </td>
+                    <td style="width: 10%">
+                      <span class="fw-semibold">{{ txn.TxnRefNo }}</span>
+                    </td>
+                    <td style="width: 15%">{{ txn.DrAcct }}</td>
+                    <td style="width: 25%">{{ txn.SndrNm }}</td>
+                    <td class="text-end fw-semibold" style="width: 10%">
+                      ₹ {{ txn.TxnAmt | number: "1.2-2" }}
+                    </td>
+                    <td style="width: 10%">
+                      <span
+                        class="badge"
+                        [class.bg-primary]="txn.TxnType === 'NEFT'"
+                        [class.bg-success]="txn.TxnType === 'RTGS'"
+                        [class.bg-warning]="txn.TxnType === 'IMPS'"
+                      >
+                        {{ txn.TxnType }}
+                      </span>
+                    </td>
+                    <td style="width: 25%">
+                      <span
+                        class="d-inline-block text-truncate"
+                        style="max-width: 150px"
+                        title="{{ txn.BenefAcNm }} ({{ txn.BenefAcNo }})"
+                      >
+                        {{ txn.BenefAcNm }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              } @else {
+                <tr>
+                  <td colspan="8" class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox display-6 d-block mb-2"></i>
+                    <p class="mb-0">No transactions in this batch</p>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Modal Footer with Accept Button -->
+      </div>
+      <div class="modal-footer bg-light">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeBatchModal()"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+@if (showBatchModal) {
+  <div class="modal-backdrop fade show"></div>
+}
+
+<!-- Transaction Details Modal (Single Transaction) -->
+<div
+  class="modal fade"
+  [class.show]="showTransactionModal"
+  [style.display]="showTransactionModal ? 'block' : 'none'"
+  tabindex="-1"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-info-circle me-2"></i>Transaction Details
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          (click)="closeTransactionModal()"
+        ></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="text-muted small fw-semibold"
+              >Transaction Ref No</label
+            >
+            <p class="fw-semibold mb-0">
+              {{ selectedTransaction?.TxnRefNo || "-" }}
+            </p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small fw-semibold">Debit Account</label>
+            <p class="fw-semibold mb-0">
+              {{ selectedTransaction?.DrAcct || "-" }}
+            </p>
+          </div>
+          <div class="col-md-4">
+            <label class="text-muted small fw-semibold">Sender Name</label>
+            <p class="fw-semibold mb-0">
+              {{ selectedTransaction?.SndrNm || "-" }}
+            </p>
+          </div>
+          <div class="col-md-4">
+            <label class="text-muted small fw-semibold"
+              >Transaction Amount</label
+            >
+            <p class="fw-semibold text-success mb-0">
+              ₹ {{ selectedTransaction?.TxnAmt || 0 | number: "1.2-2" }}
+            </p>
+          </div>
+          <div class="col-md-4">
+            <label class="text-muted small fw-semibold">Transaction Type</label>
+            <p class="mb-0">
+              <span
+                class="badge"
+                [class.bg-primary]="selectedTransaction?.TxnType === 'NEFT'"
+                [class.bg-success]="selectedTransaction?.TxnType === 'RTGS'"
+                [class.bg-warning]="selectedTransaction?.TxnType === 'IMPS'"
+              >
+                {{ selectedTransaction?.TxnType || "-" }}
+              </span>
+            </p>
+          </div>
+          <div class="col-md-4">
+            <label class="text-muted small fw-semibold">Beneficiary IFSC</label>
+            <p class="fw-semibold mb-0">
+              {{ selectedTransaction?.BenefIFSC || "-" }}
+            </p>
+          </div>
+          <div class="col-md-4">
+            <label class="text-muted small fw-semibold"
+              >Beneficiary Account No</label
+            >
+            <p class="fw-semibold mb-0">
+              {{ selectedTransaction?.BenefAcNo || "-" }}
+            </p>
+          </div>
+          <div class="col-md-4">
+            <label class="text-muted small fw-semibold"
+              >Beneficiary Account Name</label
+            >
+            <p class="fw-semibold mb-0">
+              {{ selectedTransaction?.BenefAcNm || "-" }}
+            </p>
+          </div>
+          <div class="col-md-12">
+            <label class="text-muted small fw-semibold">Narrative</label>
+            <p class="mb-0">{{ selectedTransaction?.Nrtv || "-" }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeTransactionModal()"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+@if (showTransactionModal) {
+  <div class="modal-backdrop fade show"></div>
+}

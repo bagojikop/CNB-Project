@@ -1,0 +1,38 @@
+<div class="input-group-container">
+  <!-- Label -->
+  @if (label) {
+    <label class="input-group-label mb-0" style="color: #212529">
+      {{ label }}
+
+      @if (required) {
+        <span class="required">*</span>
+      }
+    </label>
+  }
+
+  <!-- Inputs -->
+  <div class="input-group-wrapper" [ngClass]="'input-group-' + size">
+    <!-- First Input -->
+    <input
+      type="text"
+      class="form-control first-input"
+      [style.width]="firstWidth"
+      [(ngModel)]="firstValue"
+      [disabled]="disabled"
+      [placeholder]="firstPlaceholder"
+      (ngModelChange)="onInputChange()"
+      (blur)="onInputBlur()"
+    />
+
+    <!-- Second Input -->
+    <input
+      type="text"
+      class="form-control second-input"
+      [(ngModel)]="secondValue"
+      [disabled]="disabled"
+      [placeholder]="secondPlaceholder"
+      (ngModelChange)="onInputChange()"
+      (blur)="onInputBlur()"
+    />
+  </div>
+</div>

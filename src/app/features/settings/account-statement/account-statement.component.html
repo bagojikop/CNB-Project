@@ -1,0 +1,354 @@
+<div class="card dss-card-vh-100" dssViewportHeight="140px">
+  <div class="card-header">
+    <div
+      class="d-flex flex-wrap gap-3 align-items-center justify-content-between"
+    >
+      <div class="d-flex gap-3 align-items-center flex-shrink-0">
+        <svg cIcon name="cilBank" size="lg"></svg>
+        <h3 class="mb-0">Account Statement</h3>
+      </div>
+      <div
+        class="row w-100 w-md-auto flex-grow-1 flex-md-grow-0"
+        style="max-width: 700px"
+      >
+        <div class="col-12 col-md-5">
+          <dss-input-text
+            label="Account No"
+            [value]="filterForm.get('accountNo')?.value"
+            (valueChange)="filterForm.get('accountNo')?.setValue($event)"
+          ></dss-input-text>
+        </div>
+        <div class="col-6 col-md-3">
+          <dss-date-fin
+            label="From Date"
+            [value]="filterForm.get('fromDate')?.value"
+            (valueChange)="filterForm.get('fromDate')?.setValue($event)"
+          ></dss-date-fin>
+        </div>
+        <div class="col-6 col-md-3">
+          <dss-date-fin
+            label="End Date"
+            [value]="filterForm.get('endDate')?.value"
+            (valueChange)="filterForm.get('endDate')?.setValue($event)"
+          ></dss-date-fin>
+        </div>
+        <div class="col-12 col-md-1 d-flex align-items-center mt-2 mt-md-0">
+          <button cButton (click)="showResult()" size="sm" class="w-100">
+            <i class="bi bi-eye text-light"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body dss-card-body-scroll">
+    <div class="table-responsive table-to-card">
+      <table class="table table-striped table-hover table-bordered">
+        <thead class="table-primary">
+          <tr>
+            <th style="width: 30%">Customer Name</th>
+            <th style="width: 15%">From Date</th>
+            <th style="width: 15%">End Date</th>
+            <th style="width: 15%">Opening Balance</th>
+            <th style="width: 15%">Closing Balance</th>
+            <th style="width: 10%"></th>
+          </tr>
+        </thead>
+        <tbody style="height: calc(100vh - 320px); overflow-y: scroll">
+          @for (item of jsonData; track item) {
+            <tr>
+              <td style="width: 30%" data-label="Customer Name">
+                {{ item.customerName }}
+              </td>
+              <td style="width: 15%" data-label="From Date">
+                {{ item.fromDate | date: "dd/MM/yyyy" }}
+              </td>
+              <td style="width: 15%" data-label="End Date">
+                {{ item.endDate | date: "dd/MM/yyyy" }}
+              </td>
+              <td style="width: 15%" data-label="Opening Balance">
+                {{ item.openingBalance }}
+              </td>
+              <td style="width: 15%" data-label="Closing Balance">
+                {{ item.closingBalance }}
+              </td>
+              <td style="width: 10%" data-label="Action">
+                <button cButton size="sm" (click)="openModal(item)">
+                  Details
+                </button>
+              </td>
+            </tr>
+            @if (item.showTransactions) {
+              <tr>
+                <td colspan="6">
+                  <div class="transaction-table-wrapper">
+                    <h6 class="mt-2 mb-2">
+                      Transaction History - {{ item.customerName }}
+                    </h6>
+                    <table class="table table-sm table-bordered">
+                      <thead class="table-secondary">
+                        <tr>
+                          <th>Date</th>
+                          <th>Description</th>
+                          <th>Debit</th>
+                          <th>Credit</th>
+                          <th>Balance</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (txn of item.transactions; track txn) {
+                          <tr>
+                            <td>{{ txn.date | date: "dd/MM/yyyy" }}</td>
+                            <td>{{ txn.description }}</td>
+                            <td>{{ txn.debit || "-" }}</td>
+                            <td>{{ txn.credit || "-" }}</td>
+                            <td>{{ txn.balance }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Simple Modal -->
+@if (showModal && selectedAccount) {
+  <div class="modal-backdrop fade show"></div>
+  <div
+    class="modal d-block"
+    tabindex="-1"
+    style="display: block; background: rgba(0, 0, 0, 0.5); overflow-y: auto"
+  >
+    <div
+      class="modal-dialog modal-lg modal-dialog-centered"
+      style="max-width: 60%"
+    >
+      <div class="modal-content shadow-lg border-0 rounded-4">
+        <div class="modal-header bg-primary text-white border-0">
+          <div class="d-flex align-items-center gap-3">
+            <svg cIcon name="cilAccount" size="xl" class="text-white"></svg>
+            <div>
+              <h5 class="modal-title fw-bold mb-0">
+                Account Statement Details
+              </h5>
+              <small class="text-white-50">{{
+                selectedAccount.customerName
+              }}</small>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            (click)="closeModal()"
+          ></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body p-4 bg-light">
+          <!-- Summary Cards -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                  <small class="text-muted text-uppercase fw-semibold"
+                    >Customer</small
+                  >
+                  <h6 class="mb-0 text-primary">
+                    {{ selectedAccount.customerName }}
+                  </h6>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                  <small class="text-muted text-uppercase fw-semibold"
+                    >From Date</small
+                  >
+                  <h6 class="mb-0">
+                    {{ selectedAccount.fromDate | date: "dd/MM/yyyy" }}
+                  </h6>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                  <small class="text-muted text-uppercase fw-semibold"
+                    >End Date</small
+                  >
+                  <h6 class="mb-0">
+                    {{ selectedAccount.endDate | date: "dd/MM/yyyy" }}
+                  </h6>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                  <small class="text-muted text-uppercase fw-semibold"
+                    >Opening Balance</small
+                  >
+                  <h6 class="mb-0 text-success fw-bold">
+                    {{ selectedAccount.openingBalance }}
+                  </h6>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-4 offset-md-4">
+              <div class="card bg-success text-white border-0 shadow-lg">
+                <div class="card-body text-center py-3">
+                  <small class="text-white-50 text-uppercase fw-semibold"
+                    >Closing Balance</small
+                  >
+                  <h3 class="mb-0 fw-bold">
+                    {{ selectedAccount.closingBalance }}
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transactions Table -->
+          <div class="bg-white rounded-3 p-3 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="mb-0 fw-bold">
+                <svg cIcon name="cilList" class="me-2"></svg>
+                Transaction History
+              </h6>
+              <span class="badge bg-secondary rounded-pill px-3 py-2">
+                {{ selectedAccount.transactions?.length || 0 }} entries
+              </span>
+            </div>
+            <div
+              class="table-responsive"
+              style="max-height: 400px; overflow-y: auto"
+            >
+              <table class="table table-hover table-striped align-middle mb-0">
+                <thead class="table-primary sticky-top">
+                  <tr>
+                    <th style="width: 7%">#</th>
+                    <th style="width: 10%">Date</th>
+                    <th style="width: 50%">Description</th>
+                    <th style="width: 10%" class="text-end">Debit</th>
+                    <th style="width: 10%" class="text-end">Credit</th>
+                    <th style="width: 10%" class="text-end fw-bold">Balance</th>
+                  </tr>
+                </thead>
+                <tbody
+                  style="
+                    height: calc(50vh - 600px) !important;
+                    overflow-y: scroll;
+                  "
+                >
+                  @for (
+                    txn of selectedAccount.transactions;
+                    track txn;
+                    let i = $index
+                  ) {
+                    <tr>
+                      <td style="width: 7%">{{ i + 1 }}</td>
+                      <td style="width: 10%">
+                        {{ txn.date | date: "dd/MM/yyyy" }}
+                      </td>
+                      <td class="text-wrap text-start" style="width: 50%">
+                        <span
+                          class="badge bg-light text-dark rounded-pill px-3 text-wrap"
+                          style="max-width: 100%; display: inline-block"
+                          >{{ txn.description }}</span
+                        >
+                      </td>
+                      <td
+                        class="text-end text-danger fw-semibold"
+                        style="width: 10%; font-size: small"
+                      >
+                        {{
+                          txn.debit
+                            ? (txn.debit | currency: "INR" : "symbol" : "1.0-0")
+                            : "-"
+                        }}
+                      </td>
+                      <td
+                        class="text-end text-success fw-semibold"
+                        style="width: 10%; font-size: small"
+                      >
+                        {{
+                          txn.credit
+                            ? (txn.credit
+                              | currency: "INR" : "symbol" : "1.0-0")
+                            : "-"
+                        }}
+                      </td>
+                      <td
+                        class="text-end fw-bold px-1"
+                        style="width: 10%; font-size: small"
+                      >
+                        {{ txn.balance | currency: "INR" : "symbol" : "1.0-0" }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+                <!-- Footer Totals -->
+                <tfoot class="table-primary">
+                  <tr>
+                    <td colspan="3" class="fw-bold text-end" style="width: 67%">
+                      Total
+                    </td>
+                    <td
+                      class="text-end fw-bold"
+                      style="width: 10%; font-size: small"
+                    >
+                      {{
+                        getTotalDebit(selectedAccount.transactions)
+                          | currency: "INR" : "symbol" : "1.0-0"
+                      }}
+                    </td>
+                    <td
+                      class="text-end fw-bold"
+                      style="width: 10%; font-size: small"
+                    >
+                      {{
+                        getTotalCredit(selectedAccount.transactions)
+                          | currency: "INR" : "symbol" : "1.0-0"
+                      }}
+                    </td>
+                    <td
+                      class="text-end fw-bold px-1"
+                      style="width: 10%; font-size: small"
+                    >
+                      {{
+                        getTotalBalance(selectedAccount.transactions)
+                          | currency: "INR" : "symbol" : "1.0-0"
+                      }}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer border-0 bg-light">
+          <button
+            type="button"
+            class="btn btn-secondary rounded-pill px-4"
+            (click)="closeModal()"
+          >
+            <svg cIcon name="cilX" class="me-1"></svg>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
