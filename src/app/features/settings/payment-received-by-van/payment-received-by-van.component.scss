@@ -1,0 +1,157 @@
+// Mobile card styling for payment-received-by-van component
+.dss-mobile-card-table {
+  @media (max-width: 575.98px) {
+    // Table container styling
+    table {
+      border-collapse: separate;
+      border-spacing: 0 0.75rem;
+    }
+
+    // Each row becomes a card
+    tbody tr {
+      display: block !important;
+      width: 100% !important;
+      background: white !important;
+      border-radius: 12px !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+      padding: 1rem 1.25rem !important;
+      margin-bottom: 0.75rem !important;
+      border: 1px solid rgba(0, 0, 0, 0.04) !important;
+      transition: all 0.2s ease !important;
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+        transform: translateY(-1px);
+      }
+
+      // Hide the default table row borders
+      border-bottom: none !important;
+    }
+
+    // Each td becomes a grid row with label-value pairs
+    td {
+      display: grid !important;
+      grid-template-columns: minmax(6.5rem, 38%) minmax(0, 1fr) !important;
+      gap: 0.5rem 1rem !important;
+      padding: 0.35rem 0 !important;
+      border: none !important;
+      background: transparent !important;
+
+      // Add subtle bottom border between items
+      &:not(:last-child) {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+      }
+
+      // Label styling (from data-label attribute)
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: #6c757d;
+        display: block;
+        padding-right: 0.5rem;
+        align-self: center;
+      }
+
+      // Value styling
+      &:not(:first-child)::before {
+        // All labels except first (which is #)
+      }
+
+      // Special handling for specific columns
+      &[data-label="VAN Number"] {
+        font-weight: 500;
+        color: #0d6efd;
+      }
+
+      &[data-label="Amount"] {
+        font-weight: 600;
+        color: #198754;
+        font-size: 1.05rem;
+      }
+
+      &[data-label="Status"] {
+        .badge {
+          font-size: 0.7rem;
+          padding: 0.35rem 0.75rem;
+          border-radius: 20px;
+          justify-self: start;
+        }
+      }
+
+      &[data-label="Actions"] {
+        grid-column: 1 / -1;
+        display: flex !important;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        padding-top: 0.5rem !important;
+        margin-top: 0.25rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+        border-bottom: none !important;
+
+        &::before {
+          display: none;
+        }
+
+        .btn {
+          font-size: 0.75rem;
+          padding: 0.25rem 0.75rem;
+          border-radius: 6px;
+        }
+      }
+    }
+
+    // Special styling for the index column
+    td:first-child {
+      font-weight: 700;
+      color: #495057;
+      font-size: 0.85rem;
+
+      &::before {
+        font-weight: 700;
+        color: #495057;
+      }
+    }
+
+    // Hover effect for the entire card row
+    tbody tr:hover td {
+      background: transparent !important;
+    }
+
+    // Status color indicators
+    td[data-label="Status"] {
+      .badge.bg-success {
+        background-color: #d1e7dd !important;
+        color: #0a3622 !important;
+      }
+      .badge.bg-warning {
+        background-color: #fff3cd !important;
+        color: #664d03 !important;
+      }
+      .badge.bg-danger {
+        background-color: #f8d7da !important;
+        color: #58151c !important;
+      }
+      .badge.bg-info {
+        background-color: #cff4fc !important;
+        color: #055160 !important;
+      }
+    }
+  }
+}
+
+// Additional small screen refinements
+@media (max-width: 399.98px) {
+  .dss-mobile-card-table {
+    tbody tr {
+      padding: 0.75rem 1rem !important;
+    }
+    td {
+      grid-template-columns: minmax(5rem, 40%) minmax(0, 1fr) !important;
+      gap: 0.35rem 0.75rem !important;
+      font-size: 0.85rem;
+    }
+  }
+}

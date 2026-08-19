@@ -24,6 +24,7 @@ import {
 } from './';
 import { moduleNavItems, navItems } from './_nav';
 import { ApiLoadingService } from '../../shared/services/api-loading.service';
+import { MyProvider } from '../../shared/services/provider';
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -63,7 +64,10 @@ export class DefaultLayoutComponent {
   );
   public navItems = this.getModuleNavItems('Settings');
 
-  constructor(private readonly apiLoadingService: ApiLoadingService) {}
+  constructor(
+    private readonly apiLoadingService: ApiLoadingService,
+    private readonly provider: MyProvider,
+  ) {}
 
   public selectModule(moduleName: string): void {
     const selectedItems = moduleNavItems[moduleName];
@@ -79,10 +83,39 @@ export class DefaultLayoutComponent {
 
   private getModuleNavItems(moduleName: string): INavData[] {
     const items = moduleNavItems[moduleName] ?? navItems;
+    const visibleItems = this.getVisibleNavItems(items);
+    const unwrappedItems = this.unwrapSingleModuleDropdown(visibleItems);
+    const filteredItems = this.filterNavItemsByRole(unwrappedItems);
 
-    return this.normalizeNavIcons(
-      this.unwrapSingleModuleDropdown(this.getVisibleNavItems(items)),
-    );
+    return this.normalizeNavIcons(filteredItems);
+  }
+
+  private filterNavItemsByRole(items: INavData[]): INavData[] {
+    const userRole = this.provider.companyInfo?.user?.role;
+
+    // If role is 2, disable the first (index 0) and second (index 1) items
+    if (userRole === 2 && items.length > 1) {
+      const disabledItems = items.map((item, index) => {
+        if (index === 0 || index === 1) {
+          // Use the 'class' property to add a custom disabled class
+          const existingClass = item.class || '';
+          return {
+            ...item,
+            class: `${existingClass} sidebar-nav-item-disabled`.trim(),
+            // Also use attributes if supported
+            attributes: {
+              ...item.attributes,
+              'aria-disabled': 'true',
+              disabled: 'true',
+            },
+          };
+        }
+        return item;
+      });
+      return disabledItems;
+    }
+
+    return items;
   }
 
   private getVisibleNavItems(items: INavData[]): INavData[] {

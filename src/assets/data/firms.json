@@ -1,0 +1,29 @@
+[
+  {
+    "branch_id": 101,
+    "firm_id": 1,
+    "firm_name": "KRUSHNA GODAVARI K.B.B.U.V.V.S.S.LTD"
+  },
+  {
+    "branch_id": 101,
+    "firm_id": 2,
+    "firm_name": "KRISHNAVENI SEEDS AND FERTILIZER"
+  },
+  {
+    "branch_id": 101,
+    "firm_id": 3,
+    "firm_name": "RAIT VIVIDODDHESHA P K S S NIYAMIT,RAIBAG"
+  },
+  {
+    "branch_id": 101,
+    "firm_id": 4,
+    "firm_name": "UNIVERSAL CARE WAREHOUSING PVT LTD"
+  },
+  {
+    "branch_id": 101,
+    "firm_id": 5,
+    "firm_name": "UNIVERSAL AUTOMOTIVE SERVICES"
+  },
+  { "branch_id": 101, "firm_id": 6, "firm_name": "KAILASH WEREHOUSING" },
+  { "branch_id": 101, "firm_id": 7, "firm_name": "TIRUMALA TRANSPORT AGENCY" }
+]

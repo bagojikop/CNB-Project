@@ -1,0 +1,428 @@
+.van-retrive-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .page-header {
+    margin-bottom: 30px;
+
+    h2 {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 8px;
+    }
+
+    .text-muted {
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+  }
+
+  .form-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-body {
+      padding: 30px;
+    }
+  }
+
+  .form-label {
+    font-weight: 500;
+    font-size: 14px;
+    color: #34495e;
+    margin-bottom: 6px;
+
+    .text-danger {
+      color: #e74c3c;
+    }
+  }
+
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #dce1e8;
+    padding: 10px 14px;
+    font-size: 14px;
+    transition:
+      border-color 0.3s ease,
+      box-shadow 0.3s ease;
+
+    &:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+      outline: none;
+    }
+
+    &.is-invalid {
+      border-color: #e74c3c;
+    }
+  }
+
+  .text-danger {
+    font-size: 12px;
+    color: #e74c3c;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #ecf0f1;
+
+    .btn {
+      padding: 10px 30px;
+      font-size: 16px;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      min-width: 140px;
+    }
+
+    .btn-primary {
+      background: #3498db;
+      border: none;
+      color: #fff;
+
+      &:hover:not(:disabled) {
+        background: #2980b9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.35);
+      }
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+
+    .btn-secondary {
+      background: #ecf0f1;
+      border: none;
+      color: #34495e;
+
+      &:hover:not(:disabled) {
+        background: #dde1e3;
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  .alert {
+    border-radius: 10px;
+    padding: 15px 20px;
+    font-size: 14px;
+
+    &.alert-danger {
+      background: #fde8e8;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+  }
+
+  .response-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+
+    .card-header {
+      background: #27ae60;
+      color: #fff;
+      padding: 14px 20px;
+      font-weight: 500;
+      font-size: 16px;
+    }
+
+    .card-body {
+      padding: 20px;
+      background: #f8f9fa;
+    }
+
+    .response-json {
+      background: #2d3436;
+      color: #dfe6e9;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: auto;
+      max-height: 500px;
+      overflow-y: auto;
+      margin: 0;
+      font-family: "Courier New", monospace;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+
+      table {
+        width: 100%;
+        min-width: 500px;
+        margin-bottom: 0;
+
+        th,
+        td {
+          padding: 0.5rem 0.75rem;
+          vertical-align: middle;
+          font-size: 0.85rem;
+        }
+
+        th {
+          font-weight: 600;
+          background: #f1f3f5;
+        }
+
+        td {
+          background: #ffffff;
+        }
+      }
+    }
+
+    /* VAN Details - convert to cards on small screens */
+    .response-section {
+      .table-responsive {
+        @media (max-width: 576px) {
+          overflow-x: visible;
+
+          table {
+            min-width: unset;
+            width: 100%;
+            border: none;
+
+            thead {
+              display: none;
+            }
+
+            tbody {
+              display: block;
+              height: auto !important;
+
+              tr {
+                display: block;
+                margin-bottom: 0.6rem;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 0.3rem 0.5rem;
+                background: #ffffff;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+                td {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  border: none;
+                  padding: 0.3rem 0.4rem;
+                  font-size: 0.75rem;
+                  white-space: normal;
+                  word-break: break-word;
+                  background: #ffffff;
+
+                  &::before {
+                    content: attr(data-label);
+                    font-weight: 600;
+                    color: #495057;
+                    margin-right: 0.5rem;
+                    flex-shrink: 0;
+                    font-size: 0.7rem;
+                  }
+
+                  &:first-child {
+                    border-top: none;
+                  }
+
+                  &:last-child {
+                    border-bottom: none;
+                  }
+
+                  .badge {
+                    font-size: 0.65rem;
+                    padding: 0.25rem 0.5rem;
+                  }
+
+                  strong {
+                    font-size: 0.75rem;
+                  }
+                }
+
+                th {
+                  display: none;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    /* Convert transaction history table to cards on small screens */
+    .table-scroll-wrapper {
+      @media (max-width: 576px) {
+        height: auto !important;
+        overflow-y: visible !important;
+        border: none !important;
+
+        table {
+          min-width: unset;
+          width: 100%;
+          border: none;
+
+          thead {
+            display: none;
+          }
+
+          tbody {
+            display: block;
+            height: auto !important;
+
+            tr {
+              display: block;
+              margin-bottom: 0.8rem;
+              border: 1px solid #dee2e6;
+              border-radius: 8px;
+              padding: 0.5rem;
+              background: #ffffff;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+              td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border: none;
+                padding: 0.4rem 0.5rem;
+                font-size: 0.8rem;
+                white-space: normal;
+                word-break: break-word;
+                background: #ffffff;
+
+                &::before {
+                  content: attr(data-label);
+                  font-weight: 600;
+                  color: #495057;
+                  margin-right: 0.5rem;
+                  flex-shrink: 0;
+                }
+
+                &:first-child {
+                  border-top: none;
+                }
+
+                &:last-child {
+                  border-bottom: none;
+                }
+
+                .badge {
+                  font-size: 0.7rem;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .van-retrive-container {
+    padding: 15px;
+
+    .form-card .card-body {
+      padding: 20px;
+    }
+
+    .form-actions {
+      flex-direction: column;
+
+      .btn {
+        width: 100%;
+        min-width: unset;
+      }
+    }
+
+    .page-header h2 {
+      font-size: 24px;
+    }
+  }
+}
+
+/* Convert table to cards on small screens */
+@media (max-width: 576px) {
+  .van-retrive-container {
+    padding: 10px;
+
+    .form-card .card-body {
+      padding: 15px;
+    }
+  }
+
+  .response-card {
+    .table-responsive {
+      overflow-x: visible;
+
+      table {
+        min-width: unset;
+        width: 100%;
+        border: none;
+
+        thead {
+          display: none;
+        }
+
+        tbody {
+          display: block;
+          height: auto !important;
+
+          tr {
+            display: block;
+            margin-bottom: 0.8rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 0.5rem;
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+            td {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border: none;
+              padding: 0.4rem 0.5rem;
+              font-size: 0.8rem;
+              white-space: normal;
+              word-break: break-word;
+
+              &::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #495057;
+                margin-right: 0.5rem;
+                flex-shrink: 0;
+              }
+
+              &:first-child {
+                border-top: none;
+              }
+
+              &:last-child {
+                border-bottom: none;
+              }
+
+              .badge {
+                font-size: 0.7rem;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,149 @@
+<h2>QR Statement</h2>
+
+<form [formGroup]="qrStatementForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label>MID *</label>
+    <input type="text" formControlName="mid" placeholder="Enter MID" />
+    <div
+      *ngIf="
+        f['mid'].invalid && (f['mid'].dirty || f['mid'].touched || submitted)
+      "
+    >
+      <span *ngIf="f['mid'].errors?.['required']">MID is required</span>
+      <span *ngIf="f['mid'].errors?.['minlength']"
+        >MID must be at least 5 characters</span
+      >
+      <span *ngIf="f['mid'].errors?.['maxlength']"
+        >MID must be at most 20 characters</span
+      >
+    </div>
+  </div>
+
+  <div>
+    <label>SID *</label>
+    <input type="text" formControlName="sid" placeholder="Enter SID" />
+    <div
+      *ngIf="
+        f['sid'].invalid && (f['sid'].dirty || f['sid'].touched || submitted)
+      "
+    >
+      <span *ngIf="f['sid'].errors?.['required']">SID is required</span>
+      <span *ngIf="f['sid'].errors?.['minlength']"
+        >SID must be at least 5 characters</span
+      >
+      <span *ngIf="f['sid'].errors?.['maxlength']"
+        >SID must be at most 20 characters</span
+      >
+    </div>
+  </div>
+
+  <div>
+    <label>Terminal ID</label>
+    <input
+      type="text"
+      formControlName="terminalId"
+      placeholder="Enter Terminal ID"
+    />
+  </div>
+
+  <div>
+    <label>Checksum</label>
+    <input
+      type="text"
+      formControlName="checksum"
+      placeholder="Enter checksum"
+    />
+  </div>
+
+  <div>
+    <label>Start Date *</label>
+    <input type="datetime-local" formControlName="startDate" />
+    <div *ngIf="f['startDate'].invalid && submitted">
+      <span>Start date is required</span>
+    </div>
+  </div>
+
+  <div>
+    <label>End Date *</label>
+    <input type="datetime-local" formControlName="endDate" />
+    <div *ngIf="f['endDate'].invalid && submitted">
+      <span>End date is required</span>
+    </div>
+  </div>
+
+  <div>
+    <label>Page Size *</label>
+    <input
+      type="number"
+      formControlName="pageSize"
+      placeholder="Enter page size"
+    />
+    <div *ngIf="f['pageSize'].invalid && submitted">
+      <span *ngIf="f['pageSize'].errors?.['required']"
+        >Page size is required</span
+      >
+      <span *ngIf="f['pageSize'].errors?.['min']"
+        >Page size must be at least 1</span
+      >
+      <span *ngIf="f['pageSize'].errors?.['max']"
+        >Page size must be at most 100</span
+      >
+    </div>
+  </div>
+
+  <div>
+    <label>Page Number *</label>
+    <input
+      type="number"
+      formControlName="pageNo"
+      placeholder="Enter page number"
+    />
+    <div *ngIf="f['pageNo'].invalid && submitted">
+      <span *ngIf="f['pageNo'].errors?.['required']"
+        >Page number is required</span
+      >
+      <span *ngIf="f['pageNo'].errors?.['min']"
+        >Page number must be at least 1</span
+      >
+    </div>
+  </div>
+
+  <div>
+    <button type="submit" [disabled]="isLoading">
+      <span *ngIf="!isLoading">Get Statement</span>
+      <span *ngIf="isLoading">Loading...</span>
+    </button>
+    <button
+      type="button"
+      (click)="
+        qrStatementForm.reset(); submitted = false; qrStatementResult = null
+      "
+    >
+      Reset
+    </button>
+  </div>
+</form>
+
+<div *ngIf="qrStatementResult">
+  <h3>Statement Request Details</h3>
+  <div>
+    <div><strong>MID:</strong> {{ qrStatementResult.mid }}</div>
+    <div><strong>SID:</strong> {{ qrStatementResult.sid }}</div>
+    <div *ngIf="qrStatementResult.terminalId">
+      <strong>Terminal ID:</strong> {{ qrStatementResult.terminalId }}
+    </div>
+    <div>
+      <strong>Start Date:</strong>
+      {{ qrStatementResult.startDate | date: "medium" }}
+    </div>
+    <div>
+      <strong>End Date:</strong>
+      {{ qrStatementResult.endDate | date: "medium" }}
+    </div>
+    <div><strong>Page Size:</strong> {{ qrStatementResult.pageSize }}</div>
+    <div><strong>Page Number:</strong> {{ qrStatementResult.pageNo }}</div>
+    <div *ngIf="qrStatementResult.checksum">
+      <strong>Checksum:</strong> {{ qrStatementResult.checksum }}
+    </div>
+  </div>
+</div>

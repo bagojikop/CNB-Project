@@ -1,7 +1,8 @@
 export interface configuration {
-  batchId: number;
+  id: string;
   firmId: string;
   credDate?: string;
+  credUser?: string;
   branchId: string;
   firmName: string;
   accountNo: string;

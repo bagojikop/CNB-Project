@@ -25,6 +25,7 @@ export interface ReportDictionory {
 export interface CompanyInfo {
   company: any;
   branches: any[];
+  firm_name: string;
   finYear: any;
   user: any;
   userinfo: any;

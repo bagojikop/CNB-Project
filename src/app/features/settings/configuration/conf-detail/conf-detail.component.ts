@@ -16,7 +16,10 @@ import { Router } from '@angular/router';
 import { DatePipe, Location } from '@angular/common';
 import * as CryptoJS from 'crypto-js';
 import { configuration } from '@shared-interfaces/settings/configuration';
-import { crudService } from '@shared-services/crudService';
+
+import { ConfigService } from '@shared-services/user.service';
+import { DialogsService } from '@shared-services/messageBox';
+import { DataRefreshService } from '@shared-services/data-refresh.service';
 
 @Component({
   selector: 'app-conf-detail',
@@ -30,7 +33,9 @@ export class ConfDetailComponent implements AfterViewInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private location = inject(Location);
-  private configService = inject(crudService);
+  private dialogSrc = inject(DialogsService);
+  private configSrc = inject(ConfigService);
+  private readonly refreshService = inject(DataRefreshService);
   readonly configInputs = createConfigurationForm(this.fb);
   readonly modalForm = createModalForm(this.fb);
   private datePipe = inject(DatePipe);
@@ -84,20 +89,48 @@ export class ConfDetailComponent implements AfterViewInit {
   }
 
   saveModalData() {
-    const josnData = this.configService.getAll() as configuration[];
-
-    const nextBatchId = josnData.length
-      ? Math.max(...josnData.map((x) => x.batchId)) + 1
-      : 1;
-
     const data: configuration = {
       ...this.configInputs.getRawValue(),
-      batchId: nextBatchId,
       credDate: this.datePipe.transform(new Date(), 'yyyy-MM-dd') ?? '',
+      credUser: 'admin',
       modalForm: this.modalForm.getRawValue(),
     };
 
-    this.configService.add(data);
+    if (data.id) {
+      this.configSrc.update(data).subscribe({
+        next: (res) => {
+          this.dialogSrc.swal({
+            dialog: 'success',
+            message: 'Record Update Successfully',
+          });
+          this.refreshService.trigger();
+          this.location.back();
+        },
+        error: (err) => {
+          this.dialogSrc.swal({
+            dialog: 'error',
+            message: err.message,
+          });
+        },
+      });
+    } else {
+      this.configSrc.add(data).subscribe({
+        next: (res) => {
+          this.dialogSrc.swal({
+            dialog: 'success',
+            message: 'Record Save Successfully',
+          });
+          this.refreshService.trigger();
+          this.location.back();
+        },
+        error: (err) => {
+          this.dialogSrc.swal({
+            dialog: 'error',
+            message: err.message,
+          });
+        },
+      });
+    }
 
     this.configInputs.reset();
     this.modalForm.reset();

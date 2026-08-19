@@ -1,0 +1,132 @@
+<!-- Transaction Details - Table View -->
+@if (batchData && batchData.length > 0 && batchData[0].TxnDtls) {
+  <div class="transaction-section">
+    <!-- Bootstrap Table -->
+    <div class="table-responsive dss-mobile-card-table">
+      <table class="table table-bordered table-hover table-striped">
+        <thead class="table-primary">
+          <tr>
+            <th style="width: 50px">#</th>
+            <th style="width: 15%">Transaction No.</th>
+            <th style="width: 7%">Type</th>
+            <th style="width: 10%">Account No.</th>
+            <th style="width: 30%">Beneficiary Account</th>
+            <th style="width: 17%">UTR</th>
+            <th style="width: 10%">Amount</th>
+            <th style="width: 10%">Status</th>
+          </tr>
+        </thead>
+        <tbody style="height: calc(100vh - 23.8rem); overflow-y: scroll">
+          @for (
+            txn of paginatedTransactions;
+            track txn.TxnRefNo;
+            let i = $index
+          ) {
+            <tr>
+              <td style="width: 50px">{{ i + 1 }}</td>
+              <td style="width: 15%">
+                <strong>{{ txn.TxnRefNo }}</strong>
+              </td>
+              <td style="width: 7%">
+                <div class="small text-muted">{{ txn.TxnType }}</div>
+              </td>
+              <td style="width: 10%">{{ txn.DrAcct }}</td>
+              <td style="width: 30%">
+                {{ txn.BenefAcNo }}
+                <div class="small text-muted">{{ txn.BenefAcNm }}</div>
+              </td>
+              <td style="width: 17%">
+                <span class="fw-semibold">{{ txn.utr_RRN_Number || "-" }}</span>
+              </td>
+              <td style="width: 10%">
+                <strong class="text-success">
+                  ₹ {{ txn.TxnAmt | number: "1.2-2" }}
+                </strong>
+              </td>
+              <td style="width: 10%">
+                <span
+                  class="badge"
+                  [class.bg-success]="
+                    txn.TxnStatus === 'Successful' ||
+                    txn.TxnStatus === 'COMPLETED'
+                  "
+                  [class.bg-primary]="
+                    txn.TxnStatus === 'VERIFIED' || txn.TxnStatus === 'APPROVED'
+                  "
+                  [class.bg-warning]="
+                    txn.TxnStatus === 'PROCESSING IN PROGRESS' ||
+                    txn.TxnStatus === 'PROCESSED'
+                  "
+                  [class.bg-danger]="
+                    txn.TxnStatus === 'ERROR' ||
+                    txn.TxnStatus === 'Rejected' ||
+                    txn.TxnStatus === 'REJECTED'
+                  "
+                  [class.bg-secondary]="txn.TxnStatus === 'EXPIRED'"
+                >
+                  {{ txn.TxnStatus }}
+                </span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                No transactions found
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+<div
+  class="d-flex justify-content-between align-items-center pt-3 border-top"
+  style="position: sticky; bottom: 0; background: white; padding-bottom: 10px"
+>
+  <div class="text-muted small">
+    Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
+    {{ (currentPage - 1) * itemsPerPage + paginatedTransactions.length }}
+    of {{ totalItems }} transactions
+  </div>
+  <nav>
+    <ul class="pagination pagination-sm mb-0">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="changePage(currentPage - 1)">
+          <span>&laquo;</span>
+        </button>
+      </li>
+      @for (page of visiblePages; track page) {
+        <li class="page-item" [class.active]="page === currentPage">
+          <button class="page-link" (click)="changePage(page)">
+            {{ page }}
+          </button>
+        </li>
+      }
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button class="page-link" (click)="changePage(currentPage + 1)">
+          <span>&raquo;</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<!-- No Data State -->
+@if (!batchData || batchData.length === 0) {
+  <c-card class="shadow-sm">
+    <c-card-body class="text-center py-5">
+      <svg
+        cIcon
+        name="cilSearch"
+        class="display-4 d-block mb-3 text-medium-emphasis"
+        size="xxl"
+      ></svg>
+      <h5 class="text-medium-emphasis">No Batch Data</h5>
+      <p class="text-medium-emphasis">
+        Enter search criteria and click Search to view batch details
+      </p>
+    </c-card-body>
+  </c-card>
+}

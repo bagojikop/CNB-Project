@@ -1,1 +1,112 @@
+@if (showDashboard) {
+  <div
+    class="demo-wrapper d-flex align-items-center p-3"
+    style="height: calc(100vh - 150px)"
+  >
+    <!-- Card Section – no header, just cards -->
+    <div class="bank-cards-section">
+      <div class="row g-4">
+        <!-- cards are generated dynamically with *ngFor; we replicate the data structure -->
+        <div
+          class="col-12 col-sm-6 col-md-4 col-xl-4"
+          *ngFor="let card of bankCards"
+        >
+          <div
+            class="bank-card card h-100"
+            (click)="onCardClick(card)"
+            [style.border-left-color]="getIconColor(card.color)"
+            [class]="card.color"
+          >
+            <div class="card-body p-4">
+              <!-- Top row: badge + icon -->
+              <div class="d-flex align-items-start justify-content-between">
+                <div class="card-content">
+                  <span
+                    class="card-badge"
+                    [style.background-color]="getIconColor(card.color)"
+                  >
+                    {{ card.count }}
+                  </span>
+                  <h5
+                    class="card-title fw-bold mt-3 mb-1"
+                    style="color: #2c3e50"
+                  >
+                    {{ card.title }}
+                  </h5>
+                  <div class="card-stats">
+                    <span class="trend-indicator">
+                      <span class="trend-up">↑</span> 12%
+                    </span>
+                    <span class="text-muted ms-2">vs last week</span>
+                  </div>
+                </div>
+                <div
+                  class="icon-wrapper"
+                  [style.background-color]="getIconColor(card.color)"
+                >
+                  <svg
+                    class="icon-lg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    stroke-width="2.5"
+                  >
+                    <ng-container *ngIf="card.icon === 'cilClock'">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </ng-container>
+                    <ng-container *ngIf="card.icon === 'cilBank'">
+                      <rect x="2" y="12" width="20" height="8" rx="1" />
+                      <path d="M12 2L2 12h20L12 2z" />
+                    </ng-container>
+                    <ng-container *ngIf="card.icon === 'cilQrCode'">
+                      <rect x="3" y="3" width="7" height="7" />
+                      <rect x="14" y="3" width="7" height="7" />
+                      <rect x="3" y="14" width="7" height="7" />
+                      <line x1="14" y1="14" x2="18" y2="14" />
+                      <line x1="18" y1="14" x2="18" y2="18" />
+                      <line x1="14" y1="18" x2="18" y2="18" />
+                    </ng-container>
+                    <ng-container *ngIf="card.icon === 'cilCreditCard'">
+                      <rect x="2" y="6" width="20" height="14" rx="2" />
+                      <line x1="2" y1="12" x2="22" y2="12" />
+                    </ng-container>
+                    <ng-container *ngIf="card.icon === 'cilCheckCircle'">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="9 12 11.5 14.5 16 10" />
+                    </ng-container>
+                    <ng-container *ngIf="card.icon === 'cilList'">
+                      <line x1="8" y1="6" x2="21" y2="6" />
+                      <line x1="8" y1="12" x2="21" y2="12" />
+                      <line x1="8" y1="18" x2="21" y2="18" />
+                      <line x1="3" y1="6" x2="3.01" y2="6" />
+                      <line x1="3" y1="12" x2="3.01" y2="12" />
+                      <line x1="3" y1="18" x2="3.01" y2="18" />
+                    </ng-container>
+                  </svg>
+                </div>
+              </div>
 
+              <!-- Footer: View Details link -->
+              <div class="card-footer-action mt-3">
+                <span class="action-link">
+                  View Details →
+                  <span class="hover-arrow">→</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Animated progress bar at bottom -->
+            <div
+              class="card-progress"
+              [style.width.%]="card.count / 1.2"
+              [style.background-color]="getIconColor(card.color)"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <router-outlet></router-outlet>
+}

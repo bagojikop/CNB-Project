@@ -1,0 +1,272 @@
+<div class="payment-status-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h2>Payment Status</h2>
+      <p class="text-muted">Track and verify payment transactions securely</p>
+    </div>
+    <div class="header-badge">
+      <span class="badge bg-primary">Secure Banking</span>
+    </div>
+  </div>
+
+  <!-- Search Card -->
+  <div class="card search-card">
+    <div class="card-body">
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-7">
+            <label for="searchBatchId" class="form-label fw-semibold">
+              <svg cIcon name="cilReceipt" size="sm" class="me-1"></svg>
+              Batch ID / Reference
+            </label>
+            <div class="input-group">
+              <span
+                class="input-group-text bg-light border-end-0 text-center p-2"
+              >
+                <svg cIcon name="cilMagnifyingGlass" class="text-primary"></svg>
+              </span>
+              <input
+                type="text"
+                class="form-control border-start-0 ps-0"
+                id="searchBatchId"
+                formControlName="searchBatchId"
+                placeholder="Enter Batch ID or Reference number"
+              />
+            </div>
+            <div
+              *ngIf="
+                searchForm.get('searchBatchId')?.invalid &&
+                searchForm.get('searchBatchId')?.touched
+              "
+              class="text-danger small mt-1"
+            >
+              <span
+                *ngIf="searchForm.get('searchBatchId')?.errors?.['required']"
+                >Batch ID / Reference is required</span
+              >
+              <span
+                *ngIf="searchForm.get('searchBatchId')?.errors?.['minlength']"
+                >Must be at least 3 characters</span
+              >
+            </div>
+          </div>
+          <div class="col-md-5">
+            <div class="d-flex gap-2">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg flex-grow-1 text-light"
+                [disabled]="searchForm.invalid"
+              >
+                <svg
+                  cIcon
+                  name="cilMagnifyingGlass"
+                  size="sm"
+                  class="me-1"
+                ></svg>
+                Check Status
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-lg"
+                (click)="clearSearch()"
+              >
+                <svg cIcon name="cilReload" size="sm"></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Result Card -->
+  <div class="card result-card" *ngIf="searchResult">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">
+        <svg
+          cIcon
+          name="cilCheckCircle"
+          size="sm"
+          class="text-success me-2"
+        ></svg>
+        Transaction Details
+      </h5>
+      <span class="badge bg-light text-dark border">
+        <svg cIcon name="cilClock" size="sm" class="me-1"></svg>
+        {{ searchResult.requestDate | date: "medium" }}
+      </span>
+    </div>
+    <div class="card-body">
+      <!-- Status Banner -->
+      <div class="status-banner mb-4">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <div class="d-flex align-items-center gap-3">
+              <div
+                class="status-icon"
+                [ngClass]="getStatusIconClass(searchResult.status)"
+              >
+                <svg cIcon [name]="getStatusIcon(searchResult.status)"></svg>
+              </div>
+              <div>
+                <div class="fw-bold fs-5">{{ searchResult.batchId }}</div>
+                <div class="text-muted small">
+                  {{ searchResult.paymentAgainst }}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 text-md-end">
+            <span
+              class="status-badge"
+              [ngClass]="getStatusBadgeClass(searchResult.status)"
+            >
+              {{ searchResult.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>
+                <svg cIcon name="cilUser" size="sm" class="me-1"></svg>
+                Party Name
+              </label>
+              <span>{{ searchResult.partyName }}</span>
+            </div>
+            <div class="detail-item">
+              <label>
+                <svg cIcon name="cilTag" size="sm" class="me-1"></svg>
+                Payment Type
+              </label>
+              <span class="badge bg-secondary">{{
+                searchResult.paymentType
+              }}</span>
+            </div>
+            <div class="detail-item">
+              <label>
+                <svg cIcon name="cilCash" size="sm" class="me-1"></svg>
+                Total Amount
+              </label>
+              <span class="fw-bold text-primary fs-5">
+                {{ searchResult.totalAmount | currency: "INR" }}
+              </span>
+            </div>
+            <div class="detail-item">
+              <label>
+                <svg cIcon name="cilBuilding" size="sm" class="me-1"></svg>
+                Bank Name
+              </label>
+              <span>{{ searchResult.bankName }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>
+                <svg cIcon name="cilCreditCard" size="sm" class="me-1"></svg>
+                Account Number
+              </label>
+              <span class="font-monospace">{{ searchResult.accountNo }}</span>
+            </div>
+            <div class="detail-item">
+              <label>
+                <svg cIcon name="cilBadge" size="sm" class="me-1"></svg>
+                Requested By
+              </label>
+              <span>{{ searchResult.requestedBy }}</span>
+            </div>
+            <div class="detail-item" *ngIf="searchResult.transactionId">
+              <label>
+                <svg cIcon name="cilHashtag" size="sm" class="me-1"></svg>
+                Transaction ID
+              </label>
+              <span class="font-monospace text-primary">{{
+                searchResult.transactionId
+              }}</span>
+            </div>
+            <div class="detail-item" *ngIf="searchResult.remarks">
+              <label>
+                <svg cIcon name="cilCommentBubble" size="sm" class="me-1"></svg>
+                Remarks
+              </label>
+              <span>{{ searchResult.remarks }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bulk Items -->
+      <div
+        *ngIf="searchResult.bulkItems && searchResult.bulkItems.length > 0"
+        class="mt-4"
+      >
+        <hr />
+        <h6 class="mb-3">
+          <svg cIcon name="cilList" size="sm" class="me-1"></svg>
+          Bulk Items
+          <span class="badge bg-secondary ms-2">{{
+            searchResult.bulkItems.length
+          }}</span>
+        </h6>
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Party Name</th>
+                <th>Amount</th>
+                <th>Account No</th>
+                <th>Status</th>
+                <th>Transaction ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of searchResult.bulkItems; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.partyName }}</td>
+                <td>{{ item.amount | currency: "INR" }}</td>
+                <td class="font-monospace">{{ item.accountNo }}</td>
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="getStatusBadgeClass(item.status)"
+                  >
+                    {{ item.status }}
+                  </span>
+                </td>
+                <td class="font-monospace">{{ item.transactionId || "-" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Result -->
+  <div *ngIf="searchPerformed && !searchResult" class="card no-result-card">
+    <div class="card-body text-center py-5">
+      <svg
+        cIcon
+        name="cilInbox"
+        size="xl"
+        class="text-muted mb-3 d-block mx-auto"
+      ></svg>
+      <h5 class="mt-3">No Record Found</h5>
+      <p class="text-muted">
+        No payment record found for the given Batch ID / Reference.
+      </p>
+      <button class="btn btn-outline-primary btn-sm" (click)="clearSearch()">
+        <svg cIcon name="cilReload" size="sm" class="me-1"></svg>
+        Try Again
+      </button>
+    </div>
+  </div>
+</div>

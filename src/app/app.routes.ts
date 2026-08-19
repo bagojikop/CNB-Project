@@ -25,6 +25,15 @@ export const routes: Routes = [
           import('./features/dashboard/dashboard.component').then(
             (m) => m.DashboardComponent,
           ),
+        children: [
+          {
+            path: 'dashboard-form',
+            loadChildren: () =>
+              import('./routes/dashboard/dashboard.module').then(
+                (m) => m.DashboardModule,
+              ),
+          },
+        ],
       },
       {
         path: 'settings-form',

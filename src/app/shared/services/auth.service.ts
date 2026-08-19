@@ -14,11 +14,13 @@ import { apiResponse } from '@shared-interfaces/commans/apiResponse';
 import { UserPermissions } from './common';
 import { Http } from './httpService';
 import { MyProvider } from './provider';
-
+import { UserService } from './user.service';
+import data from './../../../assets/data/firms.json';
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private userSrc = inject(UserService);
   //   private url = 'http://localhost:3000/students';
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(
     this.hasToken(),
@@ -42,61 +44,80 @@ export class AuthService {
     return false; // or handle differently for SSR
   }
 
-  // login(entity: any): Observable<apiResponse> {
-  //   // return this.http.post('auth/login', entity).pipe(
-  //   //   switchMap((res: apiResponse) => {
-  //   //     if (res.status_cd !== 1) {
-  //   //       return [res];
-  //   //     }
-  //   //     const companyInfo = (this.provider.companyInfo ??= {} as any);
-  //   //     const { id, ...client } = res.data.client;
-  //   //     companyInfo.user = client;
-  //   //     companyInfo.user.user_id = id;
-  //   //     companyInfo.user.access_token = res.data.token;
-  //   //     localStorage.setItem('token', res.data.token);
-  //   //     companyInfo.company = {} as any;
-  //   //     companyInfo.company.firm_id = 101;
-  //   //     companyInfo.company.branch_id = '101';
-  //   //     companyInfo.company.div_id = 20262027
-  //   //     companyInfo.company.fdt = '2026/04/01'
-  //   //     companyInfo.company.tdt = '2027/03/31'
-  //   //     // const auditAccess = res.data.user.modules?.filter((x: any) => x.moduleId == 3) ?? [];
-  //   //     // if (auditAccess.length > 0) {
-  //   //     //   this.router.navigate(['selectfirm']);
-  //   //     //   return [res];
-  //   //     // }
-  //   //     // companyInfo.company = res.data.firm;
-  //   //     // companyInfo.finYear = {
-  //   //     //   fdt: new Date(res.data.finyear.fdt),
-  //   //     //   tdt: new Date(res.data.finyear.tdt),
-  //   //     // };
-  //   //     return this.http.get('user/usergrants', { userid: id }).pipe(
-  //   //       switchMap((grantsRes: any) => {
-  //   //         const grants = grantsRes?.data ?? grantsRes ?? {};
-  //   //         companyInfo.user.grants = grants;
-  //   //         this.userAccessCtrl.setInfo(grants);
-  //   //         return this.http.get('Setting/list').pipe(
-  //   //           catchError(() => of({ data: [] } as apiResponse)),
-  //   //           map((settingsRes: apiResponse) => {
-  //   //             const company = (companyInfo.company ??= {});
-  //   //             company.settings = settingsRes.data;
-  //   //             this.isAuthenticatedSubject.next(true);
-  //   //             this.router.navigate(['dashboard']);
-  //   //             return res;
-  //   //           })
-  //   //         );
-  //   //       })
-  //   //     );
-  //   //   })
-  //   // );
-  // }
+  login(entity: any): Observable<apiResponse> {
+    return this.http.post('auth/login', entity).pipe(
+      switchMap((res: apiResponse) => {
+        if (res.status_cd !== 1) {
+          return [res];
+        }
+        if (!this.provider.companyInfo) {
+          this.provider.companyInfo = {} as any;
+        }
+        const companyInfo: any = this.provider.companyInfo;
+        const { id, ...client } = res.data.client;
+        companyInfo.user = client;
+        companyInfo.user.user_id = id;
 
-  // loginForDevelopment(): Observable<apiResponse> {
-  //   // return this.login({
-  //   //   username: 'admin',
-  //   //   password: 'zakkas@@',
-  //   // });
-  // }
+        companyInfo.user.access_token = res.data.token;
+        localStorage.setItem('token', res.data.token);
+        companyInfo.company = {} as any;
+        companyInfo.company.firm_id = 101;
+        companyInfo.company.firm_name =
+          data && data.length > 0 ? data[0].firm_name : 'Default Firm';
+        companyInfo.company.branch_id = '101';
+        companyInfo.company.div_id = 20262027;
+        companyInfo.company.fdt = '2026/04/01';
+        companyInfo.company.tdt = '2027/03/31';
+
+        // const auditAccess = res.data.user.modules?.filter((x: any) => x.moduleId == 3) ?? [];
+        // if (auditAccess.length > 0) {
+        //   this.router.navigate(['selectfirm']);
+        //   return [res];
+        // }
+        // companyInfo.company = res.data.firm;
+        // companyInfo.finYear = {
+        //   fdt: new Date(res.data.finyear.fdt),
+        //   tdt: new Date(res.data.finyear.tdt),
+        // };
+        return this.http.get('user/usergrants', { userid: id }).pipe(
+          switchMap((grantsRes: any) => {
+            const grants = grantsRes?.data ?? grantsRes ?? {};
+            companyInfo.user.grants = grants;
+            this.userAccessCtrl.setInfo(grants);
+            return this.http.get('Setting/list').pipe(
+              catchError(() => of({ data: [] } as apiResponse)),
+              map((settingsRes: apiResponse) => {
+                const company = (companyInfo.company ??= {});
+                company.settings = settingsRes.data;
+                this.isAuthenticatedSubject.next(true);
+                this.router.navigate(['dashboard']);
+                console.log(data[0].firm_name);
+                return res;
+              }),
+            );
+          }),
+        );
+      }),
+    );
+  }
+
+  loginForDevelopment() {
+    // return this.login({
+    //   username: 'admin',
+    //   password: 'zakkas@@',
+    // });
+
+    if (!this.provider.companyInfo) {
+      this.provider.companyInfo = {} as any;
+    }
+    if (!this.provider.companyInfo!.company) {
+      this.provider.companyInfo!.company = {} as any;
+    }
+    this.provider.companyInfo!.company!.firm_name =
+      data && data.length > 0 ? data[0].firm_name : 'Default Firm';
+    console.log(data[0].firm_name);
+    return this.userSrc.getByAuth('Rakesh', 'abcd');
+  }
 
   logout(): void {
     localStorage.removeItem('token');

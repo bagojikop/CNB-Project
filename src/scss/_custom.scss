@@ -87,7 +87,9 @@
 .dss-form-state-disabled .dss-form-state-section .form-control:disabled,
 .dss-form-state-disabled .dss-form-state-section .form-select:disabled,
 .dss-form-state-disabled .dss-form-state-section textarea:disabled,
-.dss-form-state-disabled .dss-form-state-section input:disabled:not([type="checkbox"]):not([type="radio"]) {
+.dss-form-state-disabled
+  .dss-form-state-section
+  input:disabled:not([type="checkbox"]):not([type="radio"]) {
   color: #6c757d;
   background-color: #f8f9fa;
   border-color: #ced4da;
@@ -100,7 +102,10 @@
   opacity: 1;
 }
 
-.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-select-container {
+.dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-select-container {
   color: #6c757d;
   background-color: #f8f9fa;
   border-color: #ced4da;
@@ -113,12 +118,31 @@
   --dss-ng-select-border: #ced4da;
 }
 
-.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value,
-.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value-label,
-.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .dss-ng-select-label,
-.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-input input,
-.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-clear-wrapper,
-.dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-arrow {
+.dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-value,
+.dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-value-label,
+.dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .dss-ng-select-label,
+.dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-input
+  input,
+.dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-clear-wrapper,
+.dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-arrow {
   color: #6c757d !important;
 }
 
@@ -130,71 +154,340 @@
   border-color: #5c636a;
 }
 
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-control:disabled,
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-select:disabled,
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section textarea:disabled,
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section input:disabled:not([type="checkbox"]):not([type="radio"]),
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-control:disabled,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-select:disabled,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section textarea:disabled,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section input:disabled:not([type="checkbox"]):not([type="radio"]),
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .form-control:disabled,
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .form-select:disabled,
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  textarea:disabled,
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  input:disabled:not([type="checkbox"]):not([type="radio"]),
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .form-control:disabled,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .form-select:disabled,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  textarea:disabled,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  input:disabled:not([type="checkbox"]):not([type="radio"]),
 .dark .dss-form-state-disabled .dss-form-state-section .form-control:disabled,
 .dark .dss-form-state-disabled .dss-form-state-section .form-select:disabled,
 .dark .dss-form-state-disabled .dss-form-state-section textarea:disabled,
-.dark .dss-form-state-disabled .dss-form-state-section input:disabled:not([type="checkbox"]):not([type="radio"]) {
+.dark
+  .dss-form-state-disabled
+  .dss-form-state-section
+  input:disabled:not([type="checkbox"]):not([type="radio"]) {
   color: #c4c9d0;
   background-color: #49515a;
   border-color: #5c636a;
 }
 
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-check-input:disabled,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .form-check-input:disabled,
-.dark .dss-form-state-disabled .dss-form-state-section .form-check-input:disabled {
+/* ============================================================
+   GLOBAL RESPONSIVE TABLE-TO-CARD CONVERSION
+   Apply to any table by adding class .table-to-card
+   ============================================================ */
+
+@media (max-width: 576px) {
+  .table-to-card {
+    overflow-x: visible !important;
+
+    table,
+    .table {
+      min-width: unset !important;
+      width: 100% !important;
+      border: none !important;
+
+      thead {
+        display: none !important;
+      }
+
+      tbody {
+        display: block !important;
+        height: auto !important;
+        max-height: none !important;
+
+        tr {
+          display: block !important;
+          margin-bottom: 0.75rem !important;
+          border: 1px solid #dee2e6 !important;
+          border-radius: 8px !important;
+          padding: 0.5rem !important;
+          background: #ffffff !important;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+
+          td,
+          th {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            border: none !important;
+            padding: 0.35rem 0.5rem !important;
+            font-size: 0.78rem !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            background: transparent !important;
+            width: auto !important;
+            max-width: none !important;
+            min-width: 0 !important;
+
+            &::before {
+              content: attr(data-label) !important;
+              font-weight: 600 !important;
+              color: #495057 !important;
+              margin-right: 0.75rem !important;
+              flex-shrink: 0 !important;
+              font-size: 0.72rem !important;
+            }
+
+            &:first-child {
+              border-top: none !important;
+            }
+
+            &:last-child {
+              border-bottom: none !important;
+            }
+
+            .badge {
+              font-size: 0.7rem !important;
+            }
+
+            .btn {
+              width: 100% !important;
+              justify-content: center !important;
+            }
+          }
+
+          /* Hide action label on small screens */
+          td[data-label="Action"]::before,
+          th[data-label="Action"]::before {
+            content: none !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Scroll wrapper override for table-to-card inside scroll containers */
+.table-scroll-wrapper.table-to-card {
+  height: auto !important;
+  overflow-y: visible !important;
+  border: none !important;
+  border-radius: 0 !important;
+
+  table,
+  .table {
+    min-width: unset !important;
+    width: 100% !important;
+    border: none !important;
+  }
+}
+
+/* Pagination inside table-to-card */
+.table-to-card + .d-flex,
+.table-to-card ~ .d-flex {
+  flex-direction: column !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+
+  > div {
+    text-align: center !important;
+  }
+}
+
+.table-to-card + .d-flex .pagination,
+.table-to-card ~ .d-flex .pagination {
+  justify-content: center !important;
+}
+
+/* Dark theme support */
+[data-coreui-theme="dark"],
+[data-bs-theme="dark"],
+.dark {
+  @media (max-width: 576px) {
+    .table-to-card {
+      tbody tr {
+        background: #2a2f3a !important;
+        border-color: #3c4b64 !important;
+
+        td,
+        th {
+          color: #e6e8ec !important;
+
+          &::before {
+            color: #adb5bd !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .form-check-input:disabled,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .form-check-input:disabled,
+.dark
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .form-check-input:disabled {
   background-color: #49515a;
   border-color: #5c636a;
 }
 
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-select-container,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-select-container,
-.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-select-container {
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-select-container,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-select-container,
+.dark
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-select-container {
   color: #c4c9d0;
   background-color: #49515a;
   border-color: #5c636a;
 }
 
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section dss-ng-select,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section dss-ng-select,
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  dss-ng-select,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  dss-ng-select,
 .dark .dss-form-state-disabled .dss-form-state-section dss-ng-select {
   --dss-ng-select-bg: #49515a;
   --dss-ng-select-color: #c4c9d0;
   --dss-ng-select-border: #5c636a;
 }
 
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value,
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value-label,
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .dss-ng-select-label,
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-input input,
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-clear-wrapper,
-[data-coreui-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-arrow,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value-label,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .dss-ng-select-label,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-input input,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-clear-wrapper,
-[data-bs-theme="dark"] .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-arrow,
-.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value,
-.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-value-label,
-.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .dss-ng-select-label,
-.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-input input,
-.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-clear-wrapper,
-.dark .dss-form-state-disabled .dss-form-state-section .ng-select.ng-select-disabled .ng-arrow {
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-value,
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-value-label,
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .dss-ng-select-label,
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-input
+  input,
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-clear-wrapper,
+[data-coreui-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-arrow,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-value,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-value-label,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .dss-ng-select-label,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-input
+  input,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-clear-wrapper,
+[data-bs-theme="dark"]
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-arrow,
+.dark
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-value,
+.dark
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-value-label,
+.dark
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .dss-ng-select-label,
+.dark
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-input
+  input,
+.dark
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-clear-wrapper,
+.dark
+  .dss-form-state-disabled
+  .dss-form-state-section
+  .ng-select.ng-select-disabled
+  .ng-arrow {
   color: #c4c9d0 !important;
 }
 
 // Disabled fields keep a visible fill so users can distinguish them from
 // enabled fields, regardless of whether they use a form-state section wrapper.
 .dss-form-state-disabled {
-
   .form-control:disabled,
   .form-select:disabled,
   textarea:disabled,
@@ -222,7 +515,6 @@
 [data-coreui-theme="dark"] .dss-form-state-disabled,
 [data-bs-theme="dark"] .dss-form-state-disabled,
 .dark .dss-form-state-disabled {
-
   .form-control:disabled,
   .form-select:disabled,
   textarea:disabled,
@@ -269,7 +561,6 @@ input:disabled:not([type="checkbox"]):not([type="radio"]),
 [data-coreui-theme="dark"],
 [data-bs-theme="dark"],
 .dark {
-
   .form-control:disabled,
   .form-select:disabled,
   textarea:disabled,
@@ -411,31 +702,31 @@ textarea.dss-control-lg,
   font-size: var(--dss-control-font-size-sm);
 }
 
-.dss-input-label+.form-check,
-.dss-input-label+.d-flex {
+.dss-input-label + .form-check,
+.dss-input-label + .d-flex {
   height: var(--dss-control-height-sm);
   min-height: var(--dss-control-height-sm);
 }
 
-.dss-input-label-md+.form-check,
-.dss-input-label-md+.d-flex {
+.dss-input-label-md + .form-check,
+.dss-input-label-md + .d-flex {
   height: var(--dss-control-height-md);
   min-height: var(--dss-control-height-md);
 }
 
-.dss-input-label-lg+.form-check,
-.dss-input-label-lg+.d-flex {
+.dss-input-label-lg + .form-check,
+.dss-input-label-lg + .d-flex {
   height: var(--dss-control-height-lg);
   min-height: var(--dss-control-height-lg);
 }
 
-.dss-input-label-md+.form-check .form-check-label,
-.dss-input-label-md+.d-flex .form-check-label {
+.dss-input-label-md + .form-check .form-check-label,
+.dss-input-label-md + .d-flex .form-check-label {
   font-size: var(--dss-control-font-size-md);
 }
 
-.dss-input-label-lg+.form-check .form-check-label,
-.dss-input-label-lg+.d-flex .form-check-label {
+.dss-input-label-lg + .form-check .form-check-label,
+.dss-input-label-lg + .d-flex .form-check-label {
   font-size: var(--dss-control-font-size-lg);
 }
 
@@ -446,7 +737,8 @@ textarea.dss-control-lg,
 .dss-card-vh-100 {
   border: 1px solid transparent;
   background:
-    linear-gradient(var(--cui-body-bg, #fff), var(--cui-body-bg, #fff)) padding-box,
+    linear-gradient(var(--cui-body-bg, #fff), var(--cui-body-bg, #fff))
+      padding-box,
     linear-gradient(0deg, dodgerblue, lightskyblue) border-box;
   border-radius: 0px !important;
   margin-top: 5px;
@@ -456,7 +748,8 @@ textarea.dss-control-lg,
 [data-bs-theme="dark"] .dss-card-vh-100,
 .dark .dss-card-vh-100 {
   background:
-    linear-gradient(var(--cui-body-bg, #212529), var(--cui-body-bg, #212529)) padding-box,
+    linear-gradient(var(--cui-body-bg, #212529), var(--cui-body-bg, #212529))
+      padding-box,
     linear-gradient(0deg, #004f9f, #006bb6) border-box;
 }
 
@@ -479,7 +772,8 @@ textarea.dss-control-lg,
   justify-content: space-between;
   gap: 0.75rem;
   background: rgba(var(--cui-info-rgb), var(--cui-bg-opacity)) !important;
-  border-bottom: 1px solid color-mix(in srgb, #853cca 45%, var(--cui-body-bg, #fff));
+  border-bottom: 1px solid
+    color-mix(in srgb, #853cca 45%, var(--cui-body-bg, #fff));
   font-family: "Trebuchet MS", Haettenschweiler, sans-serif;
   color: color-mix(in srgb, #853cca 72%, var(--cui-body-bg, #fff));
 }
@@ -498,9 +792,11 @@ textarea.dss-control-lg,
 }
 
 .dss-table-grid-header .dss-table-grid-scroll th {
-  background-color: color-mix(in srgb,
-      #7c81bb 45%,
-      var(--cui-body-bg, #fff)) !important;
+  background-color: color-mix(
+    in srgb,
+    #7c81bb 45%,
+    var(--cui-body-bg, #fff)
+  ) !important;
   border-color: color-mix(in srgb, #7d7ff7 65%, var(--cui-body-bg, #fff));
   color: #fff;
   font-weight: 600;
@@ -521,7 +817,8 @@ textarea.dss-control-lg,
 .dss-coreui-detail-table {
   margin-top: 0.65rem;
   padding-top: 0.65rem;
-  border-top: 2px solid color-mix(in srgb, var(--cui-primary, #321fdb) 70%, transparent);
+  border-top: 2px solid
+    color-mix(in srgb, var(--cui-primary, #321fdb) 70%, transparent);
 }
 
 .dss-coreui-detail-table-scroll {
@@ -576,14 +873,17 @@ table.dss-coreui-detail-table-scroll.table.table-bordered {
   text-overflow: ellipsis;
 }
 
-.dss-coreui-detail-table-scroll .table.table-bordered> :not(caption)>*>*,
-table.dss-coreui-detail-table-scroll.table.table-bordered> :not(caption)>*>* {
+.dss-coreui-detail-table-scroll .table.table-bordered > :not(caption) > * > *,
+table.dss-coreui-detail-table-scroll.table.table-bordered
+  > :not(caption)
+  > *
+  > * {
   border: 1px solid var(--dss-detail-table-border-color);
 }
 
-.dss-coreui-detail-table .table-hover tbody tr:hover>*,
-.dss-coreui-detail-table-scroll.table-hover tbody tr:hover>*,
-table.dss-coreui-detail-table-scroll.table-hover tbody tr:hover>* {
+.dss-coreui-detail-table .table-hover tbody tr:hover > *,
+.dss-coreui-detail-table-scroll.table-hover tbody tr:hover > *,
+table.dss-coreui-detail-table-scroll.table-hover tbody tr:hover > * {
   --bs-table-bg-state: #f8f9fb;
   --cui-table-bg-state: #f8f9fb;
   background-color: #f8f9fb;
@@ -804,9 +1104,11 @@ table.dss-coreui-detail-table-scroll.table.table-bordered tfoot td {
 :host-context([data-bs-theme="dark"]) .dss-card-header-btn,
 :host-context(.dark) .dss-card-header-btn {
   color: #fff;
-  background-color: color-mix(in srgb,
-      #853cca 72%,
-      var(--cui-body-bg, #212529));
+  background-color: color-mix(
+    in srgb,
+    #853cca 72%,
+    var(--cui-body-bg, #212529)
+  );
   border-color: color-mix(in srgb, #d7b5ff 40%, #853cca);
 }
 
@@ -859,16 +1161,20 @@ table.dss-coreui-detail-table-scroll.table.table-bordered tfoot td {
 
   tbody {
     display: block;
-    height: var(--dss-detail-table-body-height,
-        var(--dss-table-body-height, 150px));
-    max-height: var(--dss-detail-table-body-height,
-        var(--dss-table-body-height, 150px));
+    height: var(
+      --dss-detail-table-body-height,
+      var(--dss-table-body-height, 150px)
+    );
+    max-height: var(
+      --dss-detail-table-body-height,
+      var(--dss-table-body-height, 150px)
+    );
     overflow-y: auto;
   }
 
   th,
   td {
-    height: var(--dss-table-row-height, 34px);
+    height: var(--dss-table-row-height, 25px);
     vertical-align: middle;
   }
 }
@@ -974,9 +1280,9 @@ table.dss-coreui-detail-table-scroll.table.table-bordered tfoot td {
     flex: 0 0 min(38%, 8rem);
   }
 
-  .dss-mobile-card-table td[data-label="Action"]>button,
-  table.dss-mobile-card-table td[data-label="Action"]>button,
-  .dss-mobile-card-table .dss-table-actions>button {
+  .dss-mobile-card-table td[data-label="Action"] > button,
+  table.dss-mobile-card-table td[data-label="Action"] > button,
+  .dss-mobile-card-table .dss-table-actions > button {
     flex: 0 0 auto;
     font-size: 0.75rem;
     line-height: 1.1;
@@ -1026,7 +1332,6 @@ c-col dss-date-fin,
 // Mobile form-control responsiveness helper
 // Keeps DSS inputs/selects/date pickers inside the viewport even when a fixed width is passed.
 @media (max-width: 575.98px) {
-
   dss-input-text,
   dss-input-num,
   dss-ng-select,
@@ -1082,7 +1387,7 @@ body {
   position: relative;
 }
 
-body>.ng-dropdown-panel {
+body > .ng-dropdown-panel {
   z-index: 2050;
   border: 1px solid var(--cui-border-color, #b1b7c1);
   border-radius: 0.375rem;
@@ -1092,12 +1397,12 @@ body>.ng-dropdown-panel {
   overflow: hidden;
 }
 
-body>.ng-dropdown-panel .ng-dropdown-panel-items {
+body > .ng-dropdown-panel .ng-dropdown-panel-items {
   max-height: min(260px, 45vh);
   background-color: var(--cui-body-bg, #fff);
 }
 
-body>.ng-dropdown-panel .ng-option {
+body > .ng-dropdown-panel .ng-option {
   padding: 0.25rem 0.5rem;
   border-bottom: 1px solid var(--cui-border-color-translucent, #e6e9ef);
   background-color: var(--cui-body-bg, #fff);
@@ -1105,13 +1410,12 @@ body>.ng-dropdown-panel .ng-option {
   font-size: 0.875rem;
 }
 
-body>.ng-dropdown-panel .ng-option-marked {
+body > .ng-dropdown-panel .ng-option-marked {
   background-color: var(--cui-tertiary-bg, #f2f6ff);
 }
 
 // Form controls inside table cells should not add vertical space below the row.
 td {
-
   dss-ng-select .cFormGroup,
   dss-input-text .cFormGroup,
   dss-input-num .cFormGroup,
@@ -1120,4 +1424,112 @@ td {
   .form-check {
     margin-bottom: 0 !important;
   }
+}
+
+/* ----------------------------- Custom Table CSS ----------------------------- */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+/* Keep header fixed and body scrollable */
+thead,
+tbody tr,
+tfoot tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+tbody {
+  display: block;
+  min-height: calc(100vh - 701px);
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+thead,
+tfoot {
+  width: calc(100% - 10px);
+}
+
+/* Table cells */
+th,
+td {
+  border: 1px solid #ddd;
+  word-wrap: break-word;
+}
+
+th {
+  color: #fff;
+  font-weight: 600;
+  background-color: color-mix(in srgb, #853cca 45%, var(--cui-body-bg, #fff));
+  border-color: color-mix(in srgb, #853cca 65%, var(--cui-body-bg, #fff));
+}
+
+/* ----------------------------- Empty Row ----------------------------- */
+
+.empty-row {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.empty-row td {
+  height: calc(100vh - 601px);
+  /* same as tbody minimum height */
+  border: none;
+  padding: 0;
+  vertical-align: middle;
+}
+
+/* Center content */
+.no-data {
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 601px);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Responsive image */
+.no-data img {
+  width: clamp(80px, 15vw, 120px);
+  max-width: 100%;
+  height: auto;
+  opacity: 0.25;
+}
+
+/* Text styling */
+.no-data p {
+  margin-top: 10px;
+  margin-bottom: 0;
+  text-align: center;
+  font-size: clamp(14px, 2vw, 16px);
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* Optional: custom scrollbar */
+tbody::-webkit-scrollbar {
+  width: 8px;
+}
+
+tbody::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+tbody::-webkit-scrollbar-thumb {
+  background: #b5b5b5;
+  border-radius: 4px;
+}
+
+tbody::-webkit-scrollbar-thumb:hover {
+  background: #8d8d8d;
 }

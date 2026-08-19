@@ -21,6 +21,7 @@
     "experimentalDecorators": true,
     "moduleResolution": "bundler",
     "importHelpers": true,
+    "resolveJsonModule":true, 
     "target": "ES2022",
     "module": "preserve",
     "useDefineForClassFields": false,

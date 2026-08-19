@@ -6,9 +6,8 @@ import { SHOW_LOADING_SPINNER } from './api-loading.service';
 
 // Create a unique InjectionToken for host-provided HTTP service
 export const DSS_HTTP_SERVICE = new InjectionToken<any>(
-    'my-custom-lib.HOST_HTTP_SERVICE'
+  'my-custom-lib.HOST_HTTP_SERVICE',
 );
-
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +16,10 @@ export class Http {
   status: boolean = false;
   baseUrl: string;
 
-  constructor(public http: HttpClient, public provider: MyProvider) {
+  constructor(
+    public http: HttpClient,
+    public provider: MyProvider,
+  ) {
     this.baseUrl = environment.apiServer;
   }
 
@@ -26,9 +28,8 @@ export class Http {
   }
 
   private getHeaders(contentType?: string | null): HttpHeaders {
-    let customHeaders :any = {
-      Authorization: this.token()
-       
+    let customHeaders: any = {
+      Authorization: this.token(),
     };
 
     if (contentType === undefined) {
@@ -45,12 +46,12 @@ export class Http {
       ? `Bearer ${this.provider.companyInfo?.user.access_token}`
       : ``;
   }
-//   dbName() {
-//     return this.provider.companyInfo?.finYear?.divId || '';
-//   }
-//   firm() {
-//     return this.provider.companyInfo?.company?.firmCode || '';
-//   }
+  //   dbName() {
+  //     return this.provider.companyInfo?.finYear?.divId || '';
+  //   }
+  //   firm() {
+  //     return this.provider.companyInfo?.company?.firmCode || '';
+  //   }
   cleanObject = (obj: any, level: number): any => {
     const isObject = (value: any) =>
       value instanceof Object && value.constructor.name === 'Object';
@@ -60,7 +61,9 @@ export class Http {
     if (Array.isArray(obj)) {
       return obj
         .map((item) => this.cleanObject(item, level))
-        .filter((item) => item !== null && item !== undefined && !isEmptyObject(item));
+        .filter(
+          (item) => item !== null && item !== undefined && !isEmptyObject(item),
+        );
     }
 
     if (!isObject(obj) || level < 0) return obj;
@@ -93,56 +96,97 @@ export class Http {
   };
 
   readJson<T>(url: string) {
-  return this.http.get<T>(url);
-}
+    return this.http.get<T>(url);
+  }
 
   get(sub: string, param?: {}, header?: HttpHeaders, isLoadingSpinner = true) {
     const url = this.baseUrl + sub;
     if (!header) {
       header = this.getHeaders();
     }
-    return this.http.get<any>(url, { headers: header, params: param, context: this.spinnerContext(isLoadingSpinner) });
+    return this.http.get<any>(url, {
+      headers: header,
+      params: param,
+      context: this.spinnerContext(isLoadingSpinner),
+    });
   }
 
   getDoc(sub: string, param?: {}, isLoadingSpinner = true) {
     const url = this.baseUrl + sub;
     const header = this.getHeaders();
-    return this.http.get(url, { params: param, headers: header, responseType: 'arraybuffer', context: this.spinnerContext(isLoadingSpinner) });
+    return this.http.get(url, {
+      params: param,
+      headers: header,
+      responseType: 'arraybuffer',
+      context: this.spinnerContext(isLoadingSpinner),
+    });
   }
 
-  put(sub: string, data: any, param?: {}, header?: HttpHeaders, isLoadingSpinner = true) {
+  put(
+    sub: string,
+    data: any,
+    param?: {},
+    header?: HttpHeaders,
+    isLoadingSpinner = true,
+  ) {
     const url = this.baseUrl + sub;
     if (!header) header = this.getHeaders();
 
-    return this.http.put<any>(url, this.cleanObject(data, 2), { headers: header, params: param, context: this.spinnerContext(isLoadingSpinner) });
+    return this.http.put<any>(url, this.cleanObject(data, 2), {
+      headers: header,
+      params: param,
+      context: this.spinnerContext(isLoadingSpinner),
+    });
   }
 
-  post(sub: string, data: any, params?: {}, header?: HttpHeaders, isLoadingSpinner = true) {
+  post(
+    sub: string,
+    data: any,
+    params?: {},
+    header?: HttpHeaders,
+    isLoadingSpinner = true,
+  ) {
     const url = this.baseUrl + sub;
-    if (!header)
-      //   header = new HttpHeaders({
-      //     Authorization: this.token(),
-      //     'X-FY': this.dbName(),
-      //     'X-FIRM-ID': this.firm(),
-      //   });
-      // header.set('Content-Type', 'application/json');
-      header = this.getHeaders();
-      const cleanObjData= this.cleanObject(data, 2);
+    if (!header) header = this.getHeaders();
+    const cleanObjData = this.cleanObject(data, 2);
 
-    return this.http.post<any>(url,cleanObjData, { headers: header, params: params, context: this.spinnerContext(isLoadingSpinner) });
+    return this.http.post<any>(url, cleanObjData, {
+      headers: header,
+      params: params,
+      context: this.spinnerContext(isLoadingSpinner),
+    });
   }
 
-  attachDoc(sub: string, data: any, params?: {}, header?: HttpHeaders, isLoadingSpinner = true) {
+  attachDoc(
+    sub: string,
+    data: any,
+    params?: {},
+    header?: HttpHeaders,
+    isLoadingSpinner = true,
+  ) {
     const url = this.baseUrl + sub;
     if (!header) header = this.getHeaders('');
 
-    return this.http.post<any>(url, data, { headers: header, params: params, context: this.spinnerContext(isLoadingSpinner) });
+    return this.http.post<any>(url, data, {
+      headers: header,
+      params: params,
+      context: this.spinnerContext(isLoadingSpinner),
+    });
   }
 
-  delete(sub: string, param: {}, header?: HttpHeaders, isLoadingSpinner = true) {
+  delete(
+    sub: string,
+    param: {},
+    header?: HttpHeaders,
+    isLoadingSpinner = true,
+  ) {
     const url = this.baseUrl + sub;
     if (!header) header = this.getHeaders();
 
-    return this.http.delete<any>(url, { headers: header, params: param, context: this.spinnerContext(isLoadingSpinner) });
+    return this.http.delete<any>(url, {
+      headers: header,
+      params: param,
+      context: this.spinnerContext(isLoadingSpinner),
+    });
   }
 }

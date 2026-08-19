@@ -1,0 +1,260 @@
+{
+  "users": [
+    {
+      "username": "Abcd",
+      "password": "ABCD",
+      "mobileNo": "7083234537",
+      "email": "ANILDEVAKI1@GMAIL.COM",
+      "branch_code": "101",
+      "role": 1,
+      "roleName": "Admin",
+      "id": "9BWTRR2wsU0"
+    }
+  ],
+  "configuration": [
+    {
+      "id": "BMfdOG9Dj08",
+      "firmId": "111111",
+      "credDate": "2026-07-28",
+      "credUser": "admin",
+      "branchId": "22222222222",
+      "firmName": "ABCD",
+      "accountNo": "11111111111111",
+      "accountName": "ABCD",
+      "IFSC_Code": "",
+      "customerId": "11111111",
+      "clientId": "11111111",
+      "clientSecretKey": "111111",
+      "symmetric_key": "111111111",
+      "webhook_address": "http://google.com",
+      "static_ip": "https://192.6.35.56",
+      "modalForm": {
+        "txn_password": "213123123",
+        "mobile_otp": "123123123",
+        "mobile_no": "917083234537",
+        "encrypted_psw": "aijLMXaakjL+9F+LkIyeng=="
+      }
+    }
+  ],
+  "VANCreation": [
+    {
+      "id": "3HJko0W3z3k",
+      "Request": {
+        "body": {
+          "encryptData": {
+            "accountNo": "111111111111111",
+            "startDate": "2026-08-01",
+            "endDate": "2026-08-20",
+            "countVAN": "15",
+            "virtualAccountDetails": [
+              {
+                "vanNumber": "VAN483980001",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980002",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980003",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980004",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980005",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980006",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980007",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980008",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980009",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980010",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980011",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980012",
+                "endDate": "2026-08-20"
+              },
+              {
+                "vanNumber": "VAN483980013",
+                "endDate": "2026-08-30"
+              },
+              {
+                "vanNumber": "VAN483980014",
+                "endDate": "2026-08-31"
+              },
+              {
+                "vanNumber": "VAN483980015",
+                "endDate": "2026-08-31"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "ra2B0X2QEvo",
+      "Request": {
+        "body": {
+          "encryptData": {
+            "accountNo": "123455555555555",
+            "startDate": "2026-08-03",
+            "endDate": "2026-12-15",
+            "countVAN": "1",
+            "virtualAccountDetails": [
+              {
+                "vanNumber": "123333343"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "YqnKneEGQbY",
+      "Request": {
+        "body": {
+          "encryptData": {
+            "accountNo": "122222222222222",
+            "startDate": "2026-08-07",
+            "endDate": "2026-08-20",
+            "countVAN": "20",
+            "virtualAccountDetails": [
+              {
+                "vanNumber": "VAN798513001"
+              },
+              {
+                "vanNumber": "VAN798513002"
+              },
+              {
+                "vanNumber": "VAN798513003"
+              },
+              {
+                "vanNumber": "VAN798513004"
+              },
+              {
+                "vanNumber": "VAN798513005"
+              },
+              {
+                "vanNumber": "VAN798513006"
+              },
+              {
+                "vanNumber": "VAN798513007"
+              },
+              {
+                "vanNumber": "VAN798513008"
+              },
+              {
+                "vanNumber": "VAN798513009"
+              },
+              {
+                "vanNumber": "VAN798513010"
+              },
+              {
+                "vanNumber": "VAN798513011"
+              },
+              {
+                "vanNumber": "VAN798513012"
+              },
+              {
+                "vanNumber": "VAN798513013"
+              },
+              {
+                "vanNumber": "VAN798513014"
+              },
+              {
+                "vanNumber": "VAN798513015"
+              },
+              {
+                "vanNumber": "VAN798513016"
+              },
+              {
+                "vanNumber": "VAN798513017"
+              },
+              {
+                "vanNumber": "VAN798513018"
+              },
+              {
+                "vanNumber": "VAN798513019"
+              },
+              {
+                "vanNumber": "VAN798513020"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "payments": [
+    {
+      "id": "1",
+      "batchId": "PAY-2024-001",
+      "paymentType": "Single",
+      "totalAmount": 15000,
+      "partyName": "ABC Suppliers",
+      "paymentAgainst": "Invoice #INV-2024-001",
+      "requestDate": "2024-01-15",
+      "status": "Success",
+      "bankName": "HDFC Bank",
+      "accountNo": "1234567890",
+      "requestedBy": "John Doe",
+      "transactionId": "TXN-2024-001-001",
+      "transactionDate": "2024-01-16",
+      "remarks": "Payment completed successfully"
+    },
+    {
+      "id": "2",
+      "batchId": "PAY-2024-002",
+      "paymentType": "Bulk",
+      "totalAmount": 45000,
+      "partyName": "XYZ Traders",
+      "paymentAgainst": "Invoice #INV-2024-002",
+      "requestDate": "2024-01-20",
+      "status": "Pending",
+      "bankName": "ICICI Bank",
+      "accountNo": "9876543210",
+      "requestedBy": "Jane Smith",
+      "remarks": "Awaiting approval",
+      "bulkItems": [
+        {
+          "id": 1,
+          "partyName": "Item 1",
+          "amount": 15000,
+          "accountNo": "1111111111",
+          "status": "Pending",
+          "transactionId": "TXN-2024-002-001"
+        },
+        {
+          "id": 2,
+          "partyName": "Item 2",
+          "amount": 30000,
+          "accountNo": "2222222222",
+          "status": "Pending",
+          "transactionId": "TXN-2024-002-002"
+        }
+      ]
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

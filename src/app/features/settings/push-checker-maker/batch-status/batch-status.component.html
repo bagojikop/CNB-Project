@@ -1,0 +1,91 @@
+<div class="batch-status-container">
+  <!-- Transactions Table -->
+  <div class="transactions-section">
+    <div class="table-responsive dss-mobile-card-table">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 40px">#</th>
+            <th style="width: 7%">Amount(₹)</th>
+            <th style="width: 10%">Credit Account</th>
+            <th style="width: 10%">Debit Account</th>
+            <th style="width: 8%">IFSC Code</th>
+            <th style="width: 20%">Beneficiary</th>
+            <th style="width: 8%">Status</th>
+            <th style="width: 11%">Txn. Type</th>
+            <th style="width: 11%">Reference</th>
+            <th style="width: 15%">Narrative</th>
+          </tr>
+        </thead>
+        <tbody style="height: calc(100vh - 22.2rem); overflow-y: scroll">
+          <tr *ngFor="let txn of paginatedTransactions; let i = index">
+            <td style="width: 40px">{{ i + 1 }}</td>
+            <td style="width: 7%" class="amount">{{ txn.amount | number }}</td>
+            <td style="width: 10%">{{ txn.creditAccountId }}</td>
+            <td style="width: 10%">{{ txn.debitAccountId }}</td>
+            <td style="width: 8%">{{ txn.ifscCode }}</td>
+            <td style="width: 20%">{{ txn.Benename }}</td>
+            <td style="width: 8%" class="text-center">
+              <span
+                class="status-badge"
+                [class.verified]="txn.status === 'VERIFIED'"
+                [class.processing]="
+                  txn.status === 'PROCESSING IN PROGRESS' ||
+                  txn.status === 'PROCESSING'
+                "
+                [class.processed]="txn.status === 'PROCESSED'"
+                [class.exception]="txn.status === 'PROCESSED WITH EXCEPTION'"
+                [class.approved]="txn.status === 'APPROVED'"
+                [class.completed]="txn.status === 'COMPLETED'"
+                [class.error]="txn.status === 'ERROR'"
+                [class.rejected]="txn.status === 'REJECTED'"
+                [class.expired]="txn.status === 'EXPIRED'"
+              >
+                {{ txn.status }}
+              </span>
+            </td>
+            <td style="width: 11%">{{ txn.TxnType }}</td>
+            <td style="width: 11%">{{ txn.txnRefNo }}</td>
+            <td class="narrative" style="width: 15%">{{ txn.Nrtv }}</td>
+          </tr>
+          <tr *ngIf="transactions.length === 0">
+            <td colspan="10" class="no-data">No transactions found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="card-footer bg-white border-top" *ngIf="totalItems > 0">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="text-muted small">
+          Showing {{ startIndex }} - {{ endIndex }} of {{ totalItems }} entries
+        </div>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="changePage(currentPage - 1)"
+                >Previous</a
+              >
+            </li>
+            <li
+              class="page-item"
+              *ngFor="let page of visiblePages"
+              [class.active]="page === currentPage"
+              [class.disabled]="page === -1"
+            >
+              <a class="page-link" (click)="page !== -1 && changePage(page)">
+                {{ page === -1 ? "…" : page }}
+              </a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" (click)="changePage(currentPage + 1)"
+                >Next</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>

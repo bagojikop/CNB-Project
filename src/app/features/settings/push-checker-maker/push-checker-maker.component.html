@@ -1,0 +1,52 @@
+<div class="card dss-card-vh-100" dssViewportHeight="140px">
+  <div class="card-header">
+    <h6 class="mb-0">Push Checker-Maker</h6>
+  </div>
+  <div class="card-body dss-card-body-scroll p-0">
+    <ul class="nav nav-tabs nav-tabs-slash">
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 1"
+          (click)="setActiveTab(1)"
+          style="cursor: pointer"
+        >
+          <i class="bi bi-cash-stack me-2"></i>Push Maker
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 2"
+          (click)="setActiveTab(2)"
+          style="cursor: pointer"
+        >
+          <i class="bi bi-building me-2"></i>Push Init
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 3"
+          (click)="setActiveTab(3)"
+          style="cursor: pointer"
+        >
+          <i class="bi bi-grid-3x3-gap-fill me-2"></i>Batch Status
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 4"
+          (click)="setActiveTab(4)"
+          style="cursor: pointer"
+        >
+          <i class="bi bi-search me-2"></i>Batch Enquiry
+        </a>
+      </li>
+    </ul>
+    <div class="tab-content p-3">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

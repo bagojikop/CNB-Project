@@ -33,6 +33,7 @@ import { DssLocaleService } from './shared/services/common';
 import { DssDateFinService } from './shared/services/dss-date-fin.service';
 import { AuthService } from './shared/services/auth.service';
 import { environment } from '../environments/environment';
+import { MyProvider } from '@shared-services/provider';
 
 export function initializeDssConfig(): void {
   const localeService = inject(DssLocaleService);
@@ -52,7 +53,12 @@ export function initializeAuth(): Promise<void> | void {
   }
 
   const auth = inject(AuthService);
-  //return firstValueFrom(auth.loginForDevelopment()).then(() => undefined);
+  var myprovider = inject(MyProvider);
+
+  return firstValueFrom(auth.loginForDevelopment()).then((res) => {
+    console.log(res);
+    myprovider.companyInfo!.user = res;
+  });
 }
 
 export const appConfig: ApplicationConfig = {

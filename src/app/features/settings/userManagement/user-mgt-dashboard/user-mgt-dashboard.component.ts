@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -12,9 +18,10 @@ import {
   DSS_FORM_CONTROLS,
 } from '@shared-directives/dss-form-controls';
 import { createUserManagementForm } from './user-mgt-edit.factory';
-import { crudService } from '@shared-services/crudService';
+
 import { userMgt } from '@shared-interfaces/settings/user';
 import { DialogsService } from '@shared-services/messageBox';
+import { UserService } from '@shared-services/user.service';
 
 @Component({
   selector: 'app-user-mgt-dashboard',
@@ -25,7 +32,7 @@ import { DialogsService } from '@shared-services/messageBox';
 export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
   readonly caseStyle = CaseStyle;
   dashboardTitle: string = 'User Management';
-  private crudService = inject(crudService);
+  private userSrc = inject(UserService);
   private readonly router = inject(Router);
   private fb = inject(FormBuilder);
   private dialog = inject(DialogsService);
@@ -35,13 +42,7 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
   readonly handleEdit = (item?: any) => this.onGridEdit(item);
   readonly handleDelete = (item?: any) => this.onGridDelete(item);
 
-  form = this.fb.group({
-    jsonData: this.fb.array([]),
-  });
-
-  get jsonData(): FormArray {
-    return this.form.get('jsonData') as FormArray;
-  }
+  jsonData = signal<userMgt[]>([]);
 
   columns = [
     {
@@ -50,6 +51,7 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
       type: 'string',
       _style: { width: '40%' },
     },
+
     {
       key: 'email',
       label: 'Email',
@@ -57,10 +59,16 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
       _style: { width: '40%' },
     },
     {
+      key: 'branch_name',
+      label: 'Branch',
+      type: 'string',
+      _style: { width: '30%' },
+    },
+    {
       key: 'roleName',
       label: 'Role',
       type: 'string',
-      _style: { width: '20%' },
+      _style: { width: '10%' },
     },
   ];
 
@@ -75,17 +83,51 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     },
   ];
 
-  ngOnInit(): void {
-    this.crudService.STORAGE_KEY.set('UserMgt');
-  }
+  branches = [
+    { branch_code: 'ALL', branch_name: '[ALL]' },
+    { branch_code: '121', branch_name: 'ANDHRA PRADESH' },
+    { branch_code: '118', branch_name: 'DHARASHIV' },
+    { branch_code: '111', branch_name: 'DHARWAD' },
+    { branch_code: '120', branch_name: 'HYDERABAD' },
+    { branch_code: '105', branch_name: 'KARAD' },
+    { branch_code: '109', branch_name: 'KAVATHEMAHANKAL' },
+    { branch_code: '103', branch_name: 'KOLHAPUR' },
+    {
+      branch_code: '119',
+      branch_name: 'KRUSHNA GODAVARI KBBUVVSS LTD KANADWADI (HO)',
+    },
+    { branch_code: '125', branch_name: 'KUDAL' },
+    { branch_code: '107', branch_name: 'NANDED' },
+    { branch_code: '104', branch_name: 'PANDHARPUR' },
+    { branch_code: '102', branch_name: 'RAIBAG' },
+    { branch_code: '101', branch_name: 'SANGLI' },
+    { branch_code: '122', branch_name: 'SINDHANUR' },
+    { branch_code: '106', branch_name: 'VIJAYPUR' },
+  ];
+
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
-    const data = this.crudService.getAll() as userMgt[];
+    this.userSrc.getAll().subscribe({
+      next: (res: any) => {
+        if (res) {
+          for (const element of res) {
+            const matchedBranch = this.branches?.filter(
+              (f) => f.branch_code == element?.branch_code,
+            )[0];
+            element.branch_name = matchedBranch?.branch_name || '';
+          }
 
-    this.jsonData.clear();
-
-    data.forEach((user) => {
-      this.jsonData.push(this.createUserMgtForm(user));
+          console.log(res);
+          this.jsonData.set(res);
+        }
+      },
+      error: (err) => {
+        this.dialog.swal({
+          dialog: 'error',
+          message: err.message,
+        });
+      },
     });
   }
 
@@ -94,18 +136,24 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
       .get('roleName')
       ?.setValue(event.cd === 1 ? 'Admin' : 'User');
   }
+
   createUserMgtForm(user?: userMgt) {
     return this.fb.group({
       id: [user?.id],
-      username: [user?.username],
+
+      username: [user?.username, Validators.required],
 
       password: [user?.password],
 
-      email: [user?.email],
+      email: [user?.email, Validators.required],
+
+      mobileNo: [user?.mobileNo],
 
       role: [user?.role],
 
       roleName: [user?.roleName],
+
+      branch_code: [user?.branch_code || 'ALL'],
     });
   }
 
@@ -127,50 +175,82 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const user = this.userInputs.value as userMgt;
+    const formValue = this.userInputs.getRawValue();
+    const user: userMgt = {
+      id: formValue.id ?? undefined,
+      username: formValue.username,
+      password: formValue.password,
+      mobileNo: formValue.mobileNo,
+      email: formValue.email ?? undefined,
+      branch_code: formValue.branch_code,
+      role: formValue.role || '',
+      roleName: formValue.roleName || '',
+    };
 
-    const users = this.crudService.getAll() as userMgt[];
-
-    const index = user.id
-      ? users.findIndex((x) => Number(x.id) === Number(user.id))
-      : -1;
-
-    //onEdit
-    if (index >= 0) {
-      debugger;
-      // Update FormArray
-      this.jsonData.at(index).patchValue(user);
-      this.crudService.update(user);
-      // Update localStorage array
-      users[index] = user;
-
-      //onSave
+    if (user.id != null) {
+      const users = this.jsonData() as userMgt[];
+      var index = users.findIndex((user) => user?.id === user.id);
     } else {
-      debugger;
-      // New record
-      user.id = users.length ? (users[users.length - 1].id ?? 0) + 1 : 1;
-
-      this.jsonData.push(this.createUserMgtForm(user));
-
-      users.push(user);
-      this.crudService.add(user);
+      var index = -1;
     }
 
-    this.dialog.swal({
-      dialog: 'success',
-      message: 'Record Save Successfully',
-    });
+    //onEdit
+    if (index !== -1) {
+      debugger;
+      this.userSrc.update(user).subscribe({
+        next: (res) => {
+          this.jsonData.update((data) => {
+            const updated = [...data];
+            updated[index] = {
+              ...updated[index],
+              ...user,
+            };
+            return updated;
+          });
 
-    this.userInputs.reset();
+          this.dialog.swal({
+            dialog: 'success',
+            message: 'Record Update Successfully',
+          });
+        },
+        error: (err) => {
+          this.dialog.swal({
+            dialog: 'error',
+            message: err.message,
+          });
+        },
+      });
+    } else {
+      // New record
+
+      this.userSrc.add(user).subscribe({
+        next: (res) => {
+          this.jsonData.update((data) => [...data, { ...user }]);
+          this.dialog.swal({
+            dialog: 'success',
+            message: 'Record Save Successfully',
+          });
+        },
+        error: (err) => {
+          this.dialog.swal({
+            dialog: 'error',
+            message: err.message,
+          });
+        },
+      });
+    }
+
     this.visible = false;
   }
 
-  onGridEdit(item: any) {
-    debugger;
+  consoleTest() {
+    console.log('Button Clicked');
+  }
 
+  onGridEdit(item: any) {
     this.userInputs.patchValue({
       ...item,
-      id: item.___id,
+      id: item.id,
     });
     this.visible = true;
   }
@@ -182,18 +262,24 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
         message: 'Do you want to Delete this record',
       })
       .then((res) => {
-        console.log(res);
-
         if (res) {
-          const index = this.jsonData.controls.findIndex(
-            (control) => control.value.id === item.id,
-          );
+          this.userSrc.delete(item.id).subscribe({
+            next: (res) => {
+              const index = this.jsonData().findIndex(
+                (control) => control.id === item.id,
+              );
 
-          if (index !== -1) {
-            this.jsonData.removeAt(index);
-          }
-
-          this.crudService.delete(item.id!);
+              if (index !== -1) {
+                this.jsonData().splice(index, 1);
+              }
+            },
+            error: (err) => {
+              this.dialog.swal({
+                dialog: 'error',
+                message: err.message,
+              });
+            },
+          });
         }
       });
   }

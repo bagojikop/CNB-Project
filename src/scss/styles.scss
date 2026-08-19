@@ -36,7 +36,7 @@ $info-gradient-dark-color: gradient($info-dark-color) !default;
   $success-bg-subtle: tint-color($success-color, 80%),
   $info-bg-subtle: tint-color($info-color, 80%),
   $warning-bg-subtle: tint-color($warning-color, 80%),
-  $danger-bg-subtle:  tint-color($danger-color, 80%),
+  $danger-bg-subtle: tint-color($danger-color, 80%),
   $primary-border-subtle: tint-color($primary-color, 60%),
   $success-border-subtle: tint-color($success-color, 60%),
   $info-border-subtle: tint-color($info-color, 60%),
@@ -50,9 +50,9 @@ $info-gradient-dark-color: gradient($info-dark-color) !default;
   $theme-gradients-dark: (
     "primary": $primary-gradient-dark-color,
     "success": $success-gradient-dark-color,
-    "info":    $info-gradient-dark-color,
+    "info": $info-gradient-dark-color,
     "warning": $warning-gradient-dark-color,
-    "danger":  $danger-gradient-dark-color
+    "danger": $danger-gradient-dark-color,
   ),
   $primary-text-emphasis-dark: shade-color($primary-dark-color, 60%),
   $info-text-emphasis-dark: shade-color($info-dark-color, 60%),
@@ -68,11 +68,11 @@ $info-gradient-dark-color: gradient($info-dark-color) !default;
   $info-border-subtle-dark: tint-color($info-dark-color, 60%),
   $warning-border-subtle-dark: tint-color($warning-dark-color, 60%),
   $danger-border-subtle-dark: tint-color($danger-dark-color, 60%),
-  $font-size-base: .9375rem,
-  $border-color-translucent: rgba(#080a0c, .0875),
+  $font-size-base: 0.9375rem,
+  $border-color-translucent: rgba(#080a0c, 0.0875),
   $footer-bg: var(--cui-body-bg),
-  $table-cell-padding-y: .75rem,
-  $table-cell-padding-x: .75rem,
+  $table-cell-padding-y: 0.75rem,
+  $table-cell-padding-x: 0.75rem
 );
 
 // Custom styles for this theme
@@ -84,11 +84,45 @@ $info-gradient-dark-color: gradient($info-dark-color) !default;
 // If you want to add custom CSS you can put it here.
 @use "custom";
 
-
-
 // Examples
 // We use those styles to show code examples, you should remove them in your application.
 @use "examples";
 
 //--------- TEMP FIXES---------
 // These styles are used to fix some issues with the template, you should remove them in your application and write your own styles instead.
+
+// ===== Disabled sidebar nav items ===== //
+.sidebar-nav-item-disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+
+  .nav-link {
+    pointer-events: none;
+    cursor: not-allowed;
+    color: rgba(255, 255, 255, 0.4) !important;
+    opacity: 1 !important;
+
+    .nav-icon {
+      color: rgba(255, 255, 255, 0.35) !important;
+    }
+  }
+
+  .nav-group-toggle {
+    pointer-events: none;
+    cursor: not-allowed;
+    color: rgba(255, 255, 255, 0.4) !important;
+
+    .nav-icon {
+      color: rgba(255, 255, 255, 0.35) !important;
+    }
+  }
+
+  .nav-group-items .nav-link {
+    color: rgba(255, 255, 255, 0.4) !important;
+
+    .nav-icon {
+      color: rgba(255, 255, 255, 0.35) !important;
+    }
+  }
+}
+// ===== /Disabled sidebar nav items ===== //

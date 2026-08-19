@@ -1,0 +1,478 @@
+<div class="card dss-card-vh-100" dssViewportHeight="140px">
+  <div class="card-body dss-card-body-scroll">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Payment Request Approval</h5>
+
+      <div class="d-flex align-items-center gap-3">
+        @if (selectedPaymentType === "single") {
+          <button class="btn btn-success btn-sm" (click)="pushSelectedItems()">
+            <i class="bi bi-arrow-up-circle"></i> Push
+          </button>
+        }
+        <!-- <span class="badge bg-primary">{{ getPendingCount() }} Pending</span> -->
+      </div>
+    </div>
+
+    <div class="table-responsive table-to-card">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            @if (selectedPaymentType === "single") {
+              <th style="width: 5%">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  (change)="toggleAllSelections($event)"
+                  [checked]="allSelected"
+                  style="cursor: pointer"
+                />
+              </th>
+            }
+            <th style="width: 15%">Batch ID</th>
+            <th style="width: 10%">Type</th>
+            @if (this.selectedPaymentType == "single") {
+              <th style="width: 30%">Party Name</th>
+            }
+            <th style="width: 10%">Amount</th>
+            <th style="width: 10%">Date</th>
+            <th style="width: 10%">Status</th>
+
+            <th class="text-center" style="width: 10%">Actions</th>
+          </tr>
+        </thead>
+        <tbody style="height: calc(100vh - 25em); overflow-y: scroll">
+          @for (item of paginatedData; track item.id) {
+            <tr [class.table-active]="item.status === 'Pending'">
+              @if (selectedPaymentType === "single") {
+                <td style="width: 5%">
+                  @if (item.status !== "Approved") {
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      [checked]="isSingleSelected(item.id)"
+                      (change)="toggleSingleSelection(item.id)"
+                      style="cursor: pointer"
+                    />
+                  }
+                </td>
+              }
+              <td style="width: 15%">
+                <span
+                  style="font-weight: 600; color: #1a2332; font-size: 0.9rem"
+                  >#{{ item.batchId }}</span
+                >
+              </td>
+              <td style="width: 10%">
+                <span
+                  class="badge rounded-pill px-3 py-1"
+                  [ngClass]="
+                    item.paymentType === 'Bulk'
+                      ? 'bg-info text-white'
+                      : 'bg-secondary text-white'
+                  "
+                  style="
+                    font-weight: 500;
+                    font-size: 0.75rem;
+                    letter-spacing: 0.3px;
+                  "
+                >
+                  {{ item.paymentType }}
+                </span>
+              </td>
+              @if (this.selectedPaymentType == "single") {
+                <td style="width: 30%">
+                  {{ item.partyName || "-" }}
+                </td>
+              }
+              <td style="width: 10%">
+                <span
+                  style="font-weight: 700; color: #1e7e34; font-size: 0.95rem"
+                >
+                  {{ item.totalAmount | currency: "INR" : "symbol" }}
+                </span>
+              </td>
+              <td style="width: 10%">
+                {{ item.requestDate | date: "dd MMM yyyy" }}
+              </td>
+              <td style="width: 10%">
+                <span
+                  class="badge rounded-pill px-3 py-1"
+                  [ngClass]="getStatusClass(item.status)"
+                >
+                  <span
+                    *ngIf="item.status === 'Pending'"
+                    style="display: inline-flex; align-items: center; gap: 4px"
+                  >
+                    <span
+                      class="spinner-grow spinner-grow-sm"
+                      style="width: 8px; height: 8px"
+                    ></span>
+                    {{ item.status }}
+                  </span>
+                  <span *ngIf="item.status !== 'Pending'">{{
+                    item.status
+                  }}</span>
+                </span>
+              </td>
+
+              <td style="width: 10%">
+                <div class="d-flex gap-1 justify-content-center">
+                  @if (item.paymentType === "Bulk") {
+                    <button
+                      class="btn btn-sm btn-outline-primary rounded-pill px-2"
+                      (click)="onShow(item)"
+                      title="View Details"
+                      style="border-color: #dde4ed; color: #4a5a6a"
+                    >
+                      <i class="bi bi-eye" style="font-size: 0.9rem"></i>
+                    </button>
+                  }
+
+                  <!-- Single: Dropdown Actions -->
+                  @if (item.paymentType == "Single") {
+                    <div
+                      class="dropdown d-inline-block"
+                      #dropdown=""
+                      (click)="$event.stopPropagation()"
+                    >
+                      <button
+                        class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                        type="button"
+                        (click)="toggleDropdown(dropdown)"
+                        [disabled]="item.status !== 'Pending'"
+                        style="
+                          border-color: #dde4ed;
+                          color: #4a5a6a;
+                          font-size: 0.8rem;
+                        "
+                      >
+                        <i
+                          class="bi bi-three-dots-vertical"
+                          style="font-size: 0.9rem"
+                        ></i>
+                      </button>
+                      <ul
+                        class="dropdown-menu dropdown-menu-end shadow-sm"
+                        [class.show]="dropdown.isOpen"
+                        style="
+                          position: absolute;
+                          inset: 0px 0px auto auto;
+                          transform: translate(0px, -5px);
+                          z-index: 1050;
+                          border-radius: 12px;
+                          padding: 6px 0;
+                          border: none;
+                          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+                        "
+                      >
+                        <li>
+                          <button
+                            class="dropdown-item text-danger"
+                            (click)="
+                              rejectSinglePayment(item); closeDropdown(dropdown)
+                            "
+                            [disabled]="item.status !== 'Pending'"
+                            style="
+                              border-radius: 8px;
+                              margin: 2px 6px;
+                              padding: 8px 16px;
+                            "
+                          >
+                            <i class="bi bi-x-circle-fill me-2"></i> Reject
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            class="dropdown-item text-warning"
+                            (click)="
+                              holdSinglePayment(item); closeDropdown(dropdown)
+                            "
+                            [disabled]="item.status !== 'Pending'"
+                            style="
+                              border-radius: 8px;
+                              margin: 2px 6px;
+                              padding: 8px 16px;
+                            "
+                          >
+                            <i class="bi bi-clock-fill me-2"></i> Hold
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="text-center py-5 text-muted">
+                <i
+                  class="bi bi-inbox"
+                  style="
+                    font-size: 2.5rem;
+                    display: block;
+                    margin-bottom: 12px;
+                    opacity: 0.5;
+                  "
+                ></i>
+                <p style="font-size: 0.95rem; font-weight: 500">
+                  No payment requests found for the selected filter.
+                </p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+
+    <div class="d-flex justify-content-end align-items-center">
+      <div class="text-muted small">
+        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} -
+        {{
+          currentPage * itemsPerPage > filteredData.length
+            ? filteredData.length
+            : currentPage * itemsPerPage
+        }}
+        of {{ filteredData.length }} items
+      </div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="previousPage()">Previous</button>
+          </li>
+          @for (page of [].constructor(totalPages); track $index) {
+            <li class="page-item" [class.active]="currentPage === $index + 1">
+              <button class="page-link" (click)="goToPage($index + 1)">
+                {{ $index + 1 }}
+              </button>
+            </li>
+          }
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="nextPage()">Next</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    @if (showDetails && selectedItem) {
+      <div class="modal-overlay">
+        <div class="modal-content modal-xl">
+          <div class="modal-header">
+            <h5 class="modal-title">Payment Request Details</h5>
+            <button
+              type="button"
+              class="btn-close"
+              (click)="closeDetails()"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="detail-group">
+                  <label>Batch No.</label>
+                  <p>
+                    <strong>{{ selectedItem.batchId }}</strong>
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Payment Type</label>
+                  <p>
+                    <span
+                      class="badge"
+                      [ngClass]="
+                        selectedItem.paymentType === 'Bulk'
+                          ? 'bg-info'
+                          : 'bg-secondary'
+                      "
+                    >
+                      {{ selectedItem.paymentType }}
+                    </span>
+                  </p>
+                </div>
+
+                <div class="detail-group">
+                  <label>Total Amount</label>
+                  <p class="text-primary fw-bold">
+                    {{ selectedItem.totalAmount | currency: "INR" : "symbol" }}
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Request Date</label>
+                  <p>{{ selectedItem.requestDate }}</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="detail-group">
+                  <label>Payment Against</label>
+                  <p>
+                    <strong>{{ selectedItem.paymentAgainst }}</strong>
+                  </p>
+                </div>
+                <div class="detail-group">
+                  <label>Bank Name</label>
+                  <p>{{ selectedItem.bankName }}</p>
+                </div>
+                <div class="detail-group">
+                  <label>Account No.</label>
+                  <p>{{ selectedItem.accountNo }}</p>
+                </div>
+                <div class="detail-group">
+                  <label>Requested By</label>
+                  <p>{{ selectedItem.requestedBy }}</p>
+                </div>
+                <div class="detail-group">
+                  <label>Status</label>
+                  <p>
+                    <span
+                      class="badge"
+                      [ngClass]="getStatusClass(selectedItem.status)"
+                    >
+                      {{ selectedItem.status }}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bulk Items List with Checkboxes -->
+            @if (
+              selectedItem.paymentType === "Bulk" &&
+              selectedItem.bulkItems &&
+              selectedItem.bulkItems.length > 0
+            ) {
+              <div class="mt-4">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-3"
+                >
+                  <h6 class="mb-0">
+                    Bulk Payment Items ({{ selectedItem.bulkItems.length }})
+                  </h6>
+                  <div class="d-flex gap-2">
+                    <span class="badge bg-info"
+                      >{{ getSelectedCount() }} Selected</span
+                    >
+                    <button
+                      class="btn btn-sm btn-success"
+                      (click)="approveSelectedBulk()"
+                      [disabled]="getSelectedCount() === 0"
+                    >
+                      <i class="bi bi-check2-all"></i> Approve Selected
+                    </button>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table
+                    class="table table-bordered table-hover table-sm"
+                    style="width: 100%; table-layout: fixed"
+                  >
+                    <thead
+                      class="table-light"
+                      style="position: sticky; top: 0; z-index: 2"
+                    >
+                      <tr>
+                        <th style="width: 5%">
+                          <input
+                            type="checkbox"
+                            class="form-check-input"
+                            [(ngModel)]="selectAllBulk"
+                            (change)="toggleSelectAll($event)"
+                          />
+                        </th>
+                        <th style="width: 5%">#</th>
+                        <th style="width: 25%">Name</th>
+                        <th style="width: 15%">Amount</th>
+                        <th style="width: 15%">Account</th>
+                        <th style="width: 10%">Status</th>
+                        <th style="width: 25%">Reason for Approval</th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      style="
+                        display: block;
+                        max-height: 200px;
+                        overflow-y: auto;
+                      "
+                    >
+                      @for (
+                        bulkItem of selectedItem.bulkItems;
+                        track bulkItem.id;
+                        let i = $index
+                      ) {
+                        <tr
+                          [class.table-success]="bulkItem.status === 'Approved'"
+                        >
+                          <td style="width: 5%">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              [checked]="isBulkSelected(bulkItem.id)"
+                              (change)="toggleBulkSelection(bulkItem.id)"
+                              [disabled]="bulkItem.status === 'Approved'"
+                            />
+                          </td>
+                          <td style="width: 5%">{{ i + 1 }}</td>
+                          <td style="width: 25%">
+                            <strong>{{
+                              bulkItem.employeeName ||
+                                bulkItem.farmerName ||
+                                bulkItem.name
+                            }}</strong>
+                          </td>
+                          <td style="width: 15%">
+                            {{ bulkItem.amount | currency: "INR" : "symbol" }}
+                          </td>
+                          <td style="width: 15%">{{ bulkItem.account }}</td>
+                          <td style="width: 10%">
+                            <span
+                              class="badge"
+                              [ngClass]="
+                                bulkItem.status === 'Approved'
+                                  ? 'bg-success'
+                                  : 'bg-warning'
+                              "
+                            >
+                              {{ bulkItem.status }}
+                            </span>
+                          </td>
+                          <td style="width: 25%">
+                            <input
+                              type="text"
+                              class="form-control form-control-sm"
+                              placeholder="Enter reason..."
+                              [(ngModel)]="bulkItem.approvalReason"
+                              [disabled]="bulkItem.status === 'Approved'"
+                            />
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-danger"
+              (click)="rejectSinglePayment(selectedItem)"
+            >
+              <i class="bi bi-x-circle"></i> Reject All
+            </button>
+            <button
+              class="btn btn-success"
+              (click)="approveSinglePayment(selectedItem)"
+              [disabled]="isApproveAllDisabled(selectedItem)"
+            >
+              <i class="bi bi-check-circle"></i> Approve All
+            </button>
+            <button class="btn btn-secondary" (click)="closeDetails()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
