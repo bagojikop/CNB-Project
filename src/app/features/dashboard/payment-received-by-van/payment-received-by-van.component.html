@@ -193,13 +193,6 @@
           Recent VAN Payments
         </h5>
         <div class="d-flex gap-2 align-items-center">
-          <div
-            *ngIf="isLoading"
-            class="spinner-border spinner-border-sm text-primary"
-            role="status"
-          >
-            <span class="visually-hidden">Loading...</span>
-          </div>
           <input
             type="text"
             class="form-control form-control-sm rounded-pill"
@@ -224,14 +217,14 @@
         <table class="table table-hover align-middle mb-0">
           <thead class="table-primary">
             <tr>
-              <th class="px-4">#</th>
-              <th>VAN Number</th>
-              <th>Customer</th>
-              <th>Amount</th>
-              <th>Payment Date</th>
-              <th>Invoice #</th>
-              <th>Status</th>
-              <th class="text-center">Action</th>
+              <th style="width: 50px" class="px-4">#</th>
+              <th style="width: 13%">VAN Number</th>
+              <th style="width: 32%">Customer</th>
+              <th style="width: 10%; text-align: center">Amount</th>
+              <th style="width: 15%">Payment Date</th>
+              <th style="width: 13%">Invoice #</th>
+              <th style="width: 10%">Status</th>
+              <th style="width: 7%" class="text-center">Action</th>
             </tr>
           </thead>
           <tbody
@@ -245,15 +238,15 @@
               *ngFor="let payment of filteredPayments; let i = index"
               style="display: table; width: 100%; table-layout: fixed"
             >
-              <td class="px-4" data-label="#">
+              <td class="px-4" data-label="#" style="width: 50px">
                 {{ (currentPage - 1) * 10 + i + 1 }}
               </td>
-              <td data-label="VAN Number">
+              <td data-label="VAN Number" style="width: 13%">
                 <code class="bg-light p-1 rounded">{{
                   payment.vanNumber
                 }}</code>
               </td>
-              <td data-label="Customer">
+              <td data-label="Customer" style="width: 32%">
                 <div class="d-flex align-items-center">
                   <div
                     class="bg-primary bg-opacity-10 rounded-circle p-2 me-2"
@@ -277,18 +270,22 @@
                   </div>
                 </div>
               </td>
-              <td data-label="Amount" class="fw-bold text-success">
+              <td
+                data-label="Amount"
+                class="fw-bold text-success text-end"
+                style="width: 10%"
+              >
                 {{ payment.amount | currency: "INR" : "symbol" : "1.0-0" }}
               </td>
-              <td data-label="Payment Date">
+              <td data-label="Payment Date" style="width: 15%">
                 {{ payment.paymentDate | date: "dd MMM yyyy, hh:mm a" }}
               </td>
-              <td data-label="Invoice #">
+              <td data-label="Invoice #" style="width: 13%">
                 <span class="badge bg-secondary bg-opacity-10 text-dark"
                   >INV-{{ payment.invoiceNumber }}</span
                 >
               </td>
-              <td data-label="Status">
+              <td data-label="Status" style="width: 10%">
                 <span
                   class="badge rounded-pill px-3 py-2"
                   [ngClass]="{
@@ -319,7 +316,7 @@
                   </span>
                 </span>
               </td>
-              <td data-label="Action" class="text-center">
+              <td data-label="Action" class="text-center" style="width: 7%">
                 <button
                   class="btn btn-sm btn-outline-primary rounded-pill px-3"
                   (click)="viewDetails(payment)"
