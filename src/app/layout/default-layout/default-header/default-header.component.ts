@@ -1,5 +1,11 @@
 import { NgStyle, NgTemplateOutlet } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  inject,
+  input,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import {
@@ -22,6 +28,7 @@ import {
 } from '@coreui/angular-pro';
 
 import { IconDirective } from '@coreui/icons-angular';
+import { MyProvider } from '@shared-services/provider';
 
 @Component({
   selector: 'app-default-header',
@@ -47,6 +54,7 @@ import { IconDirective } from '@coreui/icons-angular';
   ],
 })
 export class DefaultHeaderComponent extends HeaderComponent {
+  readonly provider = inject(MyProvider);
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
 
@@ -70,10 +78,13 @@ export class DefaultHeaderComponent extends HeaderComponent {
 
   sidebarId = input('sidebar1');
 
-  companyName = 'ABC Industries Pvt Ltd';
-  branchName = 'Pune';
+  branchName = 'Sangli';
   unitName = 'Factory Unit 1';
-  finYear = '2025-26';
+  finYear = '2026-27';
+
+  get companyName(): string {
+    return this.provider.companyInfo?.company?.firm_name ?? '';
+  }
 
   public newMessages = [
     {

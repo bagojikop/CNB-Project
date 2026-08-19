@@ -20,6 +20,11 @@ export function createUserManagementForm(fb: FormBuilder) {
 
     email: fb.control<userMgt['email']>('', [Validators.email]),
 
+    branch_code: fb.nonNullable.control<userMgt['branch_code']>('', [
+      Validators.required,
+    ]),
+    branch_name: fb.control(''),
+
     role: fb.control<userMgt['role'] | null>(null, [Validators.required]),
 
     roleName: fb.control<userMgt['roleName'] | null>(null, [

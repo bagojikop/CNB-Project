@@ -1,45 +1,14 @@
 {
   "users": [
     {
-      "id": "Ieg06s3b7WA",
-      "username": "Sss",
-      "password": "asbcd",
-      "email": "ss@gmail.com",
-      "role": 2,
-      "roleName": "User"
-    },
-    {
-      "id": "vO4SEjNRC-8",
-      "username": "Rakesh",
-      "password": "abcd",
-      "email": "Rk@gmail.com",
-      "role": 1,
-      "roleName": "Admin"
-    },
-    {
-      "id": "RNObNNEsCFs",
-      "username": "Rr",
-      "password": "abcd",
-      "email": "abcd@gmai",
-      "role": 2,
-      "roleName": "User"
-    },
-    {
-      "id": "3P1BycazlWE",
-      "username": "Ww",
-      "password": "abcd",
-      "email": "abcd@gmail.com",
-      "role": 2,
-      "roleName": "User"
-    },
-    {
-      "id": "kaTkXs4owhw",
       "username": "Abcd",
-      "password": "abcd",
+      "password": "ABCD",
       "mobileNo": "7083234537",
-      "email": "anildevaki1@gmail.com",
-      "role": 2,
-      "roleName": "User"
+      "email": "ANILDEVAKI1@GMAIL.COM",
+      "branch_code": "101",
+      "role": 1,
+      "roleName": "Admin",
+      "id": "9BWTRR2wsU0"
     }
   ],
   "configuration": [
@@ -239,7 +208,7 @@
   ],
   "payments": [
     {
-      "id": 1,
+      "id": "1",
       "batchId": "PAY-2024-001",
       "paymentType": "Single",
       "totalAmount": 15000,
@@ -255,7 +224,7 @@
       "remarks": "Payment completed successfully"
     },
     {
-      "id": 2,
+      "id": "2",
       "batchId": "PAY-2024-002",
       "paymentType": "Bulk",
       "totalAmount": 45000,

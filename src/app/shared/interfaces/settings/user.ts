@@ -4,6 +4,8 @@ export interface userMgt {
   password: string;
   email?: string;
   role: string;
+  branch_code: string;
+  branch_name?: string;
   roleName: string;
   mobileNo: string;
 }

@@ -14,6 +14,7 @@ import {
   DSS_FORM_CONTROLS,
   DssInputTextComponent,
 } from '@shared-directives/dss-form-controls';
+import { createVanCreation } from './van-creation-edit.factory';
 
 @Component({
   selector: 'app-van-creation-edit',
@@ -30,38 +31,12 @@ export class VanCreationEditComponent implements OnInit {
   private crudSrc = inject(vanCreationService);
   private dialog = inject(DialogsService);
   private location = inject(Location);
+  private readonly fb = inject(FormBuilder);
   saveUndoButtonIsDisable: boolean = false;
-  form: FormGroup;
+  form = createVanCreation(this.fb);
   submitted = false;
 
-  constructor(private fb: FormBuilder) {
-    this.form = this.fb.group({
-      id: [''],
-      mode: ['custom'],
-      custom: this.fb.group({
-        accountNo: ['', Validators.required],
-        startDate: [
-          new Date().toISOString().split('T')[0],
-          Validators.required,
-        ],
-        endDate: [new Date().toISOString().split('T')[0], Validators.required],
-        countVAN: [3, [Validators.required, Validators.min(1)]],
-        virtualAccountDetails: this.fb.array([]),
-      }),
-      random: this.fb.group({
-        accountNo: ['', Validators.required],
-        startDate: [
-          new Date().toISOString().split('T')[0],
-          Validators.required,
-        ],
-        endDate: [new Date().toISOString().split('T')[0], Validators.required],
-        countVAN: [
-          1,
-          [Validators.required, Validators.min(1), Validators.max(500)],
-        ],
-      }),
-    });
-
+  constructor() {
     // enable/disable validators based on initial mode
     const modeControl = this.form.get('mode');
     if (modeControl) {
@@ -177,6 +152,17 @@ export class VanCreationEditComponent implements OnInit {
   }
 
   addVanNumber(): void {
+    // Check if first item exists and has a value
+    const firstItem = this.virtualAccountDetails.at(0);
+    if (firstItem) {
+      const vanNumberControl = firstItem.get('vanNumber');
+      if (!vanNumberControl?.value || vanNumberControl.invalid) {
+        // First item is empty or invalid, mark it as touched
+        vanNumberControl?.markAsTouched();
+        return;
+      }
+    }
+
     this.virtualAccountDetails.push(
       this.fb.group({ vanNumber: ['', Validators.required] }),
     );

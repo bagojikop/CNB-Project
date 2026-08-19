@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { PaymentService } from '@shared-services/user.service';
 import { DialogsService } from '@shared-services/messageBox';
+import { createBatchStatusForm } from './batchStatus.factory';
 
 interface Payment {
   id: number;
@@ -36,8 +37,8 @@ export class BatchStatusComponent implements OnInit {
   private fb = inject(FormBuilder);
   private paymentService = inject(PaymentService);
   private dialog = inject(DialogsService);
+  readonly batchStatusForm = createBatchStatusForm(this.fb);
 
-  batchStatusForm: FormGroup;
   statuses: string[] = [
     'Pending',
     'In Progress',
@@ -50,27 +51,6 @@ export class BatchStatusComponent implements OnInit {
   payments: Payment[] = [];
   searchPerformed = false;
   isLoading = false;
-
-  constructor() {
-    this.batchStatusForm = this.fb.group({
-      batchId: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(5),
-          Validators.maxLength(20),
-        ],
-      ],
-      status: ['', Validators.required],
-      statusMessage: [''],
-      totalAmount: [0, [Validators.required, Validators.min(0)]],
-      transactionCount: [0, [Validators.required, Validators.min(0)]],
-      processedDate: [''],
-      bankReferenceNo: [''],
-      errorCode: [''],
-      errorMessage: [''],
-    });
-  }
 
   ngOnInit(): void {
     this.loadPayments();
@@ -88,41 +68,6 @@ export class BatchStatusComponent implements OnInit {
         console.error('Error loading payments from PaymentService:', err);
         this.isLoading = false;
         // Fallback to hardcoded data for demo
-        this.payments = [
-          {
-            id: 1,
-            batchId: 'PAY-2024-001',
-            paymentType: 'Single',
-            totalAmount: 15000,
-            partyName: 'ABC Suppliers',
-            paymentAgainst: 'Invoice #INV-2024-001',
-            requestDate: '2024-01-15',
-            status: 'Success',
-            bankName: 'HDFC Bank',
-            accountNo: '1234567890',
-            requestedBy: 'John Doe',
-            transactionId: 'TXN-2024-001-001',
-            transactionDate: '2024-01-16',
-            remarks: 'Payment completed successfully',
-          },
-          {
-            id: 2,
-            batchId: 'PAY-2024-002',
-            paymentType: 'Bulk',
-            totalAmount: 45000,
-            partyName: 'XYZ Traders',
-            paymentAgainst: 'Invoice #INV-2024-002',
-            requestDate: '2024-01-20',
-            status: 'Pending',
-            bankName: 'ICICI Bank',
-            accountNo: '9876543210',
-            requestedBy: 'Jane Smith',
-            transactionId: '',
-            transactionDate: '',
-            remarks: 'Awaiting approval',
-          },
-        ];
-        console.log('Using fallback payment data:', this.payments);
       },
     });
   }

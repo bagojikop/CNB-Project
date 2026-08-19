@@ -1,8 +1,9 @@
-import { Component, ElementRef, ViewChildren, QueryList } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgClass, CommonModule } from '@angular/common';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { Router } from '@angular/router';
+import data from '@assets/data/paymentRqstApproval.json';
 export interface SinglePaymentAPI {
   Request: {
     body: {
@@ -39,143 +40,48 @@ export class PaymentRequestApprovalComponent {
   selectedPaymentType: string = 'all';
   currentPage: number = 1;
   itemsPerPage: number = 3;
+  private router = inject(Router);
+  constructor() {
+    this.selectedPaymentType =
+      this.router.url ==
+      '/dashboard/dashboard-form/singal-payment-request-Approval'
+        ? 'single'
+        : 'bulk';
+  }
 
-  approvalData: any[] = [
-    {
-      id: 1,
-      batchId: 'BATCH-20260730-001',
-      paymentType: 'Single',
-      totalAmount: 12500,
-      partyName: 'Shree Traders',
-      paymentAgainst: 'Purchase Invoice INV-1001',
-      requestDate: '2026-07-30',
-      status: 'Pending',
-      bankName: 'State Bank of India',
-      accountNo: 'XXXXXX4521',
-      requestedBy: 'Rahul Sharma',
-      bulkItems: [],
-    },
-    {
-      id: 2,
-      batchId: 'BATCH-20260730-002',
-      paymentType: 'Bulk',
-      totalAmount: 98500,
-      partyName: 'Mahalaxmi Agro Pvt Ltd',
-      paymentAgainst: 'Salary Processing July 2026',
-      requestDate: '2026-07-29',
-      status: 'Pending',
-      bankName: 'HDFC Bank',
-      accountNo: 'XXXXXX7788',
-      requestedBy: 'Priya Patel',
-      bulkItems: [
-        {
-          id: 101,
-          employeeName: 'Rajesh Kumar',
-          amount: 25000,
-          account: 'XXXXXX1234',
-          status: 'Pending',
-        },
-        {
-          id: 102,
-          employeeName: 'Sneha Patel',
-          amount: 22000,
-          account: 'XXXXXX5678',
-          status: 'Pending',
-        },
-        {
-          id: 103,
-          employeeName: 'Amit Singh',
-          amount: 18000,
-          account: 'XXXXXX9012',
-          status: 'Pending',
-        },
-        {
-          id: 104,
-          employeeName: 'Priya Sharma',
-          amount: 33500,
-          account: 'XXXXXX3456',
-          status: 'Pending',
-        },
-      ],
-    },
-    {
-      id: 3,
-      batchId: 'BATCH-20260730-003',
-      paymentType: 'Single',
-      totalAmount: 45000,
-      partyName: 'Anand Agencies',
-      paymentAgainst: 'Service Charges Invoice SC-220',
-      requestDate: '2026-07-28',
-      status: 'Pending',
-      bankName: 'ICICI Bank',
-      accountNo: 'XXXXXX1122',
-      requestedBy: 'Amit Kumar',
-      bulkItems: [],
-    },
-    {
-      id: 4,
-      batchId: 'BATCH-20260730-004',
-      paymentType: 'Bulk',
-      totalAmount: 150000,
-      partyName: 'Bhumata Farmers Group',
-      paymentAgainst: 'Farmer Incentive Distribution',
-      requestDate: '2026-07-27',
-      status: 'Pending',
-      bankName: 'Bank of Maharashtra',
-      accountNo: 'XXXXXX9981',
-      requestedBy: 'Sneha Reddy',
-      bulkItems: [
-        {
-          id: 201,
-          farmerName: 'Ganesh Patil',
-          amount: 30000,
-          account: 'XXXXXX1111',
-          status: 'Pending',
-        },
-        {
-          id: 202,
-          farmerName: 'Mohan Jadhav',
-          amount: 25000,
-          account: 'XXXXXX2222',
-          status: 'Pending',
-        },
-        {
-          id: 203,
-          farmerName: 'Suresh Deshmukh',
-          amount: 45000,
-          account: 'XXXXXX3333',
-          status: 'Pending',
-        },
-        {
-          id: 204,
-          farmerName: 'Ramesh Shinde',
-          amount: 50000,
-          account: 'XXXXXX4444',
-          status: 'Pending',
-        },
-      ],
-    },
-    {
-      id: 5,
-      batchId: 'BATCH-20260730-005',
-      paymentType: 'Single',
-      totalAmount: 32000,
-      partyName: 'Ganesh Suppliers',
-      paymentAgainst: 'Raw Material Invoice RM-567',
-      requestDate: '2026-07-26',
-      status: 'Pending',
-      bankName: 'Axis Bank',
-      accountNo: 'XXXXXX6655',
-      requestedBy: 'Vikram Singh',
-      bulkItems: [],
-    },
-  ];
+  approvalData: any[] = data;
 
   selectedItem: any = null;
   showDetails = false;
   selectedBulkItems: Set<number> = new Set();
+  selectedSingleItems: Set<number> = new Set();
   selectAllBulk = false;
   dropdownRef: any = null;
+
+  // Computed property for Select All checkbox
+  get allSelected(): boolean {
+    const pendingItems = this.paginatedData.filter(
+      (item) =>
+        item.status !== 'Approved' &&
+        item.paymentType.toLowerCase() === 'single',
+    );
+    if (pendingItems.length === 0) return false;
+    return pendingItems.every((item) => this.selectedSingleItems.has(item.id));
+  }
+
+  toggleAllSelections(event: any): void {
+    const checked = event.target.checked;
+    const pendingItems = this.paginatedData.filter(
+      (item) =>
+        item.status !== 'Approved' &&
+        item.paymentType.toLowerCase() === 'single',
+    );
+    if (checked) {
+      pendingItems.forEach((item) => this.selectedSingleItems.add(item.id));
+    } else {
+      pendingItems.forEach((item) => this.selectedSingleItems.delete(item.id));
+    }
+  }
 
   onShow(item: any) {
     // Only show details for Bulk payments
@@ -300,9 +206,9 @@ export class PaymentRequestApprovalComponent {
     this.currentPage = 1; // Reset to first page when filter changes
   }
 
-  getPendingCount(): number {
-    return this.approvalData.filter((x) => x.status === 'Pending').length;
-  }
+  // getPendingCount(): number {
+  //   return this.approvalData.filter((x) => x.status === 'Pending').length;
+  // }
 
   approveSinglePayment(item: any) {
     // Build the SinglePaymentAPI request payload
@@ -415,14 +321,27 @@ export class PaymentRequestApprovalComponent {
     );
   }
 
-  // Dropdown toggle methods
+  handleClickOutside(dropdown: any, event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const dropdownElement =
+      dropdown._elementRef?.nativeElement || dropdown.parentElement;
+    if (dropdownElement && !dropdownElement.contains(target)) {
+      this.closeDropdown(dropdown);
+      document.removeEventListener(
+        'click',
+        this.handleClickOutside.bind(this, dropdown),
+      );
+    }
+  }
+
   toggleDropdown(dropdown: any): void {
     dropdown.isOpen = !dropdown.isOpen;
-    // Close other dropdowns if needed
     if (dropdown.isOpen) {
-      document.querySelectorAll('.dropdown-menu.show').forEach((el) => {
-        if (el !== dropdown.querySelector('.dropdown-menu')) {
-          el.classList.remove('show');
+      // Close other dropdowns
+      const allDropdowns = document.querySelectorAll('.dropdown');
+      allDropdowns.forEach((d: any) => {
+        if (d !== dropdown && d.isOpen) {
+          d.isOpen = false;
         }
       });
       // Add click outside listener
@@ -433,19 +352,6 @@ export class PaymentRequestApprovalComponent {
         );
       }, 0);
     } else {
-      document.removeEventListener(
-        'click',
-        this.handleClickOutside.bind(this, dropdown),
-      );
-    }
-  }
-
-  handleClickOutside(dropdown: any, event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    const dropdownElement =
-      dropdown._elementRef?.nativeElement || dropdown.parentElement;
-    if (dropdownElement && !dropdownElement.contains(target)) {
-      this.closeDropdown(dropdown);
       document.removeEventListener(
         'click',
         this.handleClickOutside.bind(this, dropdown),
@@ -501,5 +407,54 @@ export class PaymentRequestApprovalComponent {
       console.log('Payment Held:', item);
     }
     this.closeDropdown(this.dropdownRef);
+  }
+
+  // Single payment selection methods
+  isSingleSelected(itemId: number): boolean {
+    return this.selectedSingleItems.has(itemId);
+  }
+
+  toggleSingleSelection(itemId: number): void {
+    if (this.selectedSingleItems.has(itemId)) {
+      this.selectedSingleItems.delete(itemId);
+    } else {
+      this.selectedSingleItems.add(itemId);
+    }
+  }
+
+  pushSelectedItems(): void {
+    const selectedIds = Array.from(this.selectedSingleItems);
+    if (selectedIds.length === 0) {
+      alert('Please select at least one payment request to push.');
+      return;
+    }
+
+    // Find the selected items from approvalData
+    const selectedItems = this.approvalData.filter(
+      (item) =>
+        selectedIds.includes(item.id) &&
+        item.paymentType.toLowerCase() === 'single',
+    );
+
+    if (selectedItems.length === 0) {
+      alert('No valid single payment requests selected.');
+      return;
+    }
+
+    // Loop through each selected item and call approveSinglePayment
+    selectedItems.forEach((item) => {
+      this.approveSinglePayment(item);
+      // Set status to 'Approved' for each selected single payment
+      const index = this.approvalData.findIndex((d) => d.id === item.id);
+      if (index !== -1) {
+        this.approvalData[index].status = 'Approved';
+      }
+    });
+
+    // Clear selection after push
+    this.selectedSingleItems.clear();
+
+    // Show success message
+    alert(`Successfully pushed ${selectedItems.length} payment request(s).`);
   }
 }

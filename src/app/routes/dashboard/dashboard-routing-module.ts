@@ -8,7 +8,11 @@ import { QrStatusComponent } from '@features/dashboard/qr-status/qr-status.compo
 import { VANExpiryStatusComponent } from '@features/dashboard/vanexpiry-status/vanexpiry-status.component';
 const routes: Routes = [
   {
-    path: 'payment-request-Approval',
+    path: 'singal-payment-request-Approval',
+    component: PaymentRequestApprovalComponent,
+  },
+  {
+    path: 'batches-request-Approval',
     component: PaymentRequestApprovalComponent,
   },
   {

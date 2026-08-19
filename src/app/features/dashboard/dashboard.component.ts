@@ -53,49 +53,56 @@ export class DashboardComponent {
   bankCards: BankCard[] = [
     {
       id: 1,
-      title: 'Payment Request Pending',
+      title: 'Singal Payment Request Pending',
       count: 12,
       icon: 'cilClock',
       color: 'warning',
     },
-
     {
       id: 2,
+      title: 'Bulk Payment Request Pending',
+      count: 12,
+      icon: 'cilClock',
+      color: 'secondary',
+    },
+
+    {
+      id: 3,
       title: 'Payment Received by VAN',
       count: 45,
       icon: 'cilBank',
       color: 'success',
     },
     {
-      id: 3,
+      id: 4,
       title: 'Payment Received by QR',
       count: 23,
       icon: 'cilQrCode',
       color: 'info',
     },
     {
-      id: 4,
+      id: 5,
       title: 'Payment Status',
       count: 67,
       icon: 'cilCreditCard',
       color: 'primary',
     },
     {
-      id: 5,
+      id: 6,
       title: 'QR Status',
       count: 34,
       icon: 'cilCheckCircle',
       color: 'secondary',
     },
+    // {
+    //   id: 7,
+    //   title: 'Batch Status',
+    //   count: 8,
+    //   icon: 'cilList',
+    //   color: 'danger',
+    // },
     {
-      id: 6,
-      title: 'Batch Status',
-      count: 8,
-      icon: 'cilList',
-      color: 'danger',
-    },
-    {
-      id: 7,
+      id: 8,
       title: 'VAN Expiry Status',
       count: 10,
       icon: 'cilList',
@@ -137,26 +144,32 @@ export class DashboardComponent {
   onCardClick(card: BankCard): void {
     switch (card.id) {
       case 1:
-        this.glob_Routing('/dashboard/dashboard-form/payment-request-Approval');
+        this.glob_Routing(
+          '/dashboard/dashboard-form/singal-payment-request-Approval',
+        );
         break;
 
       case 2:
+        this.glob_Routing('/dashboard/dashboard-form/batches-request-Approval');
+        break;
+
+      case 3:
         this.glob_Routing('/dashboard/dashboard-form/paymentReceivedByVAN');
         break;
 
-      case 4:
+      case 5:
         this.glob_Routing('/dashboard/dashboard-form/paymentStatus');
         break;
 
-      case 5:
+      case 6:
         this.glob_Routing('/dashboard/dashboard-form/qrStatement');
         break;
 
-      case 6:
+      case 7:
         this.glob_Routing('/dashboard/dashboard-form/batchStatus');
         break;
 
-      case 7:
+      case 8:
         this.glob_Routing('/dashboard/dashboard-form/VANExpiryStatus');
         break;
     }

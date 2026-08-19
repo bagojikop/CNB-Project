@@ -65,7 +65,7 @@ export class PaymentReceivedByVANComponent implements OnInit {
     const now = new Date();
     this.payments = [];
 
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < customers.length; i++) {
       const customer = customers[Math.floor(Math.random() * customers.length)];
       const status = Math.random() > 0.3 ? 'matched' : 'pending';
       const amount = Math.floor(Math.random() * 50000) + 5000;
@@ -158,5 +158,11 @@ export class PaymentReceivedByVANComponent implements OnInit {
   refreshData(): void {
     this.generateMockData();
     this.filterPayments();
+  }
+
+  getStatusText(status: string): string {
+    if (status === 'matched') return '✓ Auto-Matched';
+    if (status === 'pending') return '⏳ Pending Match';
+    return `⚠️ ${status}`;
   }
 }

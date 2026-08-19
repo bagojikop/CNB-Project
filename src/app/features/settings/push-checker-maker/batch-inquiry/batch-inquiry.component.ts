@@ -1,8 +1,8 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import {} from '@coreui/angular-pro';
 import { DSS_FORM_CONTROLS } from '@shared-directives/dss-form-controls';
+import { Router } from '@angular/router';
 
 export interface BatchInquiryResponse {
   Response: {
@@ -61,14 +61,14 @@ export interface BatchInquiryTransaction {
 export class BatchInquiryComponent {
   // Search form
   searchForm: FormGroup;
-
+  router = inject(Router);
   // Table data
   batchData: BatchInquiryData[] = [];
   selectedBatch: BatchInquiryData | null = null;
 
   // Pagination
   currentPage: number = 1;
-  itemsPerPage: number = 3;
+  itemsPerPage: number = 10;
   get totalItems(): number {
     return this.batchData[0]?.TxnDtls?.Txn?.length || 0;
   }
@@ -156,7 +156,7 @@ export class BatchInquiryComponent {
             TxnType: 'NEFT',
             BenefIFSC: 'ICIC0000598',
             BenefAcNo: '05980151858585',
-            BenefAcNm: 'BENEFICIARYNAME',
+            BenefAcNm: 'Ramesh Traders',
             Nrtv: 'REMITTANCETOMRX',
             utr_RRN_Number: 'P174250238976177',
             TxnStatus: 'Successful',
@@ -164,6 +164,7 @@ export class BatchInquiryComponent {
             Approved_By: '57510379C',
             Approved_Date: '20250623112857',
           },
+
           {
             TxnRefNo: 'T2BATCH20250623002',
             DrAcct: '0402256027830',
@@ -172,7 +173,7 @@ export class BatchInquiryComponent {
             TxnType: 'RTGS',
             BenefIFSC: 'ICIC0000598',
             BenefAcNo: '05980151858585',
-            BenefAcNm: 'BENEFICIARYNAME',
+            BenefAcNm: 'Suresh Enterprises',
             Nrtv: 'REMITTANCETOMRX',
             utr_RRN_Number: 'CNRBR52025062354864071',
             TxnStatus: 'Successful',
@@ -187,7 +188,7 @@ export class BatchInquiryComponent {
             TxnAmt: '100.00',
             TxnType: 'INTRA',
             BenefAcNo: '6038111000017',
-            BenefAcNm: 'BENEFICIARYNAME',
+            BenefAcNm: 'Mahesh Agencies',
             Nrtv: 'REMITTANCETOMRX',
             utr_RRN_Number: 'T2BATCH20250623003',
             TxnStatus: 'Successful',
@@ -203,7 +204,7 @@ export class BatchInquiryComponent {
             TxnType: 'NEFT',
             BenefIFSC: 'ICIC0000598',
             BenefAcNo: '05980151858585',
-            BenefAcNm: 'BENEFICIARYNAME',
+            BenefAcNm: 'Ganesh Traders',
             Nrtv: 'REMITTANCETOMRX',
             TxnStatus: 'Rejected',
             Txn_init_date: '20250623112534',

@@ -51,6 +51,7 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
       type: 'string',
       _style: { width: '40%' },
     },
+
     {
       key: 'email',
       label: 'Email',
@@ -58,10 +59,16 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
       _style: { width: '40%' },
     },
     {
+      key: 'branch_name',
+      label: 'Branch',
+      type: 'string',
+      _style: { width: '30%' },
+    },
+    {
       key: 'roleName',
       label: 'Role',
       type: 'string',
-      _style: { width: '20%' },
+      _style: { width: '10%' },
     },
   ];
 
@@ -76,12 +83,44 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     },
   ];
 
+  branches = [
+    { branch_code: 'ALL', branch_name: '[ALL]' },
+    { branch_code: '121', branch_name: 'ANDHRA PRADESH' },
+    { branch_code: '118', branch_name: 'DHARASHIV' },
+    { branch_code: '111', branch_name: 'DHARWAD' },
+    { branch_code: '120', branch_name: 'HYDERABAD' },
+    { branch_code: '105', branch_name: 'KARAD' },
+    { branch_code: '109', branch_name: 'KAVATHEMAHANKAL' },
+    { branch_code: '103', branch_name: 'KOLHAPUR' },
+    {
+      branch_code: '119',
+      branch_name: 'KRUSHNA GODAVARI KBBUVVSS LTD KANADWADI (HO)',
+    },
+    { branch_code: '125', branch_name: 'KUDAL' },
+    { branch_code: '107', branch_name: 'NANDED' },
+    { branch_code: '104', branch_name: 'PANDHARPUR' },
+    { branch_code: '102', branch_name: 'RAIBAG' },
+    { branch_code: '101', branch_name: 'SANGLI' },
+    { branch_code: '122', branch_name: 'SINDHANUR' },
+    { branch_code: '106', branch_name: 'VIJAYPUR' },
+  ];
+
   ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     this.userSrc.getAll().subscribe({
-      next: (res) => {
-        this.jsonData.set(res);
+      next: (res: any) => {
+        if (res) {
+          for (const element of res) {
+            const matchedBranch = this.branches?.filter(
+              (f) => f.branch_code == element?.branch_code,
+            )[0];
+            element.branch_name = matchedBranch?.branch_name || '';
+          }
+
+          console.log(res);
+          this.jsonData.set(res);
+        }
       },
       error: (err) => {
         this.dialog.swal({
@@ -102,17 +141,19 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     return this.fb.group({
       id: [user?.id],
 
-      username: [user?.username],
+      username: [user?.username, Validators.required],
 
       password: [user?.password],
 
-      email: [user?.email],
+      email: [user?.email, Validators.required],
 
       mobileNo: [user?.mobileNo],
 
       role: [user?.role],
 
       roleName: [user?.roleName],
+
+      branch_code: [user?.branch_code || 'ALL'],
     });
   }
 
@@ -134,7 +175,17 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const user = this.userInputs.getRawValue() as userMgt;
+    const formValue = this.userInputs.getRawValue();
+    const user: userMgt = {
+      id: formValue.id ?? undefined,
+      username: formValue.username,
+      password: formValue.password,
+      mobileNo: formValue.mobileNo,
+      email: formValue.email ?? undefined,
+      branch_code: formValue.branch_code,
+      role: formValue.role || '',
+      roleName: formValue.roleName || '',
+    };
 
     if (user.id != null) {
       const users = this.jsonData() as userMgt[];
@@ -172,7 +223,6 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     } else {
       // New record
 
-      debugger;
       this.userSrc.add(user).subscribe({
         next: (res) => {
           this.jsonData.update((data) => [...data, { ...user }]);

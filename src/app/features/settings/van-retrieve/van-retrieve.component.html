@@ -58,27 +58,27 @@
 
           <!-- No of Transactions -->
           <div class="col-md-4 mb-3">
-            <dss-input-num
+            <dss-input-text
               label="No of Transactions"
               type="number"
               id="noOfTransactions"
               sizing="md"
+              currency="false"
               formControlName="noOfTransactions"
               placeholder="Enter number of transactions"
-              min="1"
             />
           </div>
 
           <!-- Page No -->
           <div class="col-md-4 mb-3">
-            <dss-input-num
+            <dss-input-text
               label="Page No"
-              type="number"
+              type="string"
               id="pageNo"
               sizing="md"
+              currency="true"
               formControlName="pageNo"
               placeholder="Enter page number"
-              min="1"
             />
           </div>
         </div>
@@ -126,7 +126,7 @@
 
   <!-- Response Display -->
   @if (responseData) {
-    <div class="card response-card mt-3">
+    <div class="card response-card dss-mobile-card-table mt-3">
       <div class="card-header bg-success text-white">
         <i class="fas fa-check-circle me-2"></i>
         Response Data

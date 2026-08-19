@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DSS_FORM_CONTROLS } from '@shared-directives/dss-form-controls';
-
+import data from '@assets/data/firms.json';
 @Component({
   selector: 'app-account-statement',
   imports: [CommonModule, ReactiveFormsModule, DSS_FORM_CONTROLS],
@@ -16,6 +16,7 @@ import { DSS_FORM_CONTROLS } from '@shared-directives/dss-form-controls';
 })
 export class AccountStatementComponent {
   private fb = inject(FormBuilder);
+  firms = data;
 
   allData: any[] = [
     {

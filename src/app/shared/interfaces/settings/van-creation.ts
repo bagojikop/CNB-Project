@@ -6,7 +6,7 @@ export interface EncryptData {
   accountNo: string;
   startDate: string;
   endDate: string;
-  countVAN: string; // server expects string
+  countVAN: number; // server expects string
   virtualAccountDetails?: VirtualAccountDetail[];
 }
 

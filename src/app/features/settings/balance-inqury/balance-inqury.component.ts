@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DSS_FORM_CONTROLS } from '@shared-directives/dss-form-controls';
-
+import data from '@assets/data/firms.json';
 interface BalanceResponse {
   status: string;
   statusCode: string;
@@ -45,12 +45,7 @@ export class BalanceInquiryComponent {
   isLoading = false;
   balanceData: BalanceResponse[] | null = null;
   filteredData: BalanceResponse[] | null = null;
-  branches: string[] = [
-    'Sangli Branch',
-    'Mumbai Branch',
-    'Pune Branch',
-    'Delhi Branch',
-  ];
+  firms: any[] = data;
 
   // Pagination
   currentPage = 1;

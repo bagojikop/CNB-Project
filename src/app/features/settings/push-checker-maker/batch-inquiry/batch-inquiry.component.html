@@ -1,42 +1,51 @@
-<c-card fluid class="p-3" style="height: calc(100vh - 16rem)">
-  <!-- Transaction Details - Card View -->
-  @if (batchData && batchData.length > 0 && batchData[0].TxnDtls) {
-    <div class="transaction-section">
-      <!-- Section Header -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
-            <span class="bg-primary bg-opacity-10 p-2 rounded">
-              <svg cIcon name="cilList" class="text-primary" size="lg"></svg>
-            </span>
-            Transaction Details
-          </h5>
-        </div>
-        <span class="badge bg-light text-dark border px-3 py-2">
-          <i class="bi bi-list-ul me-1"></i>
-          {{ batchData[0].TxnDtls.Txn.length }} transaction(s)
-        </span>
-      </div>
-
-      <div class="row g-4">
-        @for (
-          txn of paginatedTransactions;
-          track txn.TxnRefNo;
-          let i = $index
-        ) {
-          <div class="col-12 col-md-6 col-xl-4">
-            <c-card
-              class="transaction-card shadow h-100 border-0"
-              style="
-                border-radius: 10px;
-                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-              "
-            >
-              <c-card-body class="p-0">
-                <!-- Status Bar -->
-                <div
-                  class="py-1 px-3 text-white fw-semibold d-flex justify-content-between align-items-center"
-                  style="font-size: 0.75rem; border-radius: 10px 10px 0 0"
+<!-- Transaction Details - Table View -->
+@if (batchData && batchData.length > 0 && batchData[0].TxnDtls) {
+  <div class="transaction-section">
+    <!-- Bootstrap Table -->
+    <div class="table-responsive dss-mobile-card-table">
+      <table class="table table-bordered table-hover table-striped">
+        <thead class="table-primary">
+          <tr>
+            <th style="width: 50px">#</th>
+            <th style="width: 15%">Transaction No.</th>
+            <th style="width: 7%">Type</th>
+            <th style="width: 10%">Account No.</th>
+            <th style="width: 30%">Beneficiary Account</th>
+            <th style="width: 17%">UTR</th>
+            <th style="width: 10%">Amount</th>
+            <th style="width: 10%">Status</th>
+          </tr>
+        </thead>
+        <tbody style="height: calc(100vh - 23.8rem); overflow-y: scroll">
+          @for (
+            txn of paginatedTransactions;
+            track txn.TxnRefNo;
+            let i = $index
+          ) {
+            <tr>
+              <td style="width: 50px">{{ i + 1 }}</td>
+              <td style="width: 15%">
+                <strong>{{ txn.TxnRefNo }}</strong>
+              </td>
+              <td style="width: 7%">
+                <div class="small text-muted">{{ txn.TxnType }}</div>
+              </td>
+              <td style="width: 10%">{{ txn.DrAcct }}</td>
+              <td style="width: 30%">
+                {{ txn.BenefAcNo }}
+                <div class="small text-muted">{{ txn.BenefAcNm }}</div>
+              </td>
+              <td style="width: 17%">
+                <span class="fw-semibold">{{ txn.utr_RRN_Number || "-" }}</span>
+              </td>
+              <td style="width: 10%">
+                <strong class="text-success">
+                  ₹ {{ txn.TxnAmt | number: "1.2-2" }}
+                </strong>
+              </td>
+              <td style="width: 10%">
+                <span
+                  class="badge"
                   [class.bg-success]="
                     txn.TxnStatus === 'Successful' ||
                     txn.TxnStatus === 'COMPLETED'
@@ -55,245 +64,69 @@
                   "
                   [class.bg-secondary]="txn.TxnStatus === 'EXPIRED'"
                 >
-                  <span>
-                    <i
-                      class="bi bi-circle-fill me-1"
-                      style="font-size: 0.5rem"
-                    ></i>
-                    {{ txn.TxnStatus }}
-                  </span>
-                  <span class="text-white-50 small">
-                    <i class="bi bi-clock me-1"></i>
-                    {{ txn.Txn_init_date | date: "dd/MM/yy HH:mm" }}
-                  </span>
-                </div>
-
-                <!-- Card Content -->
-                <div class="p-3">
-                  <!-- Header -->
-                  <div
-                    class="d-flex justify-content-between align-items-start mb-3"
-                  >
-                    <div class="flex-grow-1 me-2">
-                      <span class="text-muted small fw-semibold text-uppercase"
-                        >Transaction #{{ i + 1 }}</span
-                      >
-                      <div
-                        class="fw-bold text-primary"
-                        style="font-size: 0.95rem"
-                      >
-                        {{ txn.TxnRefNo }}
-                      </div>
-                    </div>
-                    <span
-                      class="badge rounded-pill px-3 py-1 text-uppercase"
-                      style="font-size: 0.65rem; font-weight: 600"
-                      [class.bg-success]="
-                        txn.TxnStatus === 'Successful' ||
-                        txn.TxnStatus === 'COMPLETED'
-                      "
-                      [class.bg-primary]="
-                        txn.TxnStatus === 'VERIFIED' ||
-                        txn.TxnStatus === 'APPROVED'
-                      "
-                      [class.bg-warning]="
-                        txn.TxnStatus === 'PROCESSING IN PROGRESS' ||
-                        txn.TxnStatus === 'PROCESSED'
-                      "
-                      [class.bg-danger]="
-                        txn.TxnStatus === 'ERROR' ||
-                        txn.TxnStatus === 'Rejected' ||
-                        txn.TxnStatus === 'REJECTED'
-                      "
-                      [class.bg-secondary]="txn.TxnStatus === 'EXPIRED'"
-                    >
-                      {{ txn.TxnStatus }}
-                    </span>
-                  </div>
-
-                  <!-- Amount & Type -->
-                  <div
-                    class="d-flex justify-content-between align-items-center bg-light p-3 rounded mb-3"
-                  >
-                    <div>
-                      <span
-                        class="text-muted small d-block text-uppercase fw-semibold"
-                        >Amount</span
-                      >
-                      <strong class="text-success" style="font-size: 1.1rem">
-                        ₹ {{ txn.TxnAmt | number: "1.2-2" }}
-                      </strong>
-                    </div>
-                    <span
-                      class="badge px-3 py-2"
-                      [class.bg-primary]="txn.TxnType === 'NEFT'"
-                      [class.bg-success]="txn.TxnType === 'RTGS'"
-                      [class.bg-warning]="txn.TxnType === 'IMPS'"
-                      [class.bg-info]="txn.TxnType === 'Intra'"
-                    >
-                      {{ txn.TxnType }}
-                    </span>
-                  </div>
-
-                  <!-- Sender Info -->
-                  <div class="row g-2 mb-3">
-                    <div class="col-6">
-                      <span
-                        class="text-muted small d-block text-uppercase fw-semibold"
-                        >Dr Account</span
-                      >
-                      <span class="fw-semibold" style="font-size: 0.85rem">{{
-                        txn.DrAcct
-                      }}</span>
-                    </div>
-                    <div class="col-6">
-                      <span
-                        class="text-muted small d-block text-uppercase fw-semibold"
-                        >Sender</span
-                      >
-                      <span style="font-size: 0.85rem">{{ txn.SndrNm }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Beneficiary -->
-                  <div class="mb-3">
-                    <span
-                      class="text-muted small d-block text-uppercase fw-semibold mb-1"
-                      >Beneficiary</span
-                    >
-                    <div class="row g-2">
-                      <div class="col-6">
-                        <span class="text-muted small d-block">Account</span>
-                        <span class="fw-semibold" style="font-size: 0.85rem">{{
-                          txn.BenefAcNo
-                        }}</span>
-                      </div>
-                      <div class="col-6">
-                        <span class="text-muted small d-block">Name</span>
-                        <span style="font-size: 0.85rem">{{
-                          txn.BenefAcNm
-                        }}</span>
-                      </div>
-                      <div class="col-6">
-                        <span class="text-muted small d-block">IFSC</span>
-                        <span style="font-size: 0.85rem">{{
-                          txn.BenefIFSC || "-"
-                        }}</span>
-                      </div>
-                      <div class="col-6">
-                        <span class="text-muted small d-block">UTR/RRN</span>
-                        <span
-                          class="text-primary fw-semibold"
-                          style="font-size: 0.85rem"
-                        >
-                          {{ txn.utr_RRN_Number || "-" }}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Footer -->
-                  <div class="border-top pt-2">
-                    <div
-                      class="d-flex justify-content-between"
-                      style="font-size: 0.7rem"
-                    >
-                      <span class="text-muted">
-                        <span class="fw-semibold">Init:</span>
-                        {{ txn.Txn_init_date | date: "dd/MM/yy HH:mm" }}
-                      </span>
-                      <span class="text-muted">
-                        <span class="fw-semibold">Approved:</span>
-                        {{ txn.Approved_Date | date: "dd/MM/yy HH:mm" }}
-                      </span>
-                    </div>
-                    <div
-                      class="text-muted mt-1 text-truncate"
-                      style="font-size: 0.75rem"
-                    >
-                      <span class="fw-semibold">Narrative:</span> {{ txn.Nrtv }}
-                    </div>
-                  </div>
-                </div>
-              </c-card-body>
-            </c-card>
-          </div>
-        }
-
-        @if (batchData[0].TxnDtls.Txn.length === 0) {
-          <div class="col-12">
-            <c-card class="shadow-sm">
-              <c-card-body class="text-center py-5 text-medium-emphasis">
-                <svg
-                  cIcon
-                  name="cilInbox"
-                  class="display-4 d-block mb-2"
-                  size="xxl"
-                ></svg>
-                <p class="mb-0">No transactions found</p>
-              </c-card-body>
-            </c-card>
-          </div>
-        }
-      </div>
-    </div>
-  }
-
-  <!-- Pagination -->
-  @if (totalItems > itemsPerPage) {
-    <div
-      class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top"
-      style="
-        position: sticky;
-        bottom: 0;
-        background: white;
-        padding-bottom: 10px;
-      "
-    >
-      <div class="text-muted small">
-        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
-        {{ (currentPage - 1) * itemsPerPage + paginatedTransactions.length }}
-        of {{ totalItems }} transactions
-      </div>
-      <nav>
-        <ul class="pagination pagination-sm mb-0">
-          <li class="page-item" [class.disabled]="currentPage === 1">
-            <button class="page-link" (click)="changePage(currentPage - 1)">
-              <span>&laquo;</span>
-            </button>
-          </li>
-          @for (page of visiblePages; track page) {
-            <li class="page-item" [class.active]="page === currentPage">
-              <button class="page-link" (click)="changePage(page)">
-                {{ page }}
-              </button>
-            </li>
+                  {{ txn.TxnStatus }}
+                </span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                No transactions found
+              </td>
+            </tr>
           }
-          <li class="page-item" [class.disabled]="currentPage === totalPages">
-            <button class="page-link" (click)="changePage(currentPage + 1)">
-              <span>&raquo;</span>
-            </button>
-          </li>
-        </ul>
-      </nav>
+        </tbody>
+      </table>
     </div>
-  }
+  </div>
+}
 
-  <!-- No Data State -->
-  @if (!batchData || batchData.length === 0) {
-    <c-card class="shadow-sm">
-      <c-card-body class="text-center py-5">
-        <svg
-          cIcon
-          name="cilSearch"
-          class="display-4 d-block mb-3 text-medium-emphasis"
-          size="xxl"
-        ></svg>
-        <h5 class="text-medium-emphasis">No Batch Data</h5>
-        <p class="text-medium-emphasis">
-          Enter search criteria and click Search to view batch details
-        </p>
-      </c-card-body>
-    </c-card>
-  }
-</c-card>
+<div
+  class="d-flex justify-content-between align-items-center pt-3 border-top"
+  style="position: sticky; bottom: 0; background: white; padding-bottom: 10px"
+>
+  <div class="text-muted small">
+    Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
+    {{ (currentPage - 1) * itemsPerPage + paginatedTransactions.length }}
+    of {{ totalItems }} transactions
+  </div>
+  <nav>
+    <ul class="pagination pagination-sm mb-0">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="changePage(currentPage - 1)">
+          <span>&laquo;</span>
+        </button>
+      </li>
+      @for (page of visiblePages; track page) {
+        <li class="page-item" [class.active]="page === currentPage">
+          <button class="page-link" (click)="changePage(page)">
+            {{ page }}
+          </button>
+        </li>
+      }
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button class="page-link" (click)="changePage(currentPage + 1)">
+          <span>&raquo;</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<!-- No Data State -->
+@if (!batchData || batchData.length === 0) {
+  <c-card class="shadow-sm">
+    <c-card-body class="text-center py-5">
+      <svg
+        cIcon
+        name="cilSearch"
+        class="display-4 d-block mb-3 text-medium-emphasis"
+        size="xxl"
+      ></svg>
+      <h5 class="text-medium-emphasis">No Batch Data</h5>
+      <p class="text-medium-emphasis">
+        Enter search criteria and click Search to view batch details
+      </p>
+    </c-card-body>
+  </c-card>
+}

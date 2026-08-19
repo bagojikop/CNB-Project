@@ -14,13 +14,7 @@ import {
 
 @Component({
   selector: 'app-van-retrieve',
-  imports: [
-    ReactiveFormsModule,
-    CommonModule,
-    DSS_FORM_CONTROLS,
-    HttpClientModule,
-    DssInputNumComponent,
-  ],
+  imports: [ReactiveFormsModule, CommonModule, DSS_FORM_CONTROLS],
   templateUrl: './van-retrieve.component.html',
   styleUrl: './van-retrieve.component.scss',
 })
@@ -37,10 +31,7 @@ export class VanRetrieveComponent implements OnInit {
   totalItems = 0;
   paginatedTransactions: any[] = [];
 
-  constructor(
-    private fb: FormBuilder,
-    private http: HttpClient,
-  ) {}
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.vanForm = this.fb.group({
@@ -49,10 +40,13 @@ export class VanRetrieveComponent implements OnInit {
       fromDate: ['2020-03-02', [Validators.required]],
       toDate: ['2025-03-02', [Validators.required]],
       noOfTransactions: [
-        '500',
+        1,
         [Validators.required, Validators.min(1), Validators.max(500)],
       ],
-      pageNo: ['1', [Validators.required, Validators.min(1)]],
+      pageNo: [
+        1,
+        [Validators.required, Validators.min(1), Validators.max(500)],
+      ],
     });
   }
 
@@ -162,9 +156,10 @@ export class VanRetrieveComponent implements OnInit {
       accountNo: '6038111000017',
       fromDate: '2020-03-02',
       toDate: '2025-03-02',
-      noOfTransactions: '1000',
+      noOfTransactions: '500',
       pageNo: '1',
     });
+
     this.errorMessage = '';
     this.responseData = null;
     this.currentPage = 1;

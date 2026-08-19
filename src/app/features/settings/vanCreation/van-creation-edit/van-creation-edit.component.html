@@ -43,16 +43,35 @@
           class="form-group van-list card mb-3"
           formArrayName="virtualAccountDetails"
         >
-          <div class="d-flex justify-content-between p-2 border-bottom">
-            <label class="card-title ms-2 mt-1"
-              >VAN Numbers <span class="req">*</span></label
-            >
+          <div
+            class="d-flex justify-content-between align-items-center p-2 border-bottom"
+          >
+            <div>
+              <label class="card-title ms-2 mt-1"
+                >VAN Numbers <span class="req">*</span></label
+              >
+              <small
+                *ngIf="
+                  virtualAccountDetails.controls.length > 0 &&
+                  virtualAccountDetails.at(0).get('vanNumber')?.invalid &&
+                  virtualAccountDetails.at(0).get('vanNumber')?.touched
+                "
+                class="text-danger ms-2"
+              >
+                <i class="bi bi-exclamation-circle"></i> Please fill the current
+                VAN number first
+              </small>
+            </div>
             <button
               cButton
               class="btn btn-primary btn-sm mb-1 text-white"
               type="button"
               (click)="addVanNumber()"
-              [disabled]="saveUndoButtonIsDisable"
+              [disabled]="
+                saveUndoButtonIsDisable ||
+                (virtualAccountDetails.controls.length > 0 &&
+                  virtualAccountDetails.at(0).get('vanNumber')?.invalid)
+              "
             >
               Add VAN
             </button>

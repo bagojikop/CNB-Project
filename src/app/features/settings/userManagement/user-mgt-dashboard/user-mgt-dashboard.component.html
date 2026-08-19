@@ -64,6 +64,15 @@
         ></dss-input-text>
 
         <dss-ng-select
+          label="Branch"
+          [items]="branches"
+          formControlName="branch_code"
+          bindLabel="branch_name"
+          bindValue="branch_code"
+        >
+        </dss-ng-select>
+
+        <dss-ng-select
           id="userRolenm"
           label="Role"
           icon="cilShieldAlt"

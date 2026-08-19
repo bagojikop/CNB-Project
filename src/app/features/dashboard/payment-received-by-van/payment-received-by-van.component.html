@@ -1,5 +1,5 @@
 <!-- payment-van-dashboard.component.html -->
-<div class="container-fluid">
+<div class="container-fluid shadow-none mt-2">
   <!-- Header -->
   <div class="d-flex justify-content-between align-items-center mb-2">
     <div>
@@ -192,7 +192,14 @@
           </svg>
           Recent VAN Payments
         </h5>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 align-items-center">
+          <div
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm text-primary"
+            role="status"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
           <input
             type="text"
             class="form-control form-control-sm rounded-pill"
@@ -289,6 +296,9 @@
                       payment.status === 'matched',
                     'bg-warning bg-opacity-10 text-warning':
                       payment.status === 'pending',
+                    'bg-danger bg-opacity-10 text-danger':
+                      payment.status !== 'matched' &&
+                      payment.status !== 'pending',
                   }"
                 >
                   <span class="d-flex align-items-center gap-1">
@@ -298,13 +308,14 @@
                       [ngClass]="{
                         'bg-success': payment.status === 'matched',
                         'bg-warning': payment.status === 'pending',
+                        'bg-danger':
+                          payment.status !== 'matched' &&
+                          payment.status !== 'pending',
                       }"
                     ></span>
-                    {{
-                      payment.status === "matched"
-                        ? "✓ Auto-Matched"
-                        : "⏳ Pending Match"
-                    }}
+                    <span class="text-dark">{{
+                      getStatusText(payment.status)
+                    }}</span>
                   </span>
                 </span>
               </td>

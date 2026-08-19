@@ -89,6 +89,7 @@ export class ConfDashboardComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    console.log(this.provider.companyInfo);
     this.loadData();
 
     this.refreshService.refresh$.subscribe(() => {

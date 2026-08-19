@@ -29,16 +29,16 @@
         <div class="search-field">
           <label>
             <i class="bi bi-building"></i>
-            <span>Branch</span>
+            <span>Firm</span>
           </label>
           <select
             formControlName="branch"
             [disabled]="isLoading"
             class="field-control"
           >
-            <option value="">All Branches</option>
-            <option *ngFor="let branch of branches" [value]="branch">
-              {{ branch }}
+            <option value="">All Firms</option>
+            <option *ngFor="let firm of firms" [value]="firm.firm_id">
+              {{ firm.firm_name }}
             </option>
           </select>
         </div>
