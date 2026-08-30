@@ -8,18 +8,22 @@ import { environment } from './../../../environments/environment';
   providedIn: 'root',
 })
 export class MyProvider {
-  
+
   apiServer: string = environment.apiServer;
   reportServer: string = environment.reportServer;
   tokenBased: boolean = true;
 
-  companyInfo?: CompanyInfo = <CompanyInfo>{};
+  companyInfo?: CompanyInfo = <CompanyInfo>{
+    company: {
+      branch_id: 102
+    }
+  };
 
   ShareData: any = {
     audit: {},
   };
 
-  constructor(private dialog: DialogsService) {}
+  constructor(private dialog: DialogsService) { }
 
   validForm(form: NgForm, prefixes: string[] = ['th_']): Promise<boolean> {
     return new Promise((resolve) => {
@@ -58,7 +62,7 @@ export class MyProvider {
     });
   }
 
-  
+
 
   validThead(form: NgForm, prefix: string = 'th_'): boolean {
     const controls = Object.keys(form.controls)

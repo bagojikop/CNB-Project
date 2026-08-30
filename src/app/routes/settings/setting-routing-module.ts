@@ -3,8 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AccountStatementComponent } from '@features/settings/account-statement/account-statement.component';
 import { BalanceInquiryComponent } from '@features/settings/balance-inqury/balance-inqury.component';
-import { ConfDashboardComponent } from '@features/settings/configuration/conf-dashboard/conf-dashboard.component';
-import { ConfDetailComponent } from '@features/settings/configuration/conf-detail/conf-detail.component';
+import { BankAccountDashboardComponent } from '@features/settings/bankAccount/bankAccount-dashboard/bankAccount-dashboard.component';
+import { BankAccountDetailComponent } from '@features/settings/bankAccount/bankAccount-detail/bankAccount-detail.component';
 import { BatchInquiryComponent } from '@features/settings/push-checker-maker/batch-inquiry/batch-inquiry.component';
 import { BatchStatusComponent } from '@features/settings/push-checker-maker/batch-status/batch-status.component';
 import { PushCheckerMakerComponent } from '@features/settings/push-checker-maker/push-checker-maker.component';
@@ -18,12 +18,12 @@ import { VanCreationEditComponent } from '@features/settings/vanCreation/van-cre
 
 const routes: Routes = [
   {
-    path: 'confDashboard',
-    component: ConfDashboardComponent,
+    path: 'bankAccountDashboard',
+    component: BankAccountDashboardComponent,
   },
   {
-    path: 'confDetails',
-    component: ConfDetailComponent,
+    path: 'bankAccountDetails',
+    component: BankAccountDetailComponent,
   },
   {
     path: 'userMgtDashboard',

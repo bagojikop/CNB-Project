@@ -8,8 +8,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { CreateVANRequest } from '@shared-interfaces/settings/van-creation';
+import { bankAccount } from '@shared-interfaces/settings/bankAccount';
 import { DialogsService } from '@shared-services/messageBox';
-import { vanCreationService } from '@shared-services/user.service';
+import {
+  ConfigService,
+  vanCreationService,
+} from '@shared-services/user.service';
 import {
   DSS_FORM_CONTROLS,
   DssInputTextComponent,
@@ -29,12 +33,14 @@ import { createVanCreation } from './van-creation-edit.factory';
 })
 export class VanCreationEditComponent implements OnInit {
   private crudSrc = inject(vanCreationService);
+  private configSrc = inject(ConfigService);
   private dialog = inject(DialogsService);
   private location = inject(Location);
   private readonly fb = inject(FormBuilder);
   saveUndoButtonIsDisable: boolean = false;
   form = createVanCreation(this.fb);
   submitted = false;
+  bankAccounts: bankAccount[] = [];
 
   constructor() {
     // enable/disable validators based on initial mode
@@ -54,6 +60,7 @@ export class VanCreationEditComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadBankAccounts();
     var data: any = this.location.getState();
     console.log('received ID:', data);
 
@@ -111,6 +118,20 @@ export class VanCreationEditComponent implements OnInit {
         },
       });
     }
+  }
+
+  private loadBankAccounts(): void {
+    this.configSrc.getAll().subscribe({
+      next: (accounts) => {
+        this.bankAccounts = accounts;
+      },
+      error: (error) => {
+        this.dialog.swal({
+          dialog: 'error',
+          message: error.message,
+        });
+      },
+    });
   }
 
   // Generate unique VAN numbers based on count

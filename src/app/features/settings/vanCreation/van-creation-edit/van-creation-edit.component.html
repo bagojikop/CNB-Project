@@ -15,14 +15,22 @@
 
     @if (mode === "custom") {
       <div class="form-section" formGroupName="custom">
-        <dss-input-text
-          label="Account Number"
+        <dss-ng-select
+          label="Bank Account"
           formControlName="accountNo"
-          required="true"
+          [items]="bankAccounts"
+          bindLabel="accountName,accountNo"
+          bindValue="accountNo"
+          searchColumns="accountName,accountNo"
+          [bindSubObj]="[
+            { key: 'Account No', value: 'accountNo' },
+            { key: 'Branch Code', value: 'branchCode' },
+          ]"
+          placeholder="Select bank account"
+          [required]="true"
           sizing="lg"
-          minlength="15"
           [disabled]="saveUndoButtonIsDisable"
-        ></dss-input-text>
+        ></dss-ng-select>
 
         <div class="form-row">
           <dss-date-fin
@@ -117,13 +125,21 @@
 
     @if (mode === "random") {
       <div formGroupName="random" style="min-height: 490px">
-        <dss-input-text
-          label="Account Number"
+        <dss-ng-select
+          label="Bank Account"
           formControlName="accountNo"
-          required="true"
+          [items]="bankAccounts"
+          bindLabel="accountName,accountNo"
+          bindValue="accountNo"
+          searchColumns="accountName,accountNo"
+          [bindSubObj]="[
+            { key: 'Account No', value: 'accountNo' },
+            { key: 'Branch Code', value: 'branchCode' },
+          ]"
+          placeholder="Select bank account"
+          [required]="true"
           sizing="lg"
-          minlength="15"
-        ></dss-input-text>
+        ></dss-ng-select>
 
         <div class="form-row mb-4">
           <dss-date-fin

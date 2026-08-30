@@ -1,24 +1,25 @@
 import { AfterViewInit, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DSS_FORM_CONTROLS } from '@shared-directives/dss-form-controls';
-import { configuration } from '@shared-interfaces/settings/configuration';
+import { bankAccount } from '@shared-interfaces/settings/bankAccount';
 import { otpForm } from '@shared-directives/dss-otp-dialog/otp-dialog.component';
 
 import { ConfigService } from '@shared-services/user.service';
 import { DialogsService } from '@shared-services/messageBox';
 import { MyProvider } from '@shared-services/provider';
 import { DataRefreshService } from '@shared-services/data-refresh.service';
+import { Http } from '@shared-services/httpService';
 
 @Component({
-  selector: 'app-conf-dashboard',
+  selector: 'app-bank-accout-dashboard',
   imports: [DSS_FORM_CONTROLS, otpForm],
-  templateUrl: './conf-dashboard.component.html',
-  styleUrl: './conf-dashboard.component.scss',
+  templateUrl: './bankAccount-dashboard.component.html',
+  styleUrl: './bankAccount-dashboard.component.scss',
 })
-export class ConfDashboardComponent implements AfterViewInit {
+export class BankAccountDashboardComponent implements AfterViewInit {
   private readonly router = inject(Router);
   dashboardTitle: string = 'Account Details';
-  private configSrc = inject(ConfigService);
+  private http = inject(Http);
   private readonly dialogSrc = inject(DialogsService);
   private readonly refreshService = inject(DataRefreshService);
   readonly provider = inject(MyProvider);
@@ -27,8 +28,8 @@ export class ConfDashboardComponent implements AfterViewInit {
   readonly handleDelete = (item?: any) => this.onGridDelete(item);
   readonly isFilterVisible = false;
   varifyOtp: boolean = false;
-  Credtials = <configuration>{};
-  jsonData: configuration[] = [];
+  Credtials = <bankAccount>{};
+  jsonData: bankAccount[] = [];
   actions: string = '';
   idx: number = -1;
   columns: any[] = [
@@ -54,6 +55,12 @@ export class ConfDashboardComponent implements AfterViewInit {
     {
       key: 'branchId',
       label: 'Branch ID',
+      type: 'string',
+      _style: { width: '8%' },
+    },
+    {
+      key: 'branchCode',
+      label: 'Branch Code',
       type: 'string',
       _style: { width: '8%' },
     },
@@ -85,7 +92,7 @@ export class ConfDashboardComponent implements AfterViewInit {
   ];
 
   newCred() {
-    this.router.navigate(['settings-form/confDetails']);
+    this.router.navigate(['settings-form/bankAccountDetails']);
   }
 
   ngAfterViewInit(): void {
@@ -98,9 +105,9 @@ export class ConfDashboardComponent implements AfterViewInit {
   }
 
   private loadData(): void {
-    this.configSrc.getAll().subscribe({
+    this.http.get("bankAccount/all").subscribe({
       next: (res) => {
-        this.jsonData = res as configuration[];
+        this.jsonData = res as bankAccount[];
       },
       error: (err) => {
         this.dialogSrc.swal({
@@ -111,28 +118,28 @@ export class ConfDashboardComponent implements AfterViewInit {
     });
   }
 
-  onGridEdit(item: configuration) {
+  onGridEdit(item: bankAccount) {
     this.Credtials = item;
     this.varifyOtp = true;
     this.actions = 'view';
   }
 
-  onGridDelete(item: configuration) {
+  onGridDelete(item: bankAccount) {
     this.Credtials = item;
     this.varifyOtp = true;
     this.actions = 'delete';
     this.idx = this.jsonData.findIndex(
-      (x) => x.id === (item as configuration).id,
+      (x) => x.id === (item as bankAccount).id,
     );
   }
 
   verifyOtp(otp: string) {
     if (this.actions == 'view') {
-      this.router.navigate(['settings-form/confDetails'], {
-        state: { action: 'view', data: this.Credtials },
+      this.router.navigate(['settings-form/bankAccountDetails'], {
+        state: { action: 'view', id: this.Credtials.id },
       });
     } else {
-      this.configSrc.delete(this.Credtials.id).subscribe({
+      this.http.delete('bankAccount/delete', { id: this.Credtials.id }).subscribe({
         next: (res) => {
           this.dialogSrc.swal({
             dialog: 'success',

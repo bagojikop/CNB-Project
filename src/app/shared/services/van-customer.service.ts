@@ -30,7 +30,7 @@ export interface VANCreationRequest {
   };
 }
 
-export interface Configuration {
+export interface BankAccount {
   id: string;
   firmId: string;
   firmName: string;
@@ -44,7 +44,7 @@ export interface Configuration {
 
 export interface DbData {
   users: any[];
-  configuration: Configuration[];
+  bankAccount: BankAccount[];
   VANCreation: VANCreationRequest[];
   payments: any[];
 }
@@ -71,14 +71,14 @@ export class VANCustomerService {
   getCustomers(): Observable<Customer[]> {
     return this.getDbData().pipe(
       map((data) => {
-        return data.configuration.map((config) => ({
-          id: config.id,
-          firmName: config.firmName,
-          accountNo: config.accountNo,
-          customerId: config.customerId,
-          clientId: config.clientId,
-          firmId: config.firmId,
-          branchId: config.branchId,
+        return data.bankAccount.map((account) => ({
+          id: account.id,
+          firmName: account.firmName,
+          accountNo: account.accountNo,
+          customerId: account.customerId,
+          clientId: account.clientId,
+          firmId: account.firmId,
+          branchId: account.branchId,
         }));
       }),
     );
@@ -89,15 +89,15 @@ export class VANCustomerService {
       map((data) => {
         // Build a map of accountNo -> customer details
         const customerMap = new Map<string, any>();
-        data.configuration.forEach((config) => {
-          customerMap.set(config.accountNo, {
-            id: config.id,
-            firmName: config.firmName,
-            accountNo: config.accountNo,
-            customerId: config.customerId,
-            clientId: config.clientId,
-            firmId: config.firmId,
-            branchId: config.branchId,
+        data.bankAccount.forEach((account) => {
+          customerMap.set(account.accountNo, {
+            id: account.id,
+            firmName: account.firmName,
+            accountNo: account.accountNo,
+            customerId: account.customerId,
+            clientId: account.clientId,
+            firmId: account.firmId,
+            branchId: account.branchId,
             vanNumbers: [],
             startDate: '',
             endDate: '',
@@ -170,17 +170,17 @@ export class VANCustomerService {
         const customerMap = new Map<string, Customer>();
 
         // Build customer map
-        data.configuration.forEach((config) => {
+        data.bankAccount.forEach((account) => {
           const customer: Customer = {
-            id: config.id,
-            firmName: config.firmName,
-            accountNo: config.accountNo,
-            customerId: config.customerId,
-            clientId: config.clientId,
-            firmId: config.firmId,
-            branchId: config.branchId,
+            id: account.id,
+            firmName: account.firmName,
+            accountNo: account.accountNo,
+            customerId: account.customerId,
+            clientId: account.clientId,
+            firmId: account.firmId,
+            branchId: account.branchId,
           };
-          customerMap.set(config.accountNo, customer);
+          customerMap.set(account.accountNo, customer);
         });
 
         // Map VANs to customers

@@ -11,28 +11,35 @@
       "id": "9BWTRR2wsU0"
     }
   ],
-  "configuration": [
+  "bankAccount": [
     {
       "id": "BMfdOG9Dj08",
       "firmId": "111111",
-      "credDate": "2026-07-28",
+      "credDate": "2026-08-29",
       "credUser": "admin",
       "branchId": "22222222222",
       "firmName": "ABCD",
       "accountNo": "11111111111111",
+      "branchCode": "402",
       "accountName": "ABCD",
       "IFSC_Code": "",
       "customerId": "11111111",
       "clientId": "11111111",
+      "accessToken": "sample-access-token",
+      "redirectUrl": "",
+      "responseType": "code",
+      "state": "acdfgb",
+      "scope": "collection",
+      "txnPassword": "PbGD/MqzrnCEe09fWLrFmQ==",
       "clientSecretKey": "111111",
-      "symmetric_key": "111111111",
+      "symmetric_Key": "111111111",
       "webhook_address": "http://google.com",
-      "static_ip": "https://192.6.35.56",
+      "static_ip": "60.00.00.00,10.10.20.20",
       "modalForm": {
-        "txn_password": "213123123",
-        "mobile_otp": "123123123",
+        "txn_password": "",
+        "mobile_otp": "",
         "mobile_no": "917083234537",
-        "encrypted_psw": "aijLMXaakjL+9F+LkIyeng=="
+        "encrypted_psw": "PbGD/MqzrnCEe09fWLrFmQ=="
       }
     }
   ],
@@ -44,68 +51,68 @@
           "encryptData": {
             "accountNo": "111111111111111",
             "startDate": "2026-08-01",
-            "endDate": "2026-08-20",
+            "endDate": "2026-09-29",
             "countVAN": "15",
             "virtualAccountDetails": [
               {
                 "vanNumber": "VAN483980001",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980002",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980003",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980004",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980005",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980006",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980007",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980008",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980009",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980010",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980011",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980012",
-                "endDate": "2026-08-20"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980013",
-                "endDate": "2026-08-30"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980014",
-                "endDate": "2026-08-31"
+                "endDate": "2026-09-29"
               },
               {
                 "vanNumber": "VAN483980015",
-                "endDate": "2026-08-31"
+                "endDate": "2026-09-29"
               }
             ]
           }

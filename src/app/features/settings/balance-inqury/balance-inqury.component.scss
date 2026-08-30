@@ -580,12 +580,15 @@
   .balance-wrapper {
     padding: 20px;
   }
+
   .search-grid {
     grid-template-columns: 1fr 1fr;
   }
+
   .action-field {
     grid-column: span 2;
   }
+
   .btn-primary {
     width: 100%;
     justify-content: center;
@@ -736,4 +739,13 @@
   .empty-state p {
     font-size: 13px;
   }
+}
+
+.error-message {
+  color: #b42318;
+  background: #fef3f2;
+  padding: 12px;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }

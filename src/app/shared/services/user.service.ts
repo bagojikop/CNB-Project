@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { userMgt } from '@shared-interfaces/settings/user';
-import { configuration } from '@shared-interfaces/settings/configuration';
+import { bankAccount } from '@shared-interfaces/settings/bankAccount';
 import { CreateVANRequest } from '@shared-interfaces/settings/van-creation';
 import { DataRefreshService } from './data-refresh.service';
 
@@ -64,14 +64,14 @@ export class UserService {
 export class ConfigService {
   private http = inject(HttpClient);
   private refreshService = inject(DataRefreshService);
-  private api = 'http://localhost:3000/configuration';
+  private api = 'http://localhost:3000/bankAccount';
 
-  getAll(): Observable<configuration[]> {
-    return this.http.get<configuration[]>(this.api);
+  getAll(): Observable<bankAccount[]> {
+    return this.http.get<bankAccount[]>(this.api);
   }
 
-  add(user: configuration): Observable<configuration> {
-    return this.http.post<configuration>(this.api, user).pipe(
+  add(user: bankAccount): Observable<bankAccount> {
+    return this.http.post<bankAccount>(this.api, user).pipe(
       map((response) => {
         this.refreshService.trigger();
         return response;
@@ -79,8 +79,8 @@ export class ConfigService {
     );
   }
 
-  update(user: configuration): Observable<configuration> {
-    return this.http.put<configuration>(`${this.api}/${user.id}`, user).pipe(
+  update(user: bankAccount): Observable<bankAccount> {
+    return this.http.put<bankAccount>(`${this.api}/${user.id}`, user).pipe(
       map((response) => {
         this.refreshService.trigger();
         return response;

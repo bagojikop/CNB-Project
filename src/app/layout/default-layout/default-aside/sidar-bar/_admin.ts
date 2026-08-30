@@ -8,7 +8,7 @@ export const adminNavItems: INavData[] = [
     children: [
       {
         name: 'Configuration',
-        url: '/settings-form/confDashboard',
+        url: '/settings-form/bankAccountDashboard',
         icon: 'cil-settings',
       },
       {

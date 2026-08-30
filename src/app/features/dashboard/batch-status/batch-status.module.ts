@@ -1,4 +1,4 @@
-import { configuration } from '@shared-interfaces/settings/configuration';
+import { bankAccount } from '@shared-interfaces/settings/bankAccount';
 import { BatchStatus } from '@shared-interfaces/settings/push-checker-maker/batch_status';
 
 export type batchStatusFormValue = Pick<BatchStatus, 'Request'> & {

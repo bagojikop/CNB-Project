@@ -3,7 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  apiServer: 'https://whtms.dsserp.in/whtms.api/pi/',
+  apiServer: 'http://localhost:5184/',
   reportServer: 'http://localhost:5054',
   autoDevLogin: false,
 };

@@ -1,0 +1,448 @@
+<div class="container">
+  <form [formGroup]="configInputs" class="card dss-card-vh-100">
+    <div
+      class="card-header d-flex mb-3 justify-content-between align-items-center p-3"
+      style="background-color: #00d3ff !important"
+    >
+      <div class="d-flex gap-3 align-items-center">
+        <svg cIcon name="cilBank" size="lg"></svg>
+        <h3 class="mb-0">Bank Credentials</h3>
+      </div>
+      <button (click)="closePage()" cButtonClose></button>
+    </div>
+
+    <div class="card-body">
+      <div
+        class="card-header mb-3 d-flex gap-3 fw-bold gradient-border align-items-center"
+      >
+        <svg cIcon name="cilBuilding" size="sm"></svg>
+        <h5 class="mb-0 text-secondary">Firm Details</h5>
+      </div>
+
+      <c-row class="mb-3 mx-1">
+        <c-col sm="3">
+          <dss-input-text
+            label="FIRM ID"
+            icon="cilBuilding"
+            sizing="sm"
+            formControlName="firmId"
+          ></dss-input-text>
+        </c-col>
+        <c-col sm="3">
+          <dss-input-text
+            label="BRANCH ID"
+            icon="cilFork"
+            sizing="sm"
+            formControlName="branchId"
+          ></dss-input-text>
+        </c-col>
+        <c-col sm="6">
+          <dss-input-text
+            label="FIRM NAME"
+            sizing="sm"
+            formControlName="firmName"
+            [caseStyle]="caseStyle.UPPERCASE"
+          ></dss-input-text>
+        </c-col>
+      </c-row>
+
+      <!-- Details-->
+      <div
+        class="card-header mb-3 d-flex gap-3 fw-bold gradient-border align-items-center"
+      >
+        <svg cIcon name="cilNotes" size="sm"></svg>
+        <h5 class="mb-0 text-secondary">Canara Bank Details</h5>
+      </div>
+
+      <c-row class="mb-3 mx-1">
+        <dss-input-text
+          label="ACCOUNT NO"
+          icon="cilCreditCard"
+          sizing="sm"
+          formControlName="accountNo"
+        ></dss-input-text>
+      </c-row>
+      <c-row>
+        <c-col sm="6" md="6" lg="2">
+          <dss-input-text
+            label="BRANCH CODE"
+            icon="cilFork"
+            sizing="sm"
+            formControlName="branchCode"
+          ></dss-input-text>
+        </c-col>
+
+        <c-col sm="6" md="6" lg="2">
+          <dss-input-text
+            label=" IFSC CODE   (optional)"
+            icon="cilUser"
+            sizing="sm"
+            formControlName="ifsc_Code"
+          ></dss-input-text>
+        </c-col>
+
+        <c-col sm="6" md="6" lg="2">
+          <dss-input-text
+            label="CUSTOMER ID"
+            icon="cilUserFollow"
+            sizing="sm"
+            formControlName="customerId"
+          ></dss-input-text>
+        </c-col>
+
+        <c-col sm="6" md="6" lg="4">
+          <dss-input-text
+            label="ACCOUNT NAME"
+            icon="cilUser"
+            sizing="sm"
+            [caseStyle]="caseStyle.UPPERCASE"
+            formControlName="accountName"
+          ></dss-input-text>
+        </c-col>
+      </c-row>
+
+      <div
+        class="card-header mb-3 d-flex gap-3 fw-bold gradient-border align-items-center"
+      >
+        <svg cIcon name="cilLockLocked" size="sm"></svg>
+        <h5 class="mb-0 text-secondary">API & Integration Keys</h5>
+      </div>
+      <c-row class="mb-3 mx-1">
+        <c-col sm="3">
+          <dss-input-text
+            label="CLIENT ID"
+            icon="cilUserFollow"
+            sizing="sm"
+            formControlName="clientId"
+          ></dss-input-text>
+        </c-col>
+
+        <c-col sm="3">
+          <dss-input-text
+            label="CLIENT SECRET KEY"
+            icon="cilLockLocked"
+            sizing="sm"
+            type="password"
+            formControlName="clientSecretKey"
+          ></dss-input-text>
+        </c-col>
+        <c-col sm="3">
+          <dss-input-text
+            label="SYMMETRIC KEY"
+            icon="cilLockLocked"
+            sizing="sm"
+            type="password"
+            formControlName="symmetric_Key"
+          ></dss-input-text>
+        </c-col>
+      </c-row>
+      <c-row class="mb-3 mx-1">
+        <c-col sm="6">
+          <div class="d-flex align-items-end gap-2">
+            <dss-input-text
+              class="flex-grow-1"
+              label="ACCESS TOKEN"
+              icon="cilLockLocked"
+              sizing="sm"
+              type="password"
+              formControlName="accessToken"
+            ></dss-input-text>
+            <button
+              type="button"
+              cButton
+              color="primary"
+              class="mb-2"
+              (click)="openAccessTokenModal()"
+            >
+              GENERATE
+            </button>
+          </div>
+        </c-col>
+        <c-col sm="3">
+          <dss-input-text
+            label="SCOPE"
+            placeholder="collection"
+            icon="cilList"
+            sizing="sm"
+            formControlName="scope"
+          ></dss-input-text>
+        </c-col>
+
+        <c-col sm="3">
+          <dss-input-text
+            label="STATE"
+            placeholder="acdfgb"
+            icon="cilNotes"
+            sizing="sm"
+            formControlName="state"
+          ></dss-input-text>
+        </c-col>
+      </c-row>
+
+      <div
+        class="card-header mb-3 d-flex gap-3 fw-bold gradient-border align-items-center"
+      >
+        <svg cIcon name="cilBank" size="sm"></svg>
+        <h5 class="mb-0 text-secondary">Api Banking Credentials</h5>
+      </div>
+      <c-row class="mb-3 mx-1">
+        <c-col sm="3">
+          <dss-input-text
+            label="USERNAME"
+            icon="cilUser"
+            sizing="sm"
+            autocomplete="username"
+            formControlName="apiUserName"
+          ></dss-input-text>
+        </c-col>
+        <c-col sm="3">
+          <dss-input-text
+            type="password"
+            label="ENCRYPTION KEY"
+            placeholder="Enter Encryption Key"
+            icon="cilKey"
+            formControlName="enc_Key"
+            [maxlength]="12"
+            [minlength]="6"
+          ></dss-input-text>
+        </c-col>
+        <c-col sm="3">
+          <dss-input-text
+            label="LOGIN PASSWORD"
+            icon="cilLockLocked"
+            sizing="sm"
+            type="password"
+            readonly="true"
+            autocomplete="current-password"
+            formControlName="apiLoginPassword"
+            (click)="openPasswordModal('login')"
+          ></dss-input-text>
+        </c-col>
+
+        <c-col sm="3">
+          <dss-input-text
+            label="TXN PASSWORD"
+            placeholder="Click to enter and encrypt"
+            icon="cilLockLocked"
+            sizing="sm"
+            type="password"
+            readonly="true"
+            formControlName="apiTxnPassword"
+            (click)="openPasswordModal('txn')"
+          ></dss-input-text>
+        </c-col>
+      </c-row>
+    </div>
+    <div class="card-footer">
+      <c-row class="justify-content-start justify-content-md-end g-2">
+        <c-col xs="12" sm="12" md="6" lg="2">
+          <button
+            type="button"
+            cButton
+            color="success"
+            class="w-100"
+            [disabled]="configInputs.invalid || isConfSubmitting"
+            (click)="save()"
+          >
+            SUBMIT
+          </button>
+        </c-col>
+      </c-row>
+    </div>
+  </form>
+</div>
+
+<c-modal
+  id="passwordModal"
+  alignment="center"
+  [(visible)]="passwordModalVisible"
+>
+  <c-modal-header>
+    <h5 cModalTitle>
+      {{ passwordTarget === "login" ? "LOGIN PASSWORD" : "TXN PASSWORD" }}
+    </h5>
+    <button (click)="closePasswordModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="passwordModalForm">
+      <c-row>
+        <c-col sm="5">
+          <dss-input-text
+            type="password"
+            label="PASSWORD"
+            placeholder="Enter Password"
+            icon="cilLockLocked"
+            formControlName="password"
+          ></dss-input-text>
+        </c-col>
+
+        <c-col sm="2" class="d-flex align-items-center">
+          <button
+            type="button"
+            cButton
+            color="success"
+            size="sm"
+            class="mt-2"
+            (click)="sendEncryptedPsw()"
+            [disabled]="
+              isPasswordEmpty() || !configInputs.controls.enc_Key.value
+            "
+          >
+            ENCRYPT
+          </button>
+        </c-col>
+      </c-row>
+
+      <p class="bg-warning p-1 rounded">
+        Please enter the
+        {{ passwordTarget === "login" ? "login" : "transaction" }} password
+        registered with your bank.
+      </p>
+
+      @if (showOtp) {
+        <c-row>
+          <c-col sm="7">
+            <dss-input-text
+              autocomplete=""
+              label="MOBILE NO"
+              disabled="true"
+              formControlName="mobile_no"
+            ></dss-input-text>
+          </c-col>
+          <c-col sm="5">
+            <dss-input-text
+              label="ENTER OTP"
+              formControlName="mobile_otp"
+            ></dss-input-text
+          ></c-col>
+        </c-row>
+      }
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button
+      type="button"
+      (click)="closePasswordModal()"
+      cButton
+      color="secondary"
+    >
+      CLOSE
+    </button>
+    <button
+      type="button"
+      cButton
+      color="primary"
+      [disabled]="passwordModalForm.invalid"
+      (click)="savePasswordModalData()"
+    >
+      SUBMIT
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal
+  id="accessTokenModal"
+  alignment="center"
+  size="lg"
+  [(visible)]="accessTokenModalVisible"
+>
+  <c-modal-header>
+    <h5 cModalTitle>GENERATE ACCESS TOKEN</h5>
+    <button
+      type="button"
+      (click)="accessTokenModalVisible = false"
+      cButtonClose
+    ></button>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="accessTokenForm">
+      @if (!awaitingAuthorizationCode) {
+        <c-row>
+          <c-col sm="12">
+            <dss-input-text
+              label="URL"
+              placeholder="https://bank.example.com/oauth/authorize"
+              icon="cilLink"
+              formControlName="url"
+            ></dss-input-text>
+          </c-col>
+          <c-col sm="12">
+            <dss-input-text
+              label="REDIRECT URL"
+              placeholder="https://your-app.example.com/callback"
+              icon="cilLink"
+              formControlName="redirectUrl"
+            ></dss-input-text>
+          </c-col>
+          <c-col sm="4">
+            <dss-input-text
+              label="RESPONSE TYPE"
+              formControlName="responseType"
+            ></dss-input-text>
+          </c-col>
+          <c-col sm="4">
+            <dss-input-text
+              label="STATE"
+              formControlName="state"
+            ></dss-input-text>
+          </c-col>
+          <c-col sm="4">
+            <dss-input-text
+              label="SCOPE"
+              formControlName="scope"
+            ></dss-input-text>
+          </c-col>
+        </c-row>
+
+        @if (generatedAuthorizationUrl) {
+          <dss-input-text
+            label="GENERATED AUTHORIZATION URL"
+            [readonly]="true"
+            [value]="generatedAuthorizationUrl"
+          ></dss-input-text>
+        }
+      } @else {
+        <p>
+          Complete authorization in the newly opened window, then copy the
+          returned code and paste it below.
+        </p>
+        <dss-input-text
+          label="ENTER YOUR CODE"
+          placeholder="Paste authorization code"
+          icon="cilLockLocked"
+          formControlName="authorizationCode"
+        ></dss-input-text>
+      }
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button
+      type="button"
+      cButton
+      color="secondary"
+      (click)="accessTokenModalVisible = false"
+    >
+      CLOSE
+    </button>
+    @if (!awaitingAuthorizationCode) {
+      <button
+        type="button"
+        cButton
+        color="primary"
+        [disabled]="accessTokenForm.invalid"
+        (click)="generateAuthorizationUrl()"
+      >
+        GENERATE URL
+      </button>
+    } @else {
+      <button
+        type="button"
+        cButton
+        color="primary"
+        (click)="submitAuthorizationCode()"
+      >
+        SUBMIT CODE
+      </button>
+    }
+  </c-modal-footer>
+</c-modal>

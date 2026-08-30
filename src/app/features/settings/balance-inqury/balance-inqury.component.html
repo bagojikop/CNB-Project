@@ -10,12 +10,14 @@
         <p>View account balances across branches</p>
       </div>
     </div>
-    <div class="bank-status" *ngIf="balanceData && balanceData.length > 0">
-      <span class="status-pill success">
-        <i class="bi bi-check-circle-fill"></i>
-        {{ balanceData.length }} Accounts Found
-      </span>
-    </div>
+    @if (balanceData().length > 0) {
+      <div class="bank-status">
+        <span class="status-pill success">
+          <i class="bi bi-check-circle-fill"></i>
+          {{ balanceData().length }} Accounts Found
+        </span>
+      </div>
+    }
   </div>
 
   <!-- Search Panel -->
@@ -29,17 +31,19 @@
         <div class="search-field">
           <label>
             <i class="bi bi-building"></i>
-            <span>Firm</span>
+            <span>Account Name</span>
           </label>
           <select
-            formControlName="branch"
-            [disabled]="isLoading"
+            formControlName="firm_id"
+            [disabled]="isLoading()"
             class="field-control"
+            (change)="onFirmSelect()"
           >
-            <option value="">All Firms</option>
-            <option *ngFor="let firm of firms" [value]="firm.firm_id">
-              {{ firm.firm_name }}
-            </option>
+            @for (firm of firms; track firm.firmId) {
+              <option [value]="firm.firmId">
+                {{ firm.firmName }}
+              </option>
+            }
           </select>
         </div>
 
@@ -48,21 +52,29 @@
             <i class="bi bi-hash"></i>
             <span>Account Number</span>
           </label>
-          <input
-            type="text"
-            formControlName="accountNumber"
-            placeholder="Enter account number"
-            [disabled]="isLoading"
+
+          <select
+            formControlName="accountNo"
+            [disabled]="isLoading()"
             class="field-control"
-          />
+          >
+            <option [value]="'*'">
+              {{ "All" }}
+            </option>
+            @for (accountNo of selectedFirm.accountNos; track accountNo) {
+              <option [value]="accountNo">
+                {{ accountNo }}
+              </option>
+            }
+          </select>
         </div>
 
         <div class="search-field action-field">
           <button type="submit" class="btn-primary">
-            @if (!isLoading) {
+            @if (!isLoading()) {
               <i class="bi bi-search"></i> Search
             }
-            @if (isLoading) {
+            @if (isLoading()) {
               <span class="spinner-light"></span> Searching...
             }
           </button>
@@ -83,25 +95,25 @@
         <span
           class="field-error"
           *ngIf="
-            balanceForm.get('branch')?.invalid &&
-            balanceForm.get('branch')?.touched
+            balanceForm.get('firm_id')?.invalid &&
+            balanceForm.get('firm_id')?.touched
           "
         >
           <i class="bi bi-exclamation-circle"></i>
-          Please select a branch
+          Please select a Account
         </span>
       </div>
     </form>
   </div>
 
   <!-- Results -->
-  <div class="results-panel" *ngIf="balanceData && balanceData.length > 0">
+  <div class="results-panel" *ngIf="balanceData().length > 0">
     <div class="results-header">
       <div class="results-title">
         <i class="bi bi-table"></i>
         <h3>Account Balances</h3>
       </div>
-      <span class="results-count">{{ balanceData.length }} records</span>
+      <span class="results-count">{{ balanceData().length }} records</span>
     </div>
 
     <div class="table-responsive">
@@ -109,13 +121,13 @@
         <thead>
           <tr>
             <th style="width: 5%">#</th>
-            <th style="width: 10%">Account</th>
-            <th style="width: 40%">Name</th>
-            <th style="width: 7%">Type</th>
-            <th style="width: 8%">Currency</th>
-            <th style="width: 10%" class="text-right">Available</th>
-            <th style="width: 10%" class="text-right">Ledger</th>
-            <th style="width: 11%">IFSC</th>
+            <th style="width: 10%">account No</th>
+            <th style="width: 10%" class="text-right">Current Balance</th>
+            <th style="width: 10%" class="text-right">Uncleared Funds</th>
+            <th style="width: 10%" class="text-right">Available Balance</th>
+            <th style="width: 10%" class="text-right">Hold Amount</th>
+            <th style="width: 10%" class="text-right">overdraft</th>
+            <th style="width: 10%" class="text-right">Net Balance</th>
           </tr>
         </thead>
         <tbody
@@ -130,30 +142,22 @@
               {{ (currentPage - 1) * pageSize + i + 1 }}
             </td>
             <td style="width: 10%">
-              <span class="account-number">{{
-                item.accountDetails.accountNumber
-              }}</span>
+              <span class="account-number">{{ item.acctNumber }}</span>
             </td>
-            <td style="width: 40%">{{ item.accountDetails.accountName }}</td>
-            <td style="width: 7%; text-align: center">
-              <span class="badge-type">{{
-                item.accountDetails.accountType
-              }}</span>
+            <td style="width: 10%" class="text-right amount">
+              {{ item.unclearFunds }}
             </td>
-            <td style="width: 8%">{{ item.accountDetails.currency }}</td>
-            <td class="text-right amount" style="width: 10%">
-              <span class="balance-positive" style="font-size: small">
-                {{ item.accountDetails.currency }}
-                {{ item.balanceDetails.availableBalance | number: "1.2-2" }}
-              </span>
+            <td style="width: 10%" class="text-right amount">
+              {{ item.balAvailable }}
             </td>
-            <td class="text-right amount" style="width: 10%">
-              {{ item.accountDetails.currency }}
-              {{ item.balanceDetails.ledgerBalance | number: "1.2-2" }}
+            <td style="width: 10%" class="text-right amount">
+              {{ item.holdAmount }}
             </td>
-
-            <td style="width: 11%">
-              <span class="ifsc-code">{{ item.accountDetails.ifscCode }}</span>
+            <td style="width: 10%" class="text-right amount">
+              {{ item.overdraft }}
+            </td>
+            <td style="width: 10%" class="text-right amount">
+              {{ item.netBalance }}
             </td>
           </tr>
         </tbody>
@@ -224,15 +228,22 @@
     </div>
   </div>
 
-  <!-- Empty State -->
-  <div
-    class="empty-state"
-    *ngIf="(!balanceData || balanceData.length === 0) && !isLoading"
-  >
-    <div class="empty-icon">
-      <i class="bi bi-search"></i>
+  @if (showEmptyState()) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="bi bi-search"></i>
+      </div>
+
+      <h4>No results found</h4>
+      <p>Select a branch and enter an account number to check balance</p>
     </div>
-    <h4>No results found</h4>
-    <p>Select a branch and enter an account number to check balance</p>
-  </div>
+  }
+
+  @if (errors().length > 0) {
+    <div class="error-container">
+      @for (error of errors(); track $index) {
+        <pre class="error-message">{{ error | json }}</pre>
+      }
+    </div>
+  }
 </div>
