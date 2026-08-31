@@ -1,0 +1,145 @@
+<main class="login-page">
+  @if (loading) {
+    <div class="loading" role="status"><span></span>Signing in...</div>
+  }
+  <section class="welcome-panel">
+    <strong class="brand">DSSERP</strong>
+    <div>
+      <p class="eyebrow">Canara Bank Integration</p>
+      <h1>Welcome back to your workspace.</h1>
+      <p>Sign in to securely manage banking operations and account activity.</p>
+    </div>
+    <small>© 2026 Dynamic Super Software</small>
+  </section>
+  <section class="form-panel">
+    <div class="login-card">
+      @if (recoveryStep === "login") {
+        <p class="eyebrow">Secure access</p>
+        <h2>Sign in</h2>
+        <p class="subtitle">Enter your credentials to continue.</p>
+        <form [formGroup]="loginForm" (ngSubmit)="login()">
+          <label for="username">Username</label
+          ><input
+            id="username"
+            formControlName="username"
+            autocomplete="username"
+            placeholder="Enter your username"
+          />
+          @if (
+            loginForm.controls.username.touched &&
+            loginForm.controls.username.invalid
+          ) {
+            <small class="field-error">Username is required.</small>
+          }
+          <label for="password">Password</label>
+          <div class="password-field">
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+            /><button type="button" (click)="showPassword = !showPassword">
+              {{ showPassword ? "Hide" : "Show" }}
+            </button>
+          </div>
+          @if (
+            loginForm.controls.password.touched &&
+            loginForm.controls.password.invalid
+          ) {
+            <small class="field-error">Password is required.</small>
+          }
+          @if (errorMessage) {
+            <div class="error" role="alert">{{ errorMessage }}</div>
+          }
+          <button class="primary" type="submit" [disabled]="loading">
+            {{ loading ? "Signing in…" : "Sign in" }}
+          </button>
+          <button class="link" type="button" (click)="forgotPassword()">
+            Forgot password?
+          </button>
+        </form>
+      } @else {
+        <button class="back" type="button" (click)="closePasswordRecovery()">
+          ← Back to sign in
+        </button>
+        <p class="eyebrow">Account recovery</p>
+        @if (recoveryStep === "account") {
+          <h2>Forgot password?</h2>
+          <p class="subtitle">Enter your username, email, or mobile number.</p>
+          <form [formGroup]="accountForm" (ngSubmit)="findRecoveryAccount()">
+            <label for="identifier">Account details</label
+            ><input
+              id="identifier"
+              formControlName="identifier"
+              placeholder="Username, email, or mobile"
+            />
+            @if (recoveryError) {
+              <div class="error">{{ recoveryError }}</div>
+            }
+            <button class="primary" [disabled]="recoveryLoading">
+              {{ recoveryLoading ? "Checking…" : "Submit" }}
+            </button>
+          </form>
+        }
+        @if (recoveryStep === "otp") {
+          <h2>Enter OTP</h2>
+          <p class="subtitle">
+            Enter the 6-digit OTP sent to your registered contact.
+          </p>
+          <div class="contacts">
+            @if (maskedEmail) {
+              <span>Email: {{ maskedEmail }}</span>
+            }
+            @if (maskedMobile) {
+              <span>Mobile: {{ maskedMobile }}</span>
+            }
+          </div>
+          <form [formGroup]="otpForm" (ngSubmit)="verifyRecoveryOtp()">
+            <label for="otp">One-time password</label
+            ><input
+              id="otp"
+              class="otp"
+              inputmode="numeric"
+              maxlength="6"
+              formControlName="otp"
+              placeholder="000000"
+            />
+            @if (recoveryError) {
+              <div class="error">{{ recoveryError }}</div>
+            }
+            <button class="primary" [disabled]="recoveryLoading">
+              {{ recoveryLoading ? "Verifying…" : "Verify OTP" }}
+            </button>
+          </form>
+        }
+        @if (recoveryStep === "password") {
+          <h2>Create new password</h2>
+          <p class="subtitle">
+            Enter your temporary password and choose a new password.
+          </p>
+          <form
+            [formGroup]="resetPasswordForm"
+            (ngSubmit)="resetForgottenPassword()"
+          >
+            <label>Temporary password</label
+            ><input type="password" formControlName="temporaryPassword" /><label
+              >New password</label
+            ><input
+              type="password"
+              formControlName="newPassword"
+              placeholder="Minimum 8 characters"
+            /><label>Confirm password</label
+            ><input type="password" formControlName="confirmPassword" />
+            @if (recoveryError) {
+              <div class="error">{{ recoveryError }}</div>
+            }
+            <button class="primary" [disabled]="recoveryLoading">
+              {{ recoveryLoading ? "Updating…" : "Update password" }}
+            </button>
+          </form>
+        }
+      }
+    </div>
+  </section>
+</main>

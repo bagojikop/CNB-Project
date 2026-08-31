@@ -1,7 +1,6 @@
-export interface userMgt {
+export interface users {
   id?: string;
   username: string;
-  password: string;
   email?: string;
   role: string;
   branch_code: string;

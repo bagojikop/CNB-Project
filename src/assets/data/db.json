@@ -1,14 +1,14 @@
 {
   "users": [
     {
+      "id": "9BWTRR2wsU0",
       "username": "Abcd",
       "password": "ABCD",
       "mobileNo": "7083234537",
       "email": "ANILDEVAKI1@GMAIL.COM",
       "branch_code": "101",
       "role": 1,
-      "roleName": "Admin",
-      "id": "9BWTRR2wsU0"
+      "roleName": "Admin"
     }
   ],
   "bankAccount": [

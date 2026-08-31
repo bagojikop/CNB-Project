@@ -15,7 +15,7 @@ export class MyProvider {
 
   companyInfo?: CompanyInfo = <CompanyInfo>{
     company: {
-      branch_id: 102
+      branch_id: 106
     }
   };
 

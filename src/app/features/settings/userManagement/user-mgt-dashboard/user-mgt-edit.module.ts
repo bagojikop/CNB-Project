@@ -1,11 +1,10 @@
-import { userMgt } from '@shared-interfaces/settings/user';
+import { users } from '@shared-interfaces/settings/user';
 
 export type userMgtFormValue = Pick<
-  userMgt,
+  users,
   | 'id'
   | 'username'
   | 'email'
-  | 'password'
   | 'role'
   | 'roleName'
   | 'mobileNo'

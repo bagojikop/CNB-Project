@@ -9,6 +9,20 @@ import { DialogsService } from '@shared-services/messageBox';
 import { MyProvider } from '@shared-services/provider';
 import { DataRefreshService } from '@shared-services/data-refresh.service';
 import { Http } from '@shared-services/httpService';
+import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
+
+interface Firm {
+  firm_code: number;
+  firm_name: string;
+}
+
+interface Branch {
+  branch_code: string;
+  branch_name: string;
+}
+
+type BankAccountDashboardRow = bankAccount & { branchName: string };
 
 @Component({
   selector: 'app-bank-accout-dashboard',
@@ -20,6 +34,7 @@ export class BankAccountDashboardComponent implements AfterViewInit {
   private readonly router = inject(Router);
   dashboardTitle: string = 'Account Details';
   private http = inject(Http);
+  private httpClient = inject(HttpClient);
   private readonly dialogSrc = inject(DialogsService);
   private readonly refreshService = inject(DataRefreshService);
   readonly provider = inject(MyProvider);
@@ -29,15 +44,22 @@ export class BankAccountDashboardComponent implements AfterViewInit {
   readonly isFilterVisible = false;
   varifyOtp: boolean = false;
   Credtials = <bankAccount>{};
-  jsonData: bankAccount[] = [];
+  jsonData: BankAccountDashboardRow[] = [];
   actions: string = '';
   idx: number = -1;
   columns: any[] = [
+
     {
-      key: 'accountNo',
-      label: 'Account No.',
+      key: 'branchName',
+      label: 'Branch',
       type: 'string',
-      _style: { width: '10%' },
+      _style: { width: '15%' },
+    },
+    {
+      key: 'firmName',
+      label: 'Firm',
+      type: 'string',
+      _style: { width: '20%' },
     },
     {
       key: 'customerId',
@@ -47,17 +69,12 @@ export class BankAccountDashboardComponent implements AfterViewInit {
     },
 
     {
-      key: 'firmId',
-      label: 'Firm ID',
+      key: 'accountNo',
+      label: 'Account No.',
       type: 'string',
-      _style: { width: '8%' },
+      _style: { width: '30%' },
     },
-    {
-      key: 'branchId',
-      label: 'Branch ID',
-      type: 'string',
-      _style: { width: '8%' },
-    },
+
     {
       key: 'branchCode',
       label: 'Branch Code',
@@ -65,11 +82,15 @@ export class BankAccountDashboardComponent implements AfterViewInit {
       _style: { width: '8%' },
     },
 
+
     {
-      key: 'accountName',
-      label: 'Account Name',
-      type: 'string',
-      _style: { width: '39%' },
+      key: 'credUser',
+      label: 'Created User',
+      type: 'date',
+      dateFormat: 'dd/MM/yyyy',
+      frozen: true,
+      _style: { width: '10%' },
+      sort: 'desc',
     },
     {
       key: 'credDate',
@@ -80,15 +101,7 @@ export class BankAccountDashboardComponent implements AfterViewInit {
       _style: { width: '10%' },
       sort: 'desc',
     },
-    {
-      key: 'credUser',
-      label: 'Created User',
-      type: 'date',
-      dateFormat: 'dd/MM/yyyy',
-      frozen: true,
-      _style: { width: '10%' },
-      sort: 'desc',
-    },
+
   ];
 
   newCred() {
@@ -105,9 +118,26 @@ export class BankAccountDashboardComponent implements AfterViewInit {
   }
 
   private loadData(): void {
-    this.http.get("bankAccount/all").subscribe({
-      next: (res) => {
-        this.jsonData = res as bankAccount[];
+    forkJoin({
+      accounts: this.http.get('bankAccount/all'),
+      firms: this.httpClient.get<Firm[]>('data/firms.json'),
+      branches: this.httpClient.get<Branch[]>('data/branches.json'),
+    }).subscribe({
+      next: ({ accounts, firms, branches }) => {
+        const rows = (accounts.data || accounts) as bankAccount[];
+
+        this.jsonData = rows.map((account) => ({
+          ...account,
+          firmName:
+            firms.find(
+              (firm) => String(firm.firm_code) === String(account.firmId),
+            )?.firm_name ?? account.firmName ?? '',
+          branchName:
+            branches.find(
+              (branch) =>
+                String(branch.branch_code) === String(account.branchId),
+            )?.branch_name ?? '',
+        }));
       },
       error: (err) => {
         this.dialogSrc.swal({

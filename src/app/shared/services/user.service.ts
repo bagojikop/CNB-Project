@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { userMgt } from '@shared-interfaces/settings/user';
+import { users } from '@shared-interfaces/settings/user';
 import { bankAccount } from '@shared-interfaces/settings/bankAccount';
 import { CreateVANRequest } from '@shared-interfaces/settings/van-creation';
 import { DataRefreshService } from './data-refresh.service';
@@ -14,12 +14,12 @@ export class UserService {
   private refreshService = inject(DataRefreshService);
   private api = 'http://localhost:3000/users';
 
-  getAll(): Observable<userMgt[]> {
-    return this.http.get<userMgt[]>(this.api);
+  getAll(): Observable<users[]> {
+    return this.http.get<users[]>(this.api);
   }
 
-  add(user: userMgt): Observable<userMgt> {
-    return this.http.post<userMgt>(this.api, user).pipe(
+  add(user: users): Observable<users> {
+    return this.http.post<users>(this.api, user).pipe(
       map((response) => {
         this.refreshService.trigger();
         return response;
@@ -27,8 +27,8 @@ export class UserService {
     );
   }
 
-  update(user: userMgt): Observable<userMgt> {
-    return this.http.put<userMgt>(`${this.api}/${user.id}`, user).pipe(
+  update(user: users): Observable<users> {
+    return this.http.put<users>(`${this.api}/${user.id}`, user).pipe(
       map((response) => {
         this.refreshService.trigger();
         return response;
@@ -36,9 +36,9 @@ export class UserService {
     );
   }
 
-  getByAuth(username: string, password: string): Observable<userMgt> {
+  getByAuth(username: string, password: string): Observable<users> {
     return this.http
-      .get<userMgt[]>(this.api, {
+      .get<users[]>(this.api, {
         params: {
           username: username,
           password: password,

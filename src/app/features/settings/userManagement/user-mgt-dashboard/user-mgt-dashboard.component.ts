@@ -12,16 +12,23 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import {
   CaseStyle,
   DSS_FORM_CONTROLS,
 } from '@shared-directives/dss-form-controls';
 import { createUserManagementForm } from './user-mgt-edit.factory';
 
-import { userMgt } from '@shared-interfaces/settings/user';
+import { users } from '@shared-interfaces/settings/user';
 import { DialogsService } from '@shared-services/messageBox';
 import { UserService } from '@shared-services/user.service';
+
+interface Branch {
+  branch_code: string;
+  branch_name: string;
+}
 
 @Component({
   selector: 'app-user-mgt-dashboard',
@@ -33,6 +40,7 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
   readonly caseStyle = CaseStyle;
   dashboardTitle: string = 'User Management';
   private userSrc = inject(UserService);
+  private http = inject(HttpClient);
   private readonly router = inject(Router);
   private fb = inject(FormBuilder);
   private dialog = inject(DialogsService);
@@ -42,7 +50,7 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
   readonly handleEdit = (item?: any) => this.onGridEdit(item);
   readonly handleDelete = (item?: any) => this.onGridDelete(item);
 
-  jsonData = signal<userMgt[]>([]);
+  jsonData = signal<users[]>([]);
 
   columns = [
     {
@@ -79,47 +87,35 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     },
     {
       cd: 2,
-      nm: 'User',
+      nm: 'Checker',
     },
-  ];
-
-  branches = [
-    { branch_code: 'ALL', branch_name: '[ALL]' },
-    { branch_code: '121', branch_name: 'ANDHRA PRADESH' },
-    { branch_code: '118', branch_name: 'DHARASHIV' },
-    { branch_code: '111', branch_name: 'DHARWAD' },
-    { branch_code: '120', branch_name: 'HYDERABAD' },
-    { branch_code: '105', branch_name: 'KARAD' },
-    { branch_code: '109', branch_name: 'KAVATHEMAHANKAL' },
-    { branch_code: '103', branch_name: 'KOLHAPUR' },
     {
-      branch_code: '119',
-      branch_name: 'KRUSHNA GODAVARI KBBUVVSS LTD KANADWADI (HO)',
+      cd: 3,
+      nm: 'Maker',
     },
-    { branch_code: '125', branch_name: 'KUDAL' },
-    { branch_code: '107', branch_name: 'NANDED' },
-    { branch_code: '104', branch_name: 'PANDHARPUR' },
-    { branch_code: '102', branch_name: 'RAIBAG' },
-    { branch_code: '101', branch_name: 'SANGLI' },
-    { branch_code: '122', branch_name: 'SINDHANUR' },
-    { branch_code: '106', branch_name: 'VIJAYPUR' },
   ];
 
-  ngOnInit(): void {}
+  branches: Branch[] = [];
+
+  ngOnInit(): void { }
 
   ngAfterViewInit(): void {
-    this.userSrc.getAll().subscribe({
-      next: (res: any) => {
-        if (res) {
-          for (const element of res) {
-            const matchedBranch = this.branches?.filter(
-              (f) => f.branch_code == element?.branch_code,
-            )[0];
+    forkJoin({
+      branches: this.http.get<Branch[]>('data/branches.json'),
+      users: this.userSrc.getAll(),
+    }).subscribe({
+      next: ({ branches, users }) => {
+        this.branches = branches;
+
+        if (users) {
+          for (const element of users) {
+            const matchedBranch = this.branches.find(
+              (branch) => branch.branch_code === element.branch_code,
+            );
             element.branch_name = matchedBranch?.branch_name || '';
           }
 
-          console.log(res);
-          this.jsonData.set(res);
+          this.jsonData.set(users);
         }
       },
       error: (err) => {
@@ -137,22 +133,14 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
       ?.setValue(event.cd === 1 ? 'Admin' : 'User');
   }
 
-  createUserMgtForm(user?: userMgt) {
+  createUserMgtForm(user?: users) {
     return this.fb.group({
       id: [user?.id],
-
       username: [user?.username, Validators.required],
-
-      password: [user?.password],
-
       email: [user?.email, Validators.required],
-
       mobileNo: [user?.mobileNo],
-
       role: [user?.role],
-
       roleName: [user?.roleName],
-
       branch_code: [user?.branch_code || 'ALL'],
     });
   }
@@ -176,10 +164,10 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     }
 
     const formValue = this.userInputs.getRawValue();
-    const user: userMgt = {
+    const user: users = {
       id: formValue.id ?? undefined,
       username: formValue.username,
-      password: formValue.password,
+
       mobileNo: formValue.mobileNo,
       email: formValue.email ?? undefined,
       branch_code: formValue.branch_code,
@@ -188,7 +176,7 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     };
 
     if (user.id != null) {
-      const users = this.jsonData() as userMgt[];
+      const users = this.jsonData() as users[];
       var index = users.findIndex((user) => user?.id === user.id);
     } else {
       var index = -1;
@@ -255,7 +243,7 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     this.visible = true;
   }
 
-  onGridDelete(item: userMgt) {
+  onGridDelete(item: users) {
     this.dialog
       .swal({
         dialog: 'confirm',

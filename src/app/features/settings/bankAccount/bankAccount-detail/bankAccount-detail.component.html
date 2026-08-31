@@ -21,20 +21,25 @@
 
       <c-row class="mb-3 mx-1">
         <c-col sm="3">
-          <dss-input-text
+          <dss-ng-select
             label="FIRM ID"
             icon="cilBuilding"
-            sizing="sm"
             formControlName="firmId"
-          ></dss-input-text>
+            [items]="firms"
+            bindLabel="firm_name"
+            bindValue="firm_code"
+            (change)="onFirmChange($event)"
+          ></dss-ng-select>
         </c-col>
         <c-col sm="3">
-          <dss-input-text
+          <dss-ng-select
             label="BRANCH ID"
             icon="cilFork"
-            sizing="sm"
             formControlName="branchId"
-          ></dss-input-text>
+            [items]="branches"
+            bindLabel="branch_name"
+            bindValue="branch_code"
+          ></dss-ng-select>
         </c-col>
         <c-col sm="6">
           <dss-input-text

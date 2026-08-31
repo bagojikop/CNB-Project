@@ -1,33 +1,30 @@
 import { FormBuilder, Validators } from '@angular/forms';
-import { userMgt } from '@shared-interfaces/settings/user';
+import { users } from '@shared-interfaces/settings/user';
 
 export function createUserManagementForm(fb: FormBuilder) {
   return fb.group({
-    id: fb.control<userMgt['id'] | null>(null),
+    id: fb.control<users['id'] | null>(null),
 
-    username: fb.nonNullable.control<userMgt['username']>('', [
+    username: fb.nonNullable.control<users['username']>('', [
       Validators.required,
     ]),
 
-    password: fb.nonNullable.control<userMgt['password']>('', [
-      Validators.required,
-    ]),
 
-    mobileNo: fb.nonNullable.control<userMgt['mobileNo']>('', [
+    mobileNo: fb.nonNullable.control<users['mobileNo']>('', [
       Validators.required,
       Validators.pattern(/^[0-9]+$/),
     ]),
 
-    email: fb.control<userMgt['email']>('', [Validators.email]),
+    email: fb.control<users['email']>('', [Validators.email]),
 
-    branch_code: fb.nonNullable.control<userMgt['branch_code']>('', [
+    branch_code: fb.nonNullable.control<users['branch_code']>('', [
       Validators.required,
     ]),
     branch_name: fb.control(''),
 
-    role: fb.control<userMgt['role'] | null>(null, [Validators.required]),
+    role: fb.control<users['role'] | null>(null, [Validators.required]),
 
-    roleName: fb.control<userMgt['roleName'] | null>(null, [
+    roleName: fb.control<users['roleName'] | null>(null, [
       Validators.required,
     ]),
   });
