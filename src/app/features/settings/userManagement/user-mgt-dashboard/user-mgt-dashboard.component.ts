@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   inject,
   OnInit,
@@ -14,7 +15,7 @@ import {
 } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { firstValueFrom, forkJoin, startWith } from 'rxjs';
 import {
   CaseStyle,
   DSS_FORM_CONTROLS,
@@ -24,6 +25,8 @@ import { createUserManagementForm } from './user-mgt-edit.factory';
 import { users } from '@shared-interfaces/settings/user';
 import { DialogsService } from '@shared-services/messageBox';
 import { UserService } from '@shared-services/user.service';
+import { apiResponse } from '@shared-interfaces/commans/apiResponse';
+import { Http } from '@shared-services/httpService';
 
 interface Branch {
   branch_code: string;
@@ -39,18 +42,19 @@ interface Branch {
 export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
   readonly caseStyle = CaseStyle;
   dashboardTitle: string = 'User Management';
-  private userSrc = inject(UserService);
-  private http = inject(HttpClient);
+
+  private http = inject(Http);
   private readonly router = inject(Router);
   private fb = inject(FormBuilder);
   private dialog = inject(DialogsService);
+  private readonly cdr = inject(ChangeDetectorRef);
   readonly userInputs = createUserManagementForm(this.fb);
   visible: boolean = false;
   readonly handleAdd = () => this.addNew();
   readonly handleEdit = (item?: any) => this.onGridEdit(item);
   readonly handleDelete = (item?: any) => this.onGridDelete(item);
 
-  jsonData = signal<users[]>([]);
+  users = signal<users[]>([]);
 
   columns = [
     {
@@ -65,6 +69,12 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
       label: 'Email',
       type: 'string',
       _style: { width: '40%' },
+    },
+    {
+      key: 'mobileNo',
+      label: 'Mobile No.',
+      type: 'string',
+      _style: { width: '20%' },
     },
     {
       key: 'branch_name',
@@ -97,26 +107,51 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
 
   branches: Branch[] = [];
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    const roleControl = this.userInputs.controls.role;
+    const branchControl = this.userInputs.controls.branch_code;
+
+    roleControl.valueChanges.pipe(startWith(roleControl.value)).subscribe((role) => {
+      if (Number(role) === 1) {
+        branchControl.removeValidators(Validators.required);
+      } else {
+        branchControl.addValidators(Validators.required);
+      }
+      branchControl.updateValueAndValidity({ emitEvent: false });
+    });
+  }
 
   ngAfterViewInit(): void {
     forkJoin({
-      branches: this.http.get<Branch[]>('data/branches.json'),
-      users: this.userSrc.getAll(),
+      branches: this.http.readJson<Branch[]>('assets/data/branches.json'),
+      userResponse: this.http.get<apiResponse>('user/List'),
     }).subscribe({
-      next: ({ branches, users }) => {
+
+      next: ({ branches, userResponse }) => {
         this.branches = branches;
 
-        if (users) {
-          for (const element of users) {
+        if (userResponse.status_cd === 1) {
+          const userRows = Array.isArray(userResponse.data)
+            ? userResponse.data.map((user) => this.normalizeUser(user))
+            : [];
+
+          for (const element of userRows) {
             const matchedBranch = this.branches.find(
-              (branch) => branch.branch_code === element.branch_code,
+              (branch) => String(branch.branch_code) === String(element.branch_code),
             );
             element.branch_name = matchedBranch?.branch_name || '';
+            element.roleName = this.userRole.find((r) => r.cd === parseInt(element.role))?.nm || '';
           }
 
-          this.jsonData.set(users);
+          this.users.set(userRows);
+          return;
         }
+
+        this.users.set([]);
+        void this.dialog.swal({
+          dialog: 'error',
+          message: userResponse.errors?.message || 'Unable to load users.',
+        });
       },
       error: (err) => {
         this.dialog.swal({
@@ -127,11 +162,7 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     });
   }
 
-  change(event: any) {
-    this.userInputs
-      .get('roleName')
-      ?.setValue(event.cd === 1 ? 'Admin' : 'User');
-  }
+
 
   createUserMgtForm(user?: users) {
     return this.fb.group({
@@ -140,7 +171,7 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
       email: [user?.email, Validators.required],
       mobileNo: [user?.mobileNo],
       role: [user?.role],
-      roleName: [user?.roleName],
+
       branch_code: [user?.branch_code || 'ALL'],
     });
   }
@@ -167,80 +198,56 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
     const user: users = {
       id: formValue.id ?? undefined,
       username: formValue.username,
-
       mobileNo: formValue.mobileNo,
       email: formValue.email ?? undefined,
       branch_code: formValue.branch_code,
       role: formValue.role || '',
-      roleName: formValue.roleName || '',
+
     };
 
-    if (user.id != null) {
-      const users = this.jsonData() as users[];
-      var index = users.findIndex((user) => user?.id === user.id);
-    } else {
-      var index = -1;
+    const res = await firstValueFrom(
+      user.id ? this.http.post<apiResponse>(`user/update/${user.id}`, user)
+        : this.http.post<apiResponse>('user/create', user)
+    )
+
+    if (res.status_cd === 1) {
+      this.userInputs.patchValue(this.normalizeUser(res.data));
+      this.dialog.swal({
+        dialog: 'success',
+        message: 'Record Update Successfully',
+      }).then(() => {
+        this.visible = false;
+        this.userInputs.reset();
+        this.ngAfterViewInit();
+      })
+      //onEdit
     }
-
-    //onEdit
-    if (index !== -1) {
-      debugger;
-      this.userSrc.update(user).subscribe({
-        next: (res) => {
-          this.jsonData.update((data) => {
-            const updated = [...data];
-            updated[index] = {
-              ...updated[index],
-              ...user,
-            };
-            return updated;
-          });
-
-          this.dialog.swal({
-            dialog: 'success',
-            message: 'Record Update Successfully',
-          });
-        },
-        error: (err) => {
-          this.dialog.swal({
-            dialog: 'error',
-            message: err.message,
-          });
-        },
-      });
-    } else {
-      // New record
-
-      this.userSrc.add(user).subscribe({
-        next: (res) => {
-          this.jsonData.update((data) => [...data, { ...user }]);
-          this.dialog.swal({
-            dialog: 'success',
-            message: 'Record Save Successfully',
-          });
-        },
-        error: (err) => {
-          this.dialog.swal({
-            dialog: 'error',
-            message: err.message,
-          });
-        },
+    else {
+      this.dialog.swal({
+        dialog: 'error',
+        message: res.errors.message,
       });
     }
-
-    this.visible = false;
   }
 
   consoleTest() {
     console.log('Button Clicked');
   }
 
-  onGridEdit(item: any) {
-    this.userInputs.patchValue({
-      ...item,
-      id: item.id,
-    });
-    this.visible = true;
+  async onGridEdit(item: any) {
+    const res = await firstValueFrom(this.http.get<apiResponse>(`user/single/${item.id}`));
+    if (res.status_cd === 1) {
+      this.visible = true;
+      this.userInputs.reset(this.normalizeUser(res.data));
+      this.cdr.detectChanges();
+    }
+  }
+
+  private normalizeUser(value: any): users {
+    return {
+      ...value,
+      mobileNo: String(value?.mobileNo ?? value?.mobileno ?? value?.mobile_no ?? ''),
+    } as users;
   }
 
   onGridDelete(item: users) {
@@ -249,26 +256,38 @@ export class UserMgtDashboardComponent implements OnInit, AfterViewInit {
         dialog: 'confirm',
         message: 'Do you want to Delete this record',
       })
-      .then((res) => {
+      .then(async (res) => {
         if (res) {
-          this.userSrc.delete(item.id).subscribe({
-            next: (res) => {
-              const index = this.jsonData().findIndex(
+
+          const res = await firstValueFrom(this.http.delete<apiResponse>(`user/delete/${item.id}`));
+
+          if (res.status_cd === 1) {
+            this.dialog.swal({
+              dialog: 'success',
+              message: 'Record Deleted Successfully',
+            }).then(() => {
+              const index = this.users().findIndex(
                 (control) => control.id === item.id,
               );
 
               if (index !== -1) {
-                this.jsonData().splice(index, 1);
+                this.users.update((current) => current.filter((_, i) => i !== index));
               }
-            },
-            error: (err) => {
-              this.dialog.swal({
-                dialog: 'error',
-                message: err.message,
-              });
-            },
-          });
+            });
+          }
+
+          else {
+
+
+            this.dialog.swal({
+              dialog: 'error',
+              message: res.errors.message || 'Unable to delete the record. Please try again.',
+            }).then(() => {
+              this.ngAfterViewInit();
+            });
+          }
         }
+
       });
   }
 }

@@ -1,13 +1,41 @@
-import { Component, inject } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DSS_FORM_CONTROLS } from '@shared-directives/dss-form-controls';
-import data from '@assets/data/firms.json';
+import { apiResponse } from '@shared-interfaces/commans/apiResponse';
+import { Http } from '@shared-services/httpService';
+import { MyProvider } from '@shared-services/provider';
+import { finalize } from 'rxjs';
+
+interface FirmAccount {
+  id: number | string;
+  firmId: number;
+  firmName: string;
+  accountNos: string[];
+}
+
+interface StatementTransaction {
+  transactionDate: string;
+  description: string;
+  valueDate: string;
+  creditDebitFlag: string;
+  transactionAmount: string;
+  runningBalance: string;
+  txnRefNumber: string;
+  userRefNumber: string;
+}
+
+interface AccountStatement {
+  accountNo: string;
+  customerName: string;
+  fromDate: string;
+  endDate: string;
+  openingBalance: number;
+  closingBalance: number;
+  transactions: StatementTransaction[];
+}
+
 @Component({
   selector: 'app-account-statement',
   imports: [CommonModule, ReactiveFormsModule, DSS_FORM_CONTROLS],
@@ -15,221 +43,148 @@ import data from '@assets/data/firms.json';
   styleUrl: './account-statement.component.scss',
 })
 export class AccountStatementComponent {
-  private fb = inject(FormBuilder);
-  firms = data;
+  private readonly fb = inject(FormBuilder);
+  private readonly http = inject(Http);
+  private readonly provider = inject(MyProvider);
 
-  allData: any[] = [
-    {
-      Response: {
-        status: {
-          contextID: 'e8230231-6511-4cf7-bf65-d3a0b48521fe-00000f8b,0',
-          message: {
-            code: '0',
-            type: 'INFO',
-          },
-          result: 'SUCCESSFUL',
-        },
-        body: {
-          statementResponse: {
-            branchCode: '402',
-            currencyCode: 'INR',
-            branchName: 'POLLACHI',
-          },
-          encryptData: {
-            acctNumber: '0402256027830',
-            customerShortName: 'CUSTOMER INDIA PVT LTD',
-            openingBalance: '2373102848.52',
-            closingBalance: '2369901637.52',
-            transactions: [
-              {
-                transactionDate: '20240904113042',
-                description:
-                  'IB NEFT Dr P248240238636542 AWADESH SINGH  BARB0DURGAP 00440100018759 nrtv',
-                valueDate: '20240126000000',
-                creditDebitFlag: 'D',
-                transactionAmount: '33285.00',
-                runningBalance: '2373069563.52',
-                txnRefNumber: '100050000000262024007',
-                userRefNumber: 'P248240238636542',
-              },
-              {
-                transactionDate: '20240904113042',
-                description: 'SC NEFT OTHER THAN SB IMB',
-                valueDate: '20240131000000',
-                creditDebitFlag: 'D',
-                transactionAmount: '6.00',
-                runningBalance: '2373069557.52',
-                txnRefNumber: '100050000000262024007',
-                userRefNumber: 'P248240238636542',
-              },
-              {
-                transactionDate: '20240904171953',
-                description:
-                  'IB NEFT Dr P248240238639759 ZETWERK MANUFACTURING BUSINESSES PVT LTD  HDFC0000076 50200039900190 Fund Transfer from 1228',
-                valueDate: '20240126000000',
-                creditDebitFlag: 'D',
-                transactionAmount: '10.00',
-                runningBalance: '2373069547.52',
-                txnRefNumber: '24090400001031',
-                userRefNumber: 'P248240238639759',
-              },
-              {
-                transactionDate: '20240904171953',
-                description: 'SC NEFT OTHER THAN SB IMB',
-                valueDate: '20240131000000',
-                creditDebitFlag: 'D',
-                transactionAmount: '3.00',
-                runningBalance: '2373069544.52',
-                txnRefNumber: '24090400001031',
-                userRefNumber: 'P248240238639759',
-              },
-            ],
-          },
-        },
-      },
-      showTransactions: false,
-    },
-  ];
+  readonly isLoading = signal(false);
+  readonly errorMessage = signal('');
+  firms: FirmAccount[] = [];
+  selectedFirm: FirmAccount | null = null;
+  jsonData: AccountStatement[] = [];
 
-  jsonData: any[] = [];
-
-  ngOnInit() {
-    this.jsonData = this.allData.map((item) => {
-      const encryptData = item.Response.body.encryptData;
-      return {
-        customerName: encryptData.customerShortName,
-        openingBalance: parseFloat(encryptData.openingBalance),
-        closingBalance: parseFloat(encryptData.closingBalance),
-        fromDate:
-          encryptData.transactions.length > 0
-            ? encryptData.transactions[0].transactionDate.substring(0, 8)
-            : '',
-        endDate:
-          encryptData.transactions.length > 0
-            ? encryptData.transactions[
-                encryptData.transactions.length - 1
-              ].transactionDate.substring(0, 8)
-            : '',
-        transactions: encryptData.transactions.map((txn: any) => ({
-          date: txn.transactionDate,
-          description: txn.description,
-          debit:
-            txn.creditDebitFlag === 'D'
-              ? parseFloat(txn.transactionAmount)
-              : '',
-          credit:
-            txn.creditDebitFlag === 'C'
-              ? parseFloat(txn.transactionAmount)
-              : '',
-          balance: parseFloat(txn.runningBalance),
-        })),
-        showTransactions: false,
-      };
-    });
-  }
-
-  // Form group for filters
-  filterForm: FormGroup = this.fb.group({
-    accountNo: [''],
-    fromDate: [''],
-    endDate: [''],
+  readonly filterForm = this.fb.group({
+    firm_id: ['', Validators.required],
+    accountNo: ['', Validators.required],
+    fromDate: ['', Validators.required],
+    endDate: ['', Validators.required],
   });
 
-  // Modal properties
-  selectedAccount: any = null;
-  showModal: boolean = false;
-
-  openModal(account: any) {
-    this.selectedAccount = account;
-    this.showModal = true;
+  constructor() {
+    this.loadFirmAccounts();
   }
 
-  closeModal() {
-    this.showModal = false;
-    this.selectedAccount = null;
+  private loadFirmAccounts(): void {
+    this.http
+      .get<apiResponse>('bankAccount/all', {
+        branch_id: this.provider.companyInfo?.company.branch_id,
+      })
+      .subscribe({
+        next: (res: any) => {
+          const accounts = res?.data ?? res ?? [];
+          this.firms = accounts.map(({ accountNo, ...firm }: any) => ({
+            ...firm,
+            accountNos: String(accountNo ?? '')
+              .split(',')
+              .map((value) => value.trim())
+              .filter(Boolean),
+          }));
+        },
+        error: () => this.errorMessage.set('Unable to load firm accounts.'),
+      });
   }
 
-  getTotalDebit(transactions: any[]): number {
-    return transactions.reduce(
-      (sum, txn) => sum + (typeof txn.debit === 'number' ? txn.debit : 0),
-      0,
-    );
+  onFirmSelect(): void {
+    const firmId = Number(this.filterForm.controls.firm_id.value);
+    this.selectedFirm =
+      this.firms.find((firm) => Number(firm.firmId) === firmId) ?? null;
+    this.filterForm.controls.accountNo.setValue('');
   }
 
-  getTotalCredit(transactions: any[]): number {
-    return transactions.reduce(
-      (sum, txn) => sum + (typeof txn.credit === 'number' ? txn.credit : 0),
-      0,
-    );
-  }
-
-  getTotalBalance(transactions: any[]): number {
-    if (transactions.length === 0) return 0;
-    const lastTxn = transactions[transactions.length - 1];
-    return typeof lastTxn.balance === 'number' ? lastTxn.balance : 0;
-  }
-
-  showResult() {
-    // Get raw values from form
-    const accountNo = this.filterForm.get('accountNo')?.value || '';
-    const fromDate = this.filterForm.get('fromDate')?.value || '';
-    const endDate = this.filterForm.get('endDate')?.value || '';
-
-    console.log('=== Filters ===');
-    console.log('Account No:', accountNo);
-    console.log('From Date:', fromDate);
-    console.log('End Date:', endDate);
-    console.log('All Data:', this.allData);
-
-    // If no filters, show all data
-    if (!accountNo && !fromDate && !endDate) {
-      this.jsonData = [...this.allData];
-      console.log('No filters - showing all data');
+  showResult(): void {
+    if (this.filterForm.invalid || !this.selectedFirm) {
+      this.filterForm.markAllAsTouched();
       return;
     }
 
-    // Apply filters
-    this.jsonData = this.allData.filter((item) => {
-      let match = true;
+    const { accountNo, fromDate, endDate } = this.filterForm.getRawValue();
+    if (new Date(fromDate!) > new Date(endDate!)) {
+      this.errorMessage.set('From Date cannot be after End Date.');
+      return;
+    }
 
-      // Filter by Account No (customer name)
-      if (accountNo) {
-        match =
-          match &&
-          item.customerName
-            .toLowerCase()
-            .includes(accountNo.toLowerCase().trim());
-      }
+    const customer = { id: this.selectedFirm.id, accountNo: accountNo! };
+    this.errorMessage.set('');
+    this.jsonData = [];
+    this.isLoading.set(true);
 
-      // Filter by From Date (only compare if fromDate is provided)
-      if (fromDate) {
-        // Parse dates for proper comparison
-        const itemDate = new Date(item.fromDate);
-        const filterDate = new Date(fromDate);
-        // Reset time to compare only dates
-        itemDate.setHours(0, 0, 0, 0);
-        filterDate.setHours(0, 0, 0, 0);
-        // Check if item.fromDate is on or after the filter date
-        match = match && itemDate >= filterDate;
-      }
+    this.http
+      .post<any>('inquiry/account-statement', customer, {
+        sdt: fromDate!,
+        edt: endDate!,
+      })
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (res) => {
+          const response = res?.response ?? res?.Response ?? res;
+          const status = response?.metadata?.status ?? response?.status;
+          if (status?.result && status.result !== 'SUCCESSFUL') {
+            this.errorMessage.set(
+              status?.message?.description ?? 'Account statement inquiry failed.',
+            );
+            return;
+          }
 
-      // Filter by End Date (only compare if endDate is provided)
-      if (endDate) {
-        // Parse dates for proper comparison
-        const itemDate = new Date(item.endDate);
-        const filterDate = new Date(endDate);
-        // Reset time to compare only dates
-        itemDate.setHours(0, 0, 0, 0);
-        filterDate.setHours(0, 0, 0, 0);
-        // Check if item.endDate is on or before the filter date
-        match = match && itemDate <= filterDate;
-      }
+          const encrypted = response?.body?.encryptData;
+          if (!encrypted) {
+            this.errorMessage.set('No statement data was returned.');
+            return;
+          }
+          this.jsonData = [this.mapStatement(encrypted, fromDate!, endDate!)];
+        },
+        error: (error: HttpErrorResponse) => {
+          this.errorMessage.set(
+            error.status === 0
+              ? 'Server is unavailable.'
+              : error.status === 504
+                ? 'Account statement inquiry timed out.'
+                : `Request failed (${error.status}).`,
+          );
+        },
+      });
+  }
 
-      console.log('Item:', item.customerName, 'Match:', match);
-      return match;
-    });
+  private mapStatement(data: any, fromDate: string, endDate: string): AccountStatement {
+    return {
+      accountNo: data.acctNumber ?? this.filterForm.controls.accountNo.value ?? '',
+      customerName: data.customerShortName ?? data.customerName ?? '',
+      openingBalance: Number(data.openingBalance ?? 0),
+      closingBalance: Number(data.closingBalance ?? 0),
+      fromDate,
+      endDate,
+      transactions: (data.transactions ?? []).map((txn: any) => ({
+        transactionDate: txn.transactionDate,
+        description: txn.description,
+        valueDate: txn.valueDate,
+        creditDebitFlag: txn.creditDebitFlag,
+        transactionAmount: txn.transactionAmount,
+        runningBalance: txn.runningBalance,
+        txnRefNumber: txn.txnRefNumber,
+        userRefNumber: txn.userRefNumber,
+      })),
+    };
+  }
 
-    console.log('Filtered Data Count:', this.jsonData.length);
-    console.log('Filtered Data:', this.jsonData);
+  formatDate(value: string): string {
+    if (!value || value.length < 8) return '';
+
+    const year = value.substring(0, 4);
+    const month = value.substring(4, 6);
+    const day = value.substring(6, 8);
+
+    return `${day}/${month}/${year}`;
+  }
+
+  formatDateTime(value: string): string {
+    if (!value || value.length < 14) return '';
+
+    const year = value.substring(0, 4);
+    const month = value.substring(4, 6);
+    const day = value.substring(6, 8);
+    const hour = value.substring(8, 10);
+    const minute = value.substring(10, 12);
+    const second = value.substring(12, 14);
+
+    return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
   }
 }

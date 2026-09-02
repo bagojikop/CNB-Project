@@ -51,6 +51,9 @@ export function initializeAuth(): Promise<void> | void {
   if (environment.autoDevLogin) {
     return firstValueFrom(auth.loginForDevelopment()).then(() => undefined);
   }
+  if (!environment.restoreSessionOnStartup) {
+    return firstValueFrom(auth.startFreshSession());
+  }
   return firstValueFrom(auth.restoreSession());
 }
 

@@ -11,6 +11,7 @@ import { DataRefreshService } from '@shared-services/data-refresh.service';
 import { Http } from '@shared-services/httpService';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
+import { apiResponse } from '@shared-interfaces/commans/apiResponse';
 
 interface Firm {
   firm_code: number;
@@ -119,9 +120,9 @@ export class BankAccountDashboardComponent implements AfterViewInit {
 
   private loadData(): void {
     forkJoin({
-      accounts: this.http.get('bankAccount/all'),
-      firms: this.httpClient.get<Firm[]>('data/firms.json'),
-      branches: this.httpClient.get<Branch[]>('data/branches.json'),
+      accounts: this.http.get<apiResponse>('bankAccount/all'),
+      firms: this.httpClient.get<Firm[]>('assets/data/firms.json'),
+      branches: this.httpClient.get<Branch[]>('assets/data/branches.json'),
     }).subscribe({
       next: ({ accounts, firms, branches }) => {
         const rows = (accounts.data || accounts) as bankAccount[];
@@ -169,7 +170,7 @@ export class BankAccountDashboardComponent implements AfterViewInit {
         state: { action: 'view', id: this.Credtials.id },
       });
     } else {
-      this.http.delete('bankAccount/delete', { id: this.Credtials.id }).subscribe({
+      this.http.delete<apiResponse>('bankAccount/delete', { id: this.Credtials.id }).subscribe({
         next: (res) => {
           this.dialogSrc.swal({
             dialog: 'success',

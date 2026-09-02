@@ -6,7 +6,6 @@ export type userMgtFormValue = Pick<
   | 'username'
   | 'email'
   | 'role'
-  | 'roleName'
   | 'mobileNo'
   | 'branch_code'
 >;

@@ -1,13 +1,19 @@
 import { HttpClient, HttpContext, HttpHeaders } from '@angular/common/http';
-import { Injectable, InjectionToken } from '@angular/core';
+import { inject, Injectable, InjectionToken } from '@angular/core';
 import { MyProvider } from './provider';
-import { environment } from './../../../environments/environment';
+import { AppConfigService } from './app-config.service';
 import { SHOW_LOADING_SPINNER } from './api-loading.service';
+import { Observable } from 'rxjs/internal/Observable';
 
 // Create a unique InjectionToken for host-provided HTTP service
 export const DSS_HTTP_SERVICE = new InjectionToken<any>(
   'my-custom-lib.HOST_HTTP_SERVICE',
 );
+
+export interface DssHttpRequestOptions {
+  headers?: HttpHeaders;
+  isLoadingSpinner?: boolean;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -15,16 +21,34 @@ export const DSS_HTTP_SERVICE = new InjectionToken<any>(
 export class Http {
   status: boolean = false;
   baseUrl: string;
-
-  constructor(
-    public http: HttpClient,
-    public provider: MyProvider,
-  ) {
-    this.baseUrl = environment.apiServer;
+  config = inject(AppConfigService);
+  http = inject(HttpClient);
+  provider = inject(MyProvider);
+  constructor() {
+    this.baseUrl = this.config.apiServer;
   }
 
   private spinnerContext(isLoadingSpinner: boolean): HttpContext {
     return new HttpContext().set(SHOW_LOADING_SPINNER, isLoadingSpinner);
+  }
+
+  private resolveRequestOptions(
+    options?: DssHttpRequestOptions | HttpHeaders | boolean,
+    legacyIsLoadingSpinner = true,
+  ): Required<Pick<DssHttpRequestOptions, 'isLoadingSpinner'>> &
+    Pick<DssHttpRequestOptions, 'headers'> {
+    if (typeof options === 'boolean') {
+      return { isLoadingSpinner: options };
+    }
+
+    if (options instanceof HttpHeaders) {
+      return { headers: options, isLoadingSpinner: legacyIsLoadingSpinner };
+    }
+
+    return {
+      headers: options?.headers,
+      isLoadingSpinner: options?.isLoadingSpinner ?? legacyIsLoadingSpinner,
+    };
   }
 
   private getHeaders(contentType?: string | null): HttpHeaders {
@@ -42,9 +66,13 @@ export class Http {
   }
 
   token() {
-    return this.provider.companyInfo?.user?.access_token
-      ? `Bearer ${this.provider.companyInfo?.user.access_token}`
-      : ``;
+    const memoryToken = this.provider.companyInfo?.user?.access_token;
+    const storedToken =
+      typeof localStorage !== 'undefined'
+        ? localStorage.getItem('token')
+        : null;
+    const token = memoryToken || storedToken;
+    return token ? `Bearer ${token}` : '';
   }
   //   dbName() {
   //     return this.provider.companyInfo?.finYear?.divId || '';
@@ -99,61 +127,85 @@ export class Http {
     return this.http.get<T>(url);
   }
 
-  get(sub: string, param?: {}, header?: HttpHeaders, isLoadingSpinner = true) {
+  get<T>(
+    sub: string,
+    param?: {},
+    options?: DssHttpRequestOptions | HttpHeaders,
+    legacyIsLoadingSpinner = true,
+  ): Observable<T> {
     const url = this.baseUrl + sub;
-    if (!header) {
-      header = this.getHeaders();
-    }
-    return this.http.get<any>(url, {
-      headers: header,
+    const requestOptions = this.resolveRequestOptions(
+      options,
+      legacyIsLoadingSpinner,
+    );
+    const headers = requestOptions.headers ?? this.getHeaders();
+    return this.http.get<T>(url, {
+      headers,
       params: param,
-      context: this.spinnerContext(isLoadingSpinner),
+      context: this.spinnerContext(requestOptions.isLoadingSpinner),
     });
   }
 
-  getDoc(sub: string, param?: {}, isLoadingSpinner = true) {
+  getDoc(sub: string, param?: {}, options?: DssHttpRequestOptions | boolean) {
     const url = this.baseUrl + sub;
-    const header = this.getHeaders();
+    const requestOptions = this.resolveRequestOptions(options);
+    const headers = requestOptions.headers ?? this.getHeaders();
     return this.http.get(url, {
       params: param,
-      headers: header,
+      headers,
       responseType: 'arraybuffer',
-      context: this.spinnerContext(isLoadingSpinner),
+      context: this.spinnerContext(requestOptions.isLoadingSpinner),
     });
   }
 
-  put(
+  put<T>(
     sub: string,
     data: any,
     param?: {},
-    header?: HttpHeaders,
-    isLoadingSpinner = true,
-  ) {
+    options?: DssHttpRequestOptions | HttpHeaders,
+    legacyIsLoadingSpinner = true,
+  ): Observable<T> {
     const url = this.baseUrl + sub;
-    if (!header) header = this.getHeaders();
+    const requestOptions = this.resolveRequestOptions(
+      options,
+      legacyIsLoadingSpinner,
+    );
+    const headers = requestOptions.headers ?? this.getHeaders();
 
-    return this.http.put<any>(url, this.cleanObject(data, 2), {
-      headers: header,
+    return this.http.put<T>(url, this.cleanObject(data, 2), {
+      headers,
       params: param,
-      context: this.spinnerContext(isLoadingSpinner),
+      context: this.spinnerContext(requestOptions.isLoadingSpinner),
     });
   }
 
-  post(
+  post<T>(
     sub: string,
     data: any,
-    params?: {},
-    header?: HttpHeaders,
-    isLoadingSpinner = true,
-  ) {
+    params?: {} | undefined,
+    options?: DssHttpRequestOptions | HttpHeaders,
+    legacyIsLoadingSpinner = true,
+  ): Observable<T> {
     const url = this.baseUrl + sub;
-    if (!header) header = this.getHeaders();
+    const requestOptions = this.resolveRequestOptions(
+      options,
+      legacyIsLoadingSpinner,
+    );
+    let headers = requestOptions.headers;
+    if (!headers)
+      //   header = new HttpHeaders({
+      //     Authorization: this.token(),
+      //     'X-FY': this.dbName(),
+      //     'X-FIRM-ID': this.firm(),
+      //   });
+      // header.set('Content-Type', 'application/json');
+      headers = this.getHeaders();
     const cleanObjData = this.cleanObject(data, 2);
 
-    return this.http.post<any>(url, cleanObjData, {
-      headers: header,
-      params: params,
-      context: this.spinnerContext(isLoadingSpinner),
+    return this.http.post<T>(url, cleanObjData, {
+      headers,
+      params,
+      context: this.spinnerContext(requestOptions.isLoadingSpinner),
     });
   }
 
@@ -161,32 +213,40 @@ export class Http {
     sub: string,
     data: any,
     params?: {},
-    header?: HttpHeaders,
-    isLoadingSpinner = true,
+    options?: DssHttpRequestOptions | HttpHeaders,
+    legacyIsLoadingSpinner = true,
   ) {
     const url = this.baseUrl + sub;
-    if (!header) header = this.getHeaders('');
+    const requestOptions = this.resolveRequestOptions(
+      options,
+      legacyIsLoadingSpinner,
+    );
+    const headers = requestOptions.headers ?? this.getHeaders('');
 
     return this.http.post<any>(url, data, {
-      headers: header,
-      params: params,
-      context: this.spinnerContext(isLoadingSpinner),
+      headers,
+      params,
+      context: this.spinnerContext(requestOptions.isLoadingSpinner),
     });
   }
 
-  delete(
+  delete<T>(
     sub: string,
-    param: {},
-    header?: HttpHeaders,
-    isLoadingSpinner = true,
-  ) {
+    param?: {} | undefined,
+    options?: DssHttpRequestOptions | HttpHeaders,
+    legacyIsLoadingSpinner = true,
+  ): Observable<T> {
     const url = this.baseUrl + sub;
-    if (!header) header = this.getHeaders();
+    const requestOptions = this.resolveRequestOptions(
+      options,
+      legacyIsLoadingSpinner,
+    );
+    const headers = requestOptions.headers ?? this.getHeaders();
 
-    return this.http.delete<any>(url, {
-      headers: header,
+    return this.http.delete<T>(url, {
+      headers,
       params: param,
-      context: this.spinnerContext(isLoadingSpinner),
+      context: this.spinnerContext(requestOptions.isLoadingSpinner),
     });
   }
 }

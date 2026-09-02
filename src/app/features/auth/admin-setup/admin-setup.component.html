@@ -1,0 +1,97 @@
+<main class="setup-page">
+  <section class="intro-panel">
+    <strong class="brand">DSSERP</strong>
+    <div class="intro-copy">
+      <p class="eyebrow">First-time setup</p>
+      <h1>Create your administrator account.</h1>
+      <p>
+        This account will manage the Canara Bank integration workspace and its
+        users.
+      </p>
+    </div>
+    <p class="security-note">
+      This page is disabled after the first administrator is created.
+    </p>
+  </section>
+
+  <section class="form-panel">
+    <div class="setup-card">
+      <p class="eyebrow">Workspace owner</p>
+      <h2>Create administrator</h2>
+      <p class="subtitle">Enter the details for the first role-1 user.</p>
+      <form [formGroup]="setupForm" (ngSubmit)="createAdmin()" novalidate>
+        <label for="username">Username</label>
+        <input
+          id="username"
+          formControlName="username"
+          autocomplete="username"
+        />
+        @if (
+          setupForm.controls.username.touched &&
+          setupForm.controls.username.invalid
+        ) {
+          <small class="field-error">Enter at least 4 characters.</small>
+        }
+        <label for="phone">Mobile number</label>
+        <input
+          id="phone"
+          type="tel"
+          formControlName="phone"
+          autocomplete="tel"
+          maxlength="10"
+        />
+        @if (
+          setupForm.controls.phone.touched && setupForm.controls.phone.invalid
+        ) {
+          <small class="field-error"
+            >Enter a valid 10-digit mobile number.</small
+          >
+        }
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+        />
+        @if (
+          setupForm.controls.email.touched && setupForm.controls.email.invalid
+        ) {
+          <small class="field-error">Enter a valid email address.</small>
+        }
+        <label for="password">Password</label>
+        <div class="password-field">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="new-password"
+          />
+          <button type="button" (click)="showPassword = !showPassword">
+            {{ showPassword ? "Hide" : "Show" }}
+          </button>
+        </div>
+        @if (
+          setupForm.controls.password.touched &&
+          setupForm.controls.password.invalid
+        ) {
+          <small class="field-error">Use at least 8 characters.</small>
+        }
+        <label for="confirmPassword">Confirm password</label>
+        <input
+          id="confirmPassword"
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="confirmPassword"
+          autocomplete="new-password"
+        />
+        @if (errorMessage) {
+          <div class="setup-error" role="alert">{{ errorMessage }}</div>
+        }
+        <button class="submit-button" type="submit" [disabled]="loading">
+          {{ loading ? "Creating administrator..." : "Create administrator" }}
+        </button>
+        <a routerLink="/login" class="login-link">Return to sign in</a>
+      </form>
+    </div>
+  </section>
+</main>

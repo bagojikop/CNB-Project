@@ -17,15 +17,11 @@ export function createUserManagementForm(fb: FormBuilder) {
 
     email: fb.control<users['email']>('', [Validators.email]),
 
-    branch_code: fb.nonNullable.control<users['branch_code']>('', [
-      Validators.required,
-    ]),
+    branch_code: fb.nonNullable.control<users['branch_code']>(''),
     branch_name: fb.control(''),
 
     role: fb.control<users['role'] | null>(null, [Validators.required]),
 
-    roleName: fb.control<users['roleName'] | null>(null, [
-      Validators.required,
-    ]),
+
   });
 }

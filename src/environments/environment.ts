@@ -6,6 +6,7 @@ export const environment = {
   apiServer: 'http://localhost:5184/',
   reportServer: 'http://localhost:5054',
   autoDevLogin: false,
+  restoreSessionOnStartup: false,
 };
 
 /*

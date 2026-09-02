@@ -1,7 +1,15 @@
 import { Routes } from '@angular/router';
-import { authGuard, loginGuard } from './shared/services/auth.guard';
+import { authGuard, firstAdminSetupGuard, loginGuard } from './shared/services/auth.guard';
 
 export const routes: Routes = [
+  {
+    path: 'setup/admin',
+    canActivate: [firstAdminSetupGuard],
+    loadComponent: () =>
+      import('./features/auth/admin-setup/admin-setup.component').then(
+        (m) => m.AdminSetupComponent,
+      ),
+  },
   {
     path: 'login',
     canActivate: [loginGuard],

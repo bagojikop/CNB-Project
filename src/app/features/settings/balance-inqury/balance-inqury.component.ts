@@ -11,6 +11,7 @@ import { Http } from '@shared-services/httpService';
 import { MyProvider } from '@shared-services/provider';
 import { firstValueFrom } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { apiResponse } from '@shared-interfaces/commans/apiResponse';
 //import data from '@assets/data/firms.json';
 export interface BalanceEncryptData {
   acctNumber: string;
@@ -57,7 +58,7 @@ export class BalanceInquiryComponent {
       firm_id: ['', Validators.required],
       accountNo: ['*', [Validators.pattern(/^(\*|\d{9,18})$/)]],
     });
-    this.http.get('bankAccount/all', { branch_id: this.provider.companyInfo?.company.branch_id }).subscribe((res) => {
+    this.http.get<apiResponse>('bankAccount/all', { branch_id: this.provider.companyInfo?.company.branch_id }).subscribe((res) => {
 
       this.firms = res.data || res;
 
@@ -137,7 +138,7 @@ export class BalanceInquiryComponent {
       for (const accountNo of accNos) {
         try {
           const res: any = await firstValueFrom(
-            this.http.post('inquiry/balance', {
+            this.http.post<any>('inquiry/balance', {
               id: this.selectedFirm.id,
               accountNo,
             }),

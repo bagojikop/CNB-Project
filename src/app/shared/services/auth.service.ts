@@ -9,6 +9,12 @@ import { MyProvider } from './provider';
 
 interface Firm { firm_code: number; firm_name: string; }
 interface Branch { branch_code: string; branch_name: string; }
+export interface FirstAdminRegistration {
+  username: string;
+  phone: string;
+  email: string;
+  password: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -22,22 +28,26 @@ export class AuthService {
     private http: Http,
     private provider: MyProvider,
     private router: Router,
-  ) {}
+  ) { }
 
   hasToken(): boolean {
-    return this.isBrowser && !!localStorage.getItem('token');
+    return (
+      this.isBrowser &&
+      !!localStorage.getItem('token') &&
+      !!localStorage.getItem(this.contextStorageKey)
+    );
   }
 
   login(entity: { username: string; password: string }): Observable<apiResponse> {
-    return this.http.post('auth/login', entity).pipe(
+    return this.http.post<apiResponse>('auth/login', entity).pipe(
       switchMap((res: apiResponse) => {
         if (res.status_cd !== 1) return of(res);
 
         const payload = res.data ?? {};
-        const client = payload.client ?? payload.user ?? {};
-        const userId = client.id ?? client.user_id;
-        const firmId = client.firmId ?? client.firm_id ?? payload.firmId ?? payload.firm_id;
-        const branchId = client.branchId ?? client.branch_id ?? payload.branchId ?? payload.branch_id;
+        const client = payload.client ?? {};
+        const userId = client.id;
+
+        const branchId = client.branch_code ?? ''
         const token = payload.token;
         const companyInfo = (this.provider.companyInfo ??= {} as any);
 
@@ -45,18 +55,15 @@ export class AuthService {
         if (this.isBrowser) localStorage.setItem('token', token);
 
         return forkJoin({
-          firms: this.httpClient.get<Firm[]>('data/firms.json').pipe(catchError(() => of([] as Firm[]))),
-          branches: this.httpClient.get<Branch[]>('data/branches.json').pipe(catchError(() => of([] as Branch[]))),
+
+          branches: this.httpClient.get<Branch[]>('assets/data/branches.json').pipe(catchError(() => of([] as Branch[]))),
         }).pipe(
-          map(({ firms, branches }) => {
+          map(({ branches }) => {
             companyInfo.company = {
-              firm_id: firmId,
-              firm_name: firms.find((firm) => String(firm.firm_code) === String(firmId))?.firm_name ?? '',
               branch_id: branchId,
               branch_name: branches.find((branch) => String(branch.branch_code) === String(branchId))?.branch_name ?? '',
-              div_id: payload.div_id ?? 20262027,
-              fdt: payload.fdt ?? '2026/04/01',
-              tdt: payload.tdt ?? '2027/03/31',
+
+
             };
             this.storeContext();
             this.isAuthenticatedSubject.next(true);
@@ -69,15 +76,31 @@ export class AuthService {
   }
 
   findPasswordRecoveryAccount(identifier: string): Observable<apiResponse> {
-    return this.http.post('auth/forgot-password', { userName: identifier });
+    return this.http.post<apiResponse>('auth/forgot-password', { userName: identifier });
+  }
+
+  getSetupStatus(): Observable<boolean> {
+    return this.http.get<apiResponse>(
+      'auth/setup-status',
+      undefined,
+      { isLoadingSpinner: false },
+    ).pipe(
+      map((res) =>
+        Boolean(res?.data?.setupRequired ?? res?.data?.setup_required),
+      ),
+    );
+  }
+
+  createFirstAdmin(entity: FirstAdminRegistration): Observable<apiResponse> {
+    return this.http.post<apiResponse>('auth/setup-admin', entity);
   }
 
   verifyPasswordRecoveryOtp(userName: string, recoveryToken: string, otp: string): Observable<apiResponse> {
-    return this.http.post('auth/verify-reset-otp', { userName, recoveryToken, otp });
+    return this.http.post<apiResponse>('auth/verify-reset-otp', { userName, recoveryToken, otp });
   }
 
   resetForgottenPassword(recoveryToken: string, temporaryPassword: string, newPassword: string): Observable<apiResponse> {
-    return this.http.post('auth/reset-forgotten-password', {
+    return this.http.post<apiResponse>('auth/reset-forgotten-password', {
       recoveryToken,
       temporaryPassword,
       newPassword,
@@ -89,15 +112,31 @@ export class AuthService {
     if (!this.isBrowser) return of(void 0);
     const token = localStorage.getItem('token');
     const storedContext = localStorage.getItem(this.contextStorageKey);
-    if (!token || !storedContext) return of(void 0);
+    if (!token || !storedContext) {
+      this.clearStoredSession();
+      this.isAuthenticatedSubject.next(false);
+      return of(void 0);
+    }
 
     try {
-      this.provider.companyInfo = JSON.parse(storedContext);
+      const context = JSON.parse(storedContext);
+      if (!context?.user) throw new Error('Invalid authentication context.');
+
+      this.provider.companyInfo = context;
       this.provider.companyInfo!.user.access_token = token;
       this.isAuthenticatedSubject.next(true);
     } catch {
       this.clearStoredSession();
+      this.provider.companyInfo = {} as any;
+      this.isAuthenticatedSubject.next(false);
     }
+    return of(void 0);
+  }
+
+  startFreshSession(): Observable<void> {
+    this.clearStoredSession();
+    this.provider.companyInfo = {} as any;
+    this.isAuthenticatedSubject.next(false);
     return of(void 0);
   }
 

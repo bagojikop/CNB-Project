@@ -4,7 +4,7 @@ export interface users {
   email?: string;
   role: string;
   branch_code: string;
-  branch_name?: string;
-  roleName: string;
   mobileNo: string;
+  branch_name?: string;
+  roleName?: string;
 }

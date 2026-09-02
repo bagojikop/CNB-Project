@@ -23,6 +23,7 @@ import { DataRefreshService } from '@shared-services/data-refresh.service';
 import { Http } from '@shared-services/httpService';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
+import { apiResponse } from '@shared-interfaces/commans/apiResponse';
 
 interface Firm {
   firm_code: number;
@@ -138,13 +139,13 @@ export class BankAccountDetailComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     const editData = this.location.getState() as any;
-    const branches$ = this.httpClient.get<Branch[]>('data/branches.json');
-    const firms$ = this.httpClient.get<Firm[]>('data/firms.json');
+    const branches$ = this.httpClient.get<Branch[]>('assets/data/branches.json');
+    const firms$ = this.httpClient.get<Firm[]>('assets/data/firms.json');
     if (editData.action === 'view') {
       forkJoin({
         branches: branches$,
         firms: firms$,
-        account: this.http.get('bankAccount', { id: editData.id }),
+        account: this.http.get<apiResponse>('bankAccount', { id: editData.id }),
       }).subscribe({
         next: ({ branches, firms, account }) => {
           this.branches = branches;
@@ -193,14 +194,14 @@ export class BankAccountDetailComponent implements AfterViewInit {
     };
 
     this.isConfSubmitting = true;
-    this.http.post('bankAccount/save', bankData).subscribe({
+    this.http.post<apiResponse>('bankAccount/save', bankData).subscribe({
       next: (res) => {
         this.dialogSrc.swal({
           dialog: 'success',
           message: 'Record Update Successfully',
         });
         this.refreshService.trigger();
-        this.configInputs.patchValue(res);
+        this.configInputs.patchValue(res.data ?? bankData);
         this.finishSave();
       },
       error: (err) => {
