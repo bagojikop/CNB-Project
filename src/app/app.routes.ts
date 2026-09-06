@@ -51,6 +51,22 @@ export const routes: Routes = [
         ],
       },
       {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/auth/profile/profile.component').then(
+            (m) => m.ProfileComponent,
+          ),
+        data: { title: 'Profile' },
+      },
+      {
+        path: 'change-password',
+        loadComponent: () =>
+          import('./features/auth/change-password/change-password.component').then(
+            (m) => m.ChangePasswordComponent,
+          ),
+        data: { title: 'Change Password' },
+      },
+      {
         path: 'settings-form',
         loadChildren: () =>
           import('./routes/settings/settings.module').then(

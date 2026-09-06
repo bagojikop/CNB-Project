@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { BulkPaymentRequestComponent } from '@features/dashboard/bulk-payment-request/bulk-payment-request.component';
 import { BatchStatusComponent } from '@features/dashboard/batch-status/batch-status.component';
 import { PaymentReceivedByVANComponent } from '@features/dashboard/payment-received-by-van/payment-received-by-van.component';
 import { PaymentRequestApprovalComponent } from '@features/dashboard/payment-request-approval/payment-request-approval.component';
@@ -13,7 +14,7 @@ const routes: Routes = [
   },
   {
     path: 'batches-request-Approval',
-    component: PaymentRequestApprovalComponent,
+    component: BulkPaymentRequestComponent,
   },
   {
     path: 'VANExpiryStatus',

@@ -42,8 +42,14 @@ export const adminNavItems: INavData[] = [
         icon: 'cil-cloud-download',
       },
       {
-        name: 'Push Checker Maker',
-        url: '/settings-form/pushCheckerMaker',
+        name: 'Push Checker',
+        url: '/settings-form/pushCheckerMaker/pushMaker',
+        icon: 'cil-sync',
+      },
+
+      {
+        name: 'Push Maker',
+        url: '/settings-form/pushCheckerMaker/pushInit',
         icon: 'cil-sync',
       },
     ],

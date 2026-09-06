@@ -1,0 +1,17 @@
+<main class="profile-page">
+  <section class="profile-card">
+    <header class="profile-hero">
+      <div class="avatar">{{ initials }}</div>
+      <div><small>USER PROFILE</small><h1>{{ displayName }}</h1><span class="role-badge">{{ roleName }}</span></div>
+      <a routerLink="/change-password"><i class="bi bi-shield-lock"></i> Change Password</a>
+    </header>
+    <div class="details-grid">
+      <div class="detail"><i class="bi bi-person"></i><span><small>Username</small><strong>{{ user.username ?? user.userName ?? '—' }}</strong></span></div>
+      <div class="detail"><i class="bi bi-envelope"></i><span><small>Email</small><strong>{{ user.email ?? '—' }}</strong></span></div>
+      <div class="detail"><i class="bi bi-telephone"></i><span><small>Mobile</small><strong>{{ user.mobileNo ?? user.phone ?? '—' }}</strong></span></div>
+      <div class="detail"><i class="bi bi-building"></i><span><small>Branch</small><strong>{{ company.branch_name ?? company.branch_id ?? 'All Branches' }}</strong></span></div>
+      <div class="detail"><i class="bi bi-person-badge"></i><span><small>Role</small><strong>{{ roleName }}</strong></span></div>
+      <div class="detail"><i class="bi bi-hash"></i><span><small>User ID</small><strong>{{ user.user_id ?? user.id ?? '—' }}</strong></span></div>
+    </div>
+  </section>
+</main>

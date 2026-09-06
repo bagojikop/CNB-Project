@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone, OnDestroy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
 
@@ -25,6 +25,8 @@ import {
 import { moduleNavItems, navItems } from './_nav';
 import { ApiLoadingService } from '../../shared/services/api-loading.service';
 import { MyProvider } from '../../shared/services/provider';
+import { AuthService } from '../../shared/services/auth.service';
+import { DialogsService } from '../../shared/services/messageBox';
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -56,7 +58,14 @@ function isOverflown(element: HTMLElement) {
     ButtonCloseDirective,
   ],
 })
-export class DefaultLayoutComponent {
+export class DefaultLayoutComponent implements OnDestroy {
+  private readonly idleTimeoutMs = 10 * 60 * 1000;
+  private readonly warningTimeoutMs = 60 * 1000;
+  private idleTimer?: ReturnType<typeof setTimeout>;
+  private warningVisible = false;
+  private lastActivityReset = 0;
+  private readonly removeActivityListeners: Array<() => void> = [];
+
   public readonly apiLoading = this.apiLoadingService.isLoading;
   public activeModuleTitle = this.getModuleTitle(
     'Settings',
@@ -67,7 +76,88 @@ export class DefaultLayoutComponent {
   constructor(
     private readonly apiLoadingService: ApiLoadingService,
     private readonly provider: MyProvider,
-  ) {}
+    private readonly auth: AuthService,
+    private readonly dialogs: DialogsService,
+    private readonly zone: NgZone,
+  ) {
+    this.startIdleMonitoring();
+  }
+
+  ngOnDestroy(): void {
+    this.clearIdleTimer();
+    this.removeActivityListeners.forEach((remove) => remove());
+  }
+
+  private startIdleMonitoring(): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+    const activityEvents: Array<keyof WindowEventMap> = [
+      'mousemove',
+      'mousedown',
+      'keydown',
+      'touchstart',
+      'scroll',
+    ];
+
+    this.zone.runOutsideAngular(() => {
+      for (const eventName of activityEvents) {
+        const listener = () => this.onUserActivity();
+        window.addEventListener(eventName, listener, { passive: true });
+        this.removeActivityListeners.push(() =>
+          window.removeEventListener(eventName, listener),
+        );
+      }
+
+      const visibilityListener = () => {
+        if (document.visibilityState === 'visible') this.onUserActivity();
+      };
+      document.addEventListener('visibilitychange', visibilityListener);
+      this.removeActivityListeners.push(() =>
+        document.removeEventListener('visibilitychange', visibilityListener),
+      );
+    });
+
+    this.resetIdleTimer();
+  }
+
+  private onUserActivity(): void {
+    if (this.warningVisible) return;
+
+    const now = Date.now();
+    if (now - this.lastActivityReset < 1_000) return;
+    this.lastActivityReset = now;
+    this.resetIdleTimer();
+  }
+
+  private resetIdleTimer(): void {
+    this.clearIdleTimer();
+    this.idleTimer = setTimeout(
+      () => this.zone.run(() => void this.showIdleWarning()),
+      this.idleTimeoutMs,
+    );
+  }
+
+  private clearIdleTimer(): void {
+    if (this.idleTimer) clearTimeout(this.idleTimer);
+    this.idleTimer = undefined;
+  }
+
+  private async showIdleWarning(): Promise<void> {
+    if (this.warningVisible) return;
+
+    this.warningVisible = true;
+    this.clearIdleTimer();
+    const staySignedIn = await this.dialogs.confirmIdle(this.warningTimeoutMs);
+    this.warningVisible = false;
+
+    if (staySignedIn) {
+      this.lastActivityReset = Date.now();
+      this.resetIdleTimer();
+      return;
+    }
+
+    this.auth.logout();
+  }
 
   public selectModule(moduleName: string): void {
     const selectedItems = moduleNavItems[moduleName];
@@ -91,31 +181,34 @@ export class DefaultLayoutComponent {
   }
 
   private filterNavItemsByRole(items: INavData[]): INavData[] {
-    const userRole = this.provider.companyInfo?.user?.role;
+    const userRole = Number(this.provider.companyInfo?.user?.role);
+    const disabledName = userRole === 2
+      ? 'push maker'
+      : userRole === 3
+        ? 'push checker'
+        : '';
 
-    // If role is 2, disable the first (index 0) and second (index 1) items
-    if (userRole === 2 && items.length > 1) {
-      const disabledItems = items.map((item, index) => {
-        if (index === 0 || index === 1) {
-          // Use the 'class' property to add a custom disabled class
-          const existingClass = item.class || '';
-          return {
-            ...item,
-            class: `${existingClass} sidebar-nav-item-disabled`.trim(),
-            // Also use attributes if supported
-            attributes: {
-              ...item.attributes,
-              'aria-disabled': 'true',
-              disabled: 'true',
-            },
-          };
-        }
-        return item;
-      });
-      return disabledItems;
-    }
+    if (!disabledName) return items;
 
-    return items;
+    return items.map((item) => {
+      const children = item.children?.length
+        ? this.filterNavItemsByRole(item.children)
+        : item.children;
+      const shouldDisable = String(item.name ?? '').trim().toLowerCase() === disabledName;
+
+      if (!shouldDisable) return { ...item, children };
+
+      return {
+        ...item,
+        children,
+        class: `${item.class ?? ''} sidebar-nav-item-disabled`.trim(),
+        attributes: {
+          ...item.attributes,
+          'aria-disabled': 'true',
+          tabindex: '-1',
+        },
+      };
+    });
   }
 
   private getVisibleNavItems(items: INavData[]): INavData[] {

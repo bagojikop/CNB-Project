@@ -35,13 +35,13 @@
       </div>
 
       <!-- Company Info -->
-      <div class="d-flex flex-column lh-sm">
-        <div class="fw-bold fs-6">
+      <div class="company-context">
+        <h3 class="title-company-name" [title]="companyName">
           {{ companyName }}
-        </div>
-
-        <div class="small text-body-secondary">
-          {{ branchName }} : {{ unitName }} ({{ finYear }})
+        </h3>
+        <div class="company-context__branch" [title]="branchName">
+          <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
+          <span>{{ branchName }}</span>
         </div>
       </div>
     </div>
@@ -62,15 +62,44 @@
       </div>
     </c-header-nav>
 
-    <!--aside toggler-->
-    <button
-      cHeaderToggler
-      cSidebarToggle="aside1"
-      style="margin-inline-end: -12px"
-      toggle="visible"
-    >
-      <svg cIcon name="cilApplicationsSettings" size="lg"></svg>
-    </button>
+    <c-dropdown alignment="end" variant="nav-item" class="admin-menu">
+      <button
+        cDropdownToggle
+        [caret]="false"
+        class="admin-menu__trigger"
+        type="button"
+        aria-label="Open user account menu"
+      >
+        <span class="admin-menu__avatar">
+          <svg cIcon name="cilUser" size="lg"></svg>
+        </span>
+        <span class="admin-menu__identity d-none d-lg-flex">
+          <strong>{{ userName }}</strong>
+          <small>{{ userRoleName }}</small>
+        </span>
+        <i class="bi bi-chevron-down admin-menu__chevron"></i>
+      </button>
+
+      <div cDropdownMenu class="admin-menu__dropdown">
+        <div class="admin-menu__header">
+          <span class="admin-menu__avatar admin-menu__avatar--large">
+            <svg cIcon name="cilUser" size="lg"></svg>
+          </span>
+          <div><strong>{{ userName }}</strong><small>{{ userRoleName }}</small></div>
+        </div>
+        <div cDropdownDivider></div>
+        <a cDropdownItem routerLink="/profile" class="admin-menu__item">
+          <svg cIcon name="cilUser" size="sm"></svg><span>Profile</span>
+        </a>
+        <a cDropdownItem routerLink="/change-password" class="admin-menu__item">
+          <svg cIcon name="cilLockLocked" size="sm"></svg><span>Change Password</span>
+        </a>
+        <div cDropdownDivider></div>
+        <button cDropdownItem type="button" class="admin-menu__item admin-menu__logout" (click)="logout()">
+          <svg cIcon name="cilAccountLogout" size="sm"></svg><span>Logout</span>
+        </button>
+      </div>
+    </c-dropdown>
   </c-container>
 </ng-container>
 <!--</c-header>-->

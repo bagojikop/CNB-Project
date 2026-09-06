@@ -66,4 +66,21 @@ export class DialogsService {
                 }).then(res => res.isConfirmed);
         }
     }
+
+    confirmIdle(timeoutMs = 60_000): Promise<boolean> {
+        return Swal.fire({
+            title: 'You are idle',
+            text: 'You will be automatically logged out. Do you want to stay signed in?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, continue',
+            cancelButtonText: 'No, log out',
+            confirmButtonColor: '#0078a8',
+            cancelButtonColor: '#6c757d',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            timer: timeoutMs,
+            timerProgressBar: true,
+        }).then((result) => result.isConfirmed);
+    }
 }

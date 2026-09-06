@@ -1,0 +1,17 @@
+:host { display:block; }
+.profile-page { display:grid; min-height:calc(100vh - 150px); padding:30px; place-items:start center; color:#18243d; background:#f5f7fb; }
+.profile-card { width:min(100%,760px); overflow:hidden; border:1px solid #e2e7f0; border-radius:20px; background:#fff; box-shadow:0 12px 35px rgba(36,56,95,.07); }
+.profile-hero { display:flex; align-items:center; gap:16px; padding:26px; color:#fff; background:linear-gradient(115deg,#005b96,#00a6c8); }
+.avatar { display:grid; width:64px; height:64px; flex:0 0 64px; place-items:center; border:2px solid rgba(255,255,255,.45); border-radius:18px; background:rgba(255,255,255,.16); font-size:21px; font-weight:800; }
+.profile-hero > div:nth-child(2) { min-width:0; flex:1; }
+.profile-hero small { color:rgba(255,255,255,.75); font-size:10px; font-weight:800; letter-spacing:.12em; }
+.profile-hero h1 { margin:3px 0 6px; font-size:23px; }
+.role-badge { padding:4px 9px; border-radius:20px; color:#fff; background:rgba(255,255,255,.16); font-size:11px; }
+.profile-hero a { display:flex; align-items:center; gap:7px; padding:9px 12px; border:1px solid rgba(255,255,255,.35); border-radius:9px; color:#fff; background:rgba(255,255,255,.1); font-size:12px; font-weight:600; text-decoration:none; }
+.details-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; padding:26px; }
+.detail { display:flex; align-items:center; gap:12px; min-width:0; padding:15px; border:1px solid #e7ebf1; border-radius:12px; background:#fafbfd; }
+.detail > i { display:grid; width:38px; height:38px; flex:0 0 38px; place-items:center; border-radius:10px; color:#0078a8; background:#e8f5f9; }
+.detail span { display:flex; min-width:0; flex-direction:column; }
+.detail small { color:#748197; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
+.detail strong { overflow:hidden; margin-top:2px; font-size:13px; text-overflow:ellipsis; white-space:nowrap; }
+@media(max-width:600px) { .profile-page { padding:14px; } .profile-hero { align-items:flex-start; flex-wrap:wrap; padding:20px; } .profile-hero a { width:100%; justify-content:center; } .details-grid { grid-template-columns:1fr; padding:16px; } }

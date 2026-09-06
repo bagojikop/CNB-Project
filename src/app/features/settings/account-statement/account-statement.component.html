@@ -1,112 +1,227 @@
-<div class="card dss-card-vh-100" dssViewportHeight="140px">
-  <div class="card-header">
-    <div
-      class="d-flex flex-wrap gap-3 align-items-center justify-content-between"
-    >
-      <div class="d-flex gap-3 align-items-center flex-shrink-0">
-        <svg cIcon name="cilBank" size="lg"></svg>
-        <h3 class="mb-0">Account Statement</h3>
+<div class="statement-wrapper">
+  <header class="statement-header">
+    <div class="title-group">
+      <span class="title-icon"><i class="bi bi-file-earmark-text"></i></span>
+      <div>
+        <h2>Account Statement</h2>
+        <p>View account transactions for a selected period</p>
       </div>
-      <form
-        [formGroup]="filterForm"
-        (ngSubmit)="showResult()"
-        class="row w-100 w-md-auto flex-grow-1 flex-md-grow-0"
-        style="max-width: 900px"
-      >
-        <div class="col-12 col-md-3">
-          <dss-ng-select
-            label="Firm"
-            placeholder="Select Firm"
-            [items]="firms"
-            bindLabel="firmName"
-            bindValue="firmId"
-            formControlName="firm_id"
-            (change)="onFirmSelect()"
-          ></dss-ng-select>
-        </div>
-        <div class="col-12 col-md-3">
-          <dss-ng-select
-            label="Account No"
-            placeholder="Select Account No"
-            [items]="selectedFirm?.accountNos ?? []"
-            formControlName="accountNo"
-          ></dss-ng-select>
-        </div>
-        <div class="col-6 col-md-3">
-          <dss-date-fin
-            label="From Date"
-            [value]="filterForm.get('fromDate')?.value"
-            (valueChange)="filterForm.get('fromDate')?.setValue($event)"
-          ></dss-date-fin>
-        </div>
-        <div class="col-6 col-md-3">
-          <dss-date-fin
-            label="End Date"
-            [value]="filterForm.get('endDate')?.value"
-            (valueChange)="filterForm.get('endDate')?.setValue($event)"
-          ></dss-date-fin>
-        </div>
-        <div class="col-12 col-md-1 d-flex align-items-center mt-2 mt-md-0">
-          <button
-            cButton
-            type="submit"
-            size="sm"
-            class="w-100"
-            [disabled]="isLoading()"
-          >
-            @if (isLoading()) {
-              <span class="spinner-border spinner-border-sm"></span>
-            } @else {
-              <i class="bi bi-eye text-light"></i>
-            }
-          </button>
-        </div>
-      </form>
     </div>
-  </div>
-  <div class="card-body dss-card-body-scroll">
-    @if (errorMessage()) {
-      <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
-    }
-    <div class="table-responsive table-to-card">
-      <table class="table table-striped table-hover table-bordered">
-        <thead class="table-primary">
-          <tr>
-            <th style="width: 5%">#</th>
-            <th style="width: 10%">Transaction Date</th>
-            <th style="width: 10%">Value Date</th>
-            <th>Description</th>
-            <th style="width: 5%">C/D</th>
-            <th style="width: 10%" class="text-end">Amount</th>
-            <th style="width: 10%" class="text-end">Running Balance</th>
-            <th style="width: 10%">Transaction Ref.</th>
-            <th style="width: 10%">User Ref.</th>
-          </tr>
-        </thead>
-        <tbody style="height: calc(100vh - 320px); overflow-y: scroll">
-          @for (item of jsonData; track item) {
-            @for (txn of item.transactions; track txn; let i = $index) {
+  </header>
+
+  <section class="filter-panel" aria-label="Statement filters">
+    <form
+      [formGroup]="filterForm"
+      (ngSubmit)="showResult()"
+      class="filter-grid"
+    >
+      <dss-ng-select
+        label="Firm"
+        placeholder="Select Firm"
+        [items]="firms"
+        bindLabel="firmName"
+        bindValue="firmId"
+        formControlName="firm_id"
+        (change)="onFirmSelect()"
+      ></dss-ng-select>
+      <dss-ng-select
+        label="Account No"
+        placeholder="Select Account No"
+        [items]="selectedFirm?.accountNos ?? []"
+        formControlName="accountNo"
+      ></dss-ng-select>
+      <dss-date-fin
+        label="From"
+        [value]="filterForm.controls.fromDate.value"
+        (valueChange)="filterForm.controls.fromDate.setValue($event)"
+      ></dss-date-fin>
+      <dss-date-fin
+        label="To"
+        [value]="filterForm.controls.endDate.value"
+        (valueChange)="filterForm.controls.endDate.setValue($event)"
+      ></dss-date-fin>
+      <button class="show-button" type="submit" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <span class="spinner-border spinner-border-sm"></span
+          ><span>Loading...</span>
+        } @else {
+          <i class="bi bi-eye"></i><span>Show</span>
+        }
+      </button>
+    </form>
+  </section>
+
+  @if (errorMessage()) {
+    <div class="alert alert-danger statement-alert" role="alert">
+      <i class="bi bi-exclamation-circle"></i>{{ errorMessage() }}
+    </div>
+  }
+
+  @for (statement of jsonData; track statement.accountNo) {
+    <!-- <section class="statement-summary" aria-label="Account summary">
+      <div class="account-details">
+        <span class="summary-label">Account No</span
+        ><strong>{{ statement.accountNo }}</strong>
+        @if (statement.customerName) {
+          <span class="customer-name">{{ statement.customerName }}</span>
+        }
+      </div>
+      <div class="balance-card opening">
+        <span class="balance-icon"
+          ><i class="bi bi-box-arrow-in-right"></i
+        ></span>
+        <div>
+          <span class="summary-label">Opening Balance</span
+          ><strong>{{ statement.openingBalance | number: "1.2-2" }}</strong>
+        </div>
+      </div>
+      <div class="balance-card closing">
+        <span class="balance-icon"><i class="bi bi-box-arrow-right"></i></span>
+        <div>
+          <span class="summary-label">Closing Balance</span
+          ><strong>{{ statement.closingBalance | number: "1.2-2" }}</strong>
+        </div>
+      </div>
+    </section> -->
+
+    <section class="transactions-panel">
+      <div class="transactions-header">
+        <div>
+          <h2>Transactions</h2>
+        </div>
+        <div class="transactions-meta">
+          <span class="header-balance opening-balance">
+            <small>Opening Balance</small>
+            <strong>{{ statement.openingBalance | number: "1.2-2" }}</strong>
+          </span>
+          <span class="header-balance closing-balance">
+            <small>Closing Balance</small>
+            <strong>{{ statement.closingBalance | number: "1.2-2" }}</strong>
+          </span>
+          <span class="record-count"
+            >{{ statement.transactions.length }} records</span
+          >
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="statement-table">
+          <colgroup>
+            <col class="col-index" />
+            <col class="col-transaction-date" />
+            <col class="col-value-date" />
+            <col class="col-description" />
+            <col class="col-type" />
+            <col class="col-amount" />
+            <col class="col-balance" />
+            <col class="col-reference" />
+            <col class="col-user-reference" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Transaction Date</th>
+              <th>Value Date</th>
+              <th>Description</th>
+              <th>C/D</th>
+              <th class="text-end">Amount</th>
+              <th class="text-end">Running Balance</th>
+              <th>Transaction Ref.</th>
+              <th>User Ref.</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (
+              txn of pagedTransactions(statement);
+              track txn;
+              let i = $index
+            ) {
               <tr>
-                <td style="width: 5%">{{ i + 1 }}</td>
-                <td style="width: 10%">
-                  {{ formatDateTime(txn.transactionDate) }}
+                <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                <td>{{ formatDateTime(txn.transactionDate) }}</td>
+                <td>{{ formatDate(txn.valueDate) }}</td>
+                <td class="description">{{ txn.description }}</td>
+                <td>
+                  <span class="transaction-type">{{
+                    txn.creditDebitFlag
+                  }}</span>
                 </td>
-                <td style="width: 10%">{{ formatDate(txn.valueDate) }}</td>
-                <td class="text-wrap text-start">{{ txn.description }}</td>
-                <td style="width: 5%">{{ txn.creditDebitFlag }}</td>
-                <td style="width: 10%" class="text-end">
-                  {{ txn.transactionAmount }}
-                </td>
-                <td style="width: 10%" class="text-end fw-bold">
+                <td class="text-end amount">{{ txn.transactionAmount }}</td>
+                <td class="text-end amount balance">
                   {{ txn.runningBalance }}
                 </td>
-                <td style="width: 10%">{{ txn.txnRefNumber }}</td>
-                <td style="width: 10%">{{ txn.userRefNumber }}</td>
+                <td class="reference-text">{{ txn.txnRefNumber }}</td>
+                <td class="reference-text">{{ txn.userRefNumber }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="9" class="empty-row">
+                  No transactions found for this period.
+                </td>
               </tr>
             }
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
+          </tbody>
+        </table>
+      </div>
+      @if (statement.transactions.length > 0) {
+        <div class="pagination-bar">
+          <span>
+            Showing {{ (currentPage - 1) * pageSize + 1 }}–{{
+              currentPage * pageSize > statement.transactions.length
+                ? statement.transactions.length
+                : currentPage * pageSize
+            }}
+            of {{ statement.transactions.length }} · 100 per page
+          </span>
+          <div class="page-actions">
+            <button
+              type="button"
+              aria-label="First page"
+              [disabled]="currentPage === 1"
+              (click)="goToPage(1, statement)"
+            >
+              <i class="bi bi-chevron-double-left"></i>
+            </button>
+            <button
+              type="button"
+              aria-label="Previous page"
+              [disabled]="currentPage === 1"
+              (click)="goToPage(currentPage - 1, statement)"
+            >
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            <strong
+              >Page {{ currentPage }} of {{ totalPages(statement) }}</strong
+            >
+            <button
+              type="button"
+              aria-label="Next page"
+              [disabled]="currentPage === totalPages(statement)"
+              (click)="goToPage(currentPage + 1, statement)"
+            >
+              <i class="bi bi-chevron-right"></i>
+            </button>
+            <button
+              type="button"
+              aria-label="Last page"
+              [disabled]="currentPage === totalPages(statement)"
+              (click)="goToPage(totalPages(statement), statement)"
+            >
+              <i class="bi bi-chevron-double-right"></i>
+            </button>
+          </div>
+        </div>
+      }
+    </section>
+  } @empty {
+    @if (!isLoading() && !errorMessage()) {
+      <div class="empty-state">
+        <span><i class="bi bi-receipt"></i></span>
+        <h2>Select an account and date range</h2>
+        <p>
+          Your opening balance, closing balance, and transactions will appear
+          here.
+        </p>
+      </div>
+    }
+  }
 </div>

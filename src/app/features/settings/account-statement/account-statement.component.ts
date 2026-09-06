@@ -52,6 +52,8 @@ export class AccountStatementComponent {
   firms: FirmAccount[] = [];
   selectedFirm: FirmAccount | null = null;
   jsonData: AccountStatement[] = [];
+  readonly pageSize = 100;
+  currentPage = 1;
 
   readonly filterForm = this.fb.group({
     firm_id: ['', Validators.required],
@@ -106,6 +108,7 @@ export class AccountStatementComponent {
     const customer = { id: this.selectedFirm.id, accountNo: accountNo! };
     this.errorMessage.set('');
     this.jsonData = [];
+    this.currentPage = 1;
     this.isLoading.set(true);
 
     this.http
@@ -142,6 +145,19 @@ export class AccountStatementComponent {
           );
         },
       });
+  }
+
+  pagedTransactions(statement: AccountStatement): StatementTransaction[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return statement.transactions.slice(start, start + this.pageSize);
+  }
+
+  totalPages(statement: AccountStatement): number {
+    return Math.max(1, Math.ceil(statement.transactions.length / this.pageSize));
+  }
+
+  goToPage(page: number, statement: AccountStatement): void {
+    this.currentPage = Math.min(Math.max(page, 1), this.totalPages(statement));
   }
 
   private mapStatement(data: any, fromDate: string, endDate: string): AccountStatement {

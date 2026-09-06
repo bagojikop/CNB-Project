@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { IconModule } from '@coreui/icons-angular';
 import {
@@ -11,7 +12,14 @@ import {
 } from '@coreui/icons';
 import { DSS_FORM_CONTROLS } from '@shared-directives/dss-form-controls';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter } from 'rxjs';
+import { catchError, filter, forkJoin, of } from 'rxjs';
+import { Http } from '@shared-services/httpService';
+import { MyProvider } from '@shared-services/provider';
+
+interface PendingCount {
+  id: number;
+  value: number;
+}
 
 interface BankCard {
   id: number;
@@ -29,15 +37,40 @@ interface BankCard {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   showDashboard = true;
   private router = inject(Router);
+  private http = inject(Http);
+  private provider = inject(MyProvider);
+  private destroyRef = inject(DestroyRef);
 
   constructor() {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
         this.showDashboard = this.router.url === '/dashboard';
+      });
+  }
+
+  ngOnInit(): void {
+    const branchId = this.provider.companyInfo?.company?.branch_id;
+
+
+    const params = { branch_id: branchId || '' };
+    forkJoin([
+      this.http
+        .get<PendingCount | null>('Dashoboard/pending-create-counts', params)
+        .pipe(catchError(() => of(null))),
+      this.http
+        .get<PendingCount | null>('Dashoboard/pending-status-counts', params)
+        .pipe(catchError(() => of(null))),
+    ])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((results) => {
+        this.bankCards = this.bankCards.map((card) => ({
+          ...card,
+          count: results.find((result) => result?.id === card.id)?.value ?? 0,
+        }));
       });
   }
 
@@ -54,14 +87,14 @@ export class DashboardComponent {
     {
       id: 1,
       title: 'Singal Payment Request Pending',
-      count: 12,
+      count: 0,
       icon: 'cilClock',
       color: 'warning',
     },
     {
       id: 2,
       title: 'Bulk Payment Request Pending',
-      count: 12,
+      count: 0,
       icon: 'cilClock',
       color: 'secondary',
     },
@@ -69,28 +102,28 @@ export class DashboardComponent {
     {
       id: 3,
       title: 'Payment Received by VAN',
-      count: 45,
+      count: 0,
       icon: 'cilBank',
       color: 'success',
     },
     {
       id: 4,
       title: 'Payment Received by QR',
-      count: 23,
+      count: 0,
       icon: 'cilQrCode',
       color: 'info',
     },
     {
       id: 5,
       title: 'Payment Status',
-      count: 67,
+      count: 0,
       icon: 'cilCreditCard',
       color: 'primary',
     },
     {
       id: 6,
       title: 'QR Status',
-      count: 34,
+      count: 0,
       icon: 'cilCheckCircle',
       color: 'secondary',
     },
@@ -104,7 +137,7 @@ export class DashboardComponent {
     {
       id: 8,
       title: 'VAN Expiry Status',
-      count: 10,
+      count: 0,
       icon: 'cilList',
       color: 'danger',
     },

@@ -1533,3 +1533,166 @@ tbody::-webkit-scrollbar-thumb {
 tbody::-webkit-scrollbar-thumb:hover {
   background: #8d8d8d;
 }
+
+/* --------------------------------------------------------------------------
+   Application-wide light/dark theme bridge
+   Keeps feature pages that use custom classes aligned with CoreUI color mode.
+   -------------------------------------------------------------------------- */
+:root {
+  --dss-page-bg: #f5f8fb;
+  --dss-surface: #ffffff;
+  --dss-surface-soft: #f7f9fc;
+  --dss-surface-hover: #f8faff;
+  --dss-ink: #172033;
+  --dss-ink-soft: #334155;
+  --dss-muted: #64748b;
+  --dss-line: #e5eaf0;
+  --dss-line-soft: #edf1f5;
+  --dss-input-bg: #ffffff;
+  --dss-table-head: #eef2f7;
+  --dss-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+}
+
+[data-coreui-theme="dark"],
+[data-bs-theme="dark"],
+.dark {
+  --dss-page-bg: #171c24;
+  --dss-surface: #222832;
+  --dss-surface-soft: #292f3a;
+  --dss-surface-hover: #2c3440;
+  --dss-ink: #edf2f7;
+  --dss-ink-soft: #d5dce6;
+  --dss-muted: #9ca8b8;
+  --dss-line: #38414e;
+  --dss-line-soft: #313a46;
+  --dss-input-bg: #252c36;
+  --dss-table-head: #2b333e;
+  --dss-shadow: 0 4px 22px rgba(0, 0, 0, 0.22);
+  color-scheme: dark;
+}
+
+[data-coreui-theme="dark"] body,
+[data-bs-theme="dark"] body,
+.dark body,
+[data-coreui-theme="dark"] .body,
+[data-bs-theme="dark"] .body,
+.dark .body,
+[data-coreui-theme="dark"] .wrapper,
+[data-bs-theme="dark"] .wrapper,
+.dark .wrapper {
+  color: var(--dss-ink);
+  background-color: var(--dss-page-bg);
+}
+
+/* Custom page canvases */
+[data-coreui-theme="dark"] :is(.statement-wrapper, .balance-wrapper, .security-page, .profile-page, .login-page, .setup-page),
+[data-bs-theme="dark"] :is(.statement-wrapper, .balance-wrapper, .security-page, .profile-page, .login-page, .setup-page),
+.dark :is(.statement-wrapper, .balance-wrapper, .security-page, .profile-page, .login-page, .setup-page) {
+  color: var(--dss-ink) !important;
+  background: var(--dss-page-bg) !important;
+}
+
+/* Cards and panels shared by feature pages */
+[data-coreui-theme="dark"] :is(.filter-panel, .transactions-panel, .statement-summary, .search-panel, .results-panel, .search-card, .result-card, .no-result-card, .bank-card, .security-card, .profile-card, .login-card, .setup-card, .empty-state),
+[data-bs-theme="dark"] :is(.filter-panel, .transactions-panel, .statement-summary, .search-panel, .results-panel, .search-card, .result-card, .no-result-card, .bank-card, .security-card, .profile-card, .login-card, .setup-card, .empty-state),
+.dark :is(.filter-panel, .transactions-panel, .statement-summary, .search-panel, .results-panel, .search-card, .result-card, .no-result-card, .bank-card, .security-card, .profile-card, .login-card, .setup-card, .empty-state) {
+  color: var(--dss-ink) !important;
+  border-color: var(--dss-line) !important;
+  background: var(--dss-surface) !important;
+  box-shadow: var(--dss-shadow) !important;
+}
+
+[data-coreui-theme="dark"] :is(.account-details, .detail, .status-banner, .requirements, .contacts span, .empty-icon),
+[data-bs-theme="dark"] :is(.account-details, .detail, .status-banner, .requirements, .contacts span, .empty-icon),
+.dark :is(.account-details, .detail, .status-banner, .requirements, .contacts span, .empty-icon) {
+  color: var(--dss-ink-soft) !important;
+  border-color: var(--dss-line) !important;
+  background: var(--dss-surface-soft) !important;
+}
+
+/* Typography */
+[data-coreui-theme="dark"] :is(.title-group h1, .bank-brand h1, .results-title h3, .transactions-header h2, .empty-state h2, .security-heading h1, .payment-status-container h2, .detail strong),
+[data-bs-theme="dark"] :is(.title-group h1, .bank-brand h1, .results-title h3, .transactions-header h2, .empty-state h2, .security-heading h1, .payment-status-container h2, .detail strong),
+.dark :is(.title-group h1, .bank-brand h1, .results-title h3, .transactions-header h2, .empty-state h2, .security-heading h1, .payment-status-container h2, .detail strong) {
+  color: var(--dss-ink) !important;
+}
+
+[data-coreui-theme="dark"] :is(.title-group p, .bank-brand p, .summary-label, .customer-name, .transactions-header div > span, .empty-state p, .subtitle, .contacts, .detail small, .pagination-info, .pagination-bar),
+[data-bs-theme="dark"] :is(.title-group p, .bank-brand p, .summary-label, .customer-name, .transactions-header div > span, .empty-state p, .subtitle, .contacts, .detail small, .pagination-info, .pagination-bar),
+.dark :is(.title-group p, .bank-brand p, .summary-label, .customer-name, .transactions-header div > span, .empty-state p, .subtitle, .contacts, .detail small, .pagination-info, .pagination-bar) {
+  color: var(--dss-muted) !important;
+}
+
+/* Native/custom form controls */
+[data-coreui-theme="dark"] :is(.field-control, .password-field, .password-field input, .search-card .input-group, .search-card .form-control, .page-size-select),
+[data-bs-theme="dark"] :is(.field-control, .password-field, .password-field input, .search-card .input-group, .search-card .form-control, .page-size-select),
+.dark :is(.field-control, .password-field, .password-field input, .search-card .input-group, .search-card .form-control, .page-size-select) {
+  color: var(--dss-ink) !important;
+  border-color: var(--dss-line) !important;
+  background-color: var(--dss-input-bg) !important;
+}
+
+[data-coreui-theme="dark"] input::placeholder,
+[data-bs-theme="dark"] input::placeholder,
+.dark input::placeholder {
+  color: #7f8b9c;
+}
+
+/* Custom tables */
+[data-coreui-theme="dark"] :is(.statement-table, .bank-table),
+[data-bs-theme="dark"] :is(.statement-table, .bank-table),
+.dark :is(.statement-table, .bank-table) {
+  color: var(--dss-ink-soft);
+  background: var(--dss-surface);
+}
+
+[data-coreui-theme="dark"] :is(.statement-table th, .bank-table thead th),
+[data-bs-theme="dark"] :is(.statement-table th, .bank-table thead th),
+.dark :is(.statement-table th, .bank-table thead th) {
+  color: var(--dss-ink-soft) !important;
+  border-color: var(--dss-line) !important;
+  background: var(--dss-table-head) !important;
+}
+
+[data-coreui-theme="dark"] :is(.statement-table td, .bank-table tbody td),
+[data-bs-theme="dark"] :is(.statement-table td, .bank-table tbody td),
+.dark :is(.statement-table td, .bank-table tbody td) {
+  color: var(--dss-ink-soft) !important;
+  border-color: var(--dss-line-soft) !important;
+  background: var(--dss-surface) !important;
+}
+
+[data-coreui-theme="dark"] :is(.statement-table tbody tr:hover td, .bank-table tbody tr:hover td),
+[data-bs-theme="dark"] :is(.statement-table tbody tr:hover td, .bank-table tbody tr:hover td),
+.dark :is(.statement-table tbody tr:hover td, .bank-table tbody tr:hover td) {
+  background: var(--dss-surface-hover) !important;
+}
+
+[data-coreui-theme="dark"] :is(.statement-table .balance, .account-number, .page-actions strong),
+[data-bs-theme="dark"] :is(.statement-table .balance, .account-number, .page-actions strong),
+.dark :is(.statement-table .balance, .account-number, .page-actions strong) {
+  color: var(--dss-ink) !important;
+}
+
+[data-coreui-theme="dark"] :is(.transactions-header, .pagination-bar, .pagination-controls, .results-header),
+[data-bs-theme="dark"] :is(.transactions-header, .pagination-bar, .pagination-controls, .results-header),
+.dark :is(.transactions-header, .pagination-bar, .pagination-controls, .results-header) {
+  border-color: var(--dss-line) !important;
+}
+
+[data-coreui-theme="dark"] :is(.page-actions button, .page-btn),
+[data-bs-theme="dark"] :is(.page-actions button, .page-btn),
+.dark :is(.page-actions button, .page-btn) {
+  color: var(--dss-ink-soft) !important;
+  border-color: var(--dss-line) !important;
+  background: var(--dss-surface-soft) !important;
+}
+
+/* CoreUI primitives and dialogs inherit the same surfaces. */
+[data-coreui-theme="dark"] :is(.card, .modal-content, .dropdown-menu, .offcanvas),
+[data-bs-theme="dark"] :is(.card, .modal-content, .dropdown-menu, .offcanvas),
+.dark :is(.card, .modal-content, .dropdown-menu, .offcanvas) {
+  color: var(--dss-ink);
+  border-color: var(--dss-line);
+  background-color: var(--dss-surface);
+}

@@ -1,7 +1,7 @@
 <div class="approval-wrapper">
   <div class="approval-panel">
     <div class="approval-header">
-      <h5 class="mb-0">Single Payment Request</h5>
+      <h5 class="mb-0">Bulk Payment Request</h5>
       @if (paymentResults.length) {
         <button
           type="button"
@@ -16,7 +16,7 @@
             <div class="payment-search-field">
               <i class="bi bi-search" aria-hidden="true"></i>
               <input
-                id="payment-search-input"
+                id="bulk-payment-search-input"
                 type="search"
                 placeholder="Search payments..."
                 aria-label="Search payments"
@@ -41,7 +41,7 @@
             type="button"
             class="btn btn-success btn-sm"
             (click)="createPayments()"
-            [disabled]="isSubmitting || selectedSingleItems.size === 0"
+            [disabled]="isSubmitting || selectedBulkItems.size === 0"
           >
             <i class="bi bi-arrow-up-circle"></i> Push
           </button>
@@ -49,7 +49,7 @@
             type="button"
             class="btn btn-outline-danger btn-sm"
             (click)="rejectPayments()"
-            [disabled]="isSubmitting || selectedSingleItems.size === 0"
+            [disabled]="isSubmitting || selectedBulkItems.size === 0"
           >
             <i class="bi bi-x-circle"></i> Reject
           </button>
@@ -137,7 +137,7 @@
         class="table-responsive payment-table-container"
         tabindex="0"
         role="region"
-        aria-label="Single payment requests"
+        aria-label="Bulk payment requests"
       >
         <table class="payment-table">
           <colgroup>
@@ -177,7 +177,7 @@
           <tbody>
             @for (item of filteredData; track item.vch_id) {
               <tr
-                [class.payment-selected]="isSingleSelected(item.vch_id)"
+                [class.payment-selected]="isBulkSelected(item.vch_id)"
                 [class.payment-failed]="isFailedPayment(item.status)"
               >
                 <td>
@@ -185,9 +185,9 @@
                     type="checkbox"
                     class="form-check-input mt-0"
                     [attr.aria-label]="'Select payment ' + item.doc_no"
-                    [checked]="isSingleSelected(item.vch_id)"
+                    [checked]="isBulkSelected(item.vch_id)"
                     [disabled]="item.status === 'Approved'"
-                    (change)="toggleSingleSelection(item.vch_id)"
+                    (change)="toggleBulkSelection(item.vch_id)"
                   />
                 </td>
                 <td class="text-nowrap payment-name" [title]="item.firmName">
@@ -235,7 +235,7 @@
                   {{
                     searchTerm.trim()
                       ? "No payments match your search."
-                      : "No pending single payment requests found."
+                      : "No pending bulk payment requests found."
                   }}
                 </td>
               </tr>
@@ -250,10 +250,10 @@
 <dialog
   #messageDialog
   class="payment-message-dialog"
-  aria-labelledby="payment-message-title"
+  aria-labelledby="bulk-payment-message-title"
 >
   <div class="message-header">
-    <h5 id="payment-message-title">Payment result details</h5>
+    <h5 id="bulk-payment-message-title">Payment result details</h5>
     <button
       type="button"
       class="btn-close"
@@ -286,11 +286,11 @@
         }}</span>
       </dd>
     </dl>
-    <label for="payment-result-message" class="form-label fw-semibold"
+    <label for="bulk-payment-result-message" class="form-label fw-semibold"
       >Message</label
     >
     <textarea
-      id="payment-result-message"
+      id="bulk-payment-result-message"
       class="form-control message-content"
       rows="6"
       readonly

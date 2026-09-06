@@ -29,10 +29,12 @@ import {
 
 import { IconDirective } from '@coreui/icons-angular';
 import { MyProvider } from '@shared-services/provider';
+import { AuthService } from '@shared-services/auth.service';
 
 @Component({
   selector: 'app-default-header',
   templateUrl: './default-header.component.html',
+  styleUrl: './default-header.component.scss',
   imports: [
     ContainerComponent,
     HeaderTogglerDirective,
@@ -55,6 +57,7 @@ import { MyProvider } from '@shared-services/provider';
 })
 export class DefaultHeaderComponent extends HeaderComponent {
   readonly provider = inject(MyProvider);
+  private readonly auth = inject(AuthService);
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
 
@@ -78,12 +81,29 @@ export class DefaultHeaderComponent extends HeaderComponent {
 
   sidebarId = input('sidebar1');
 
-  branchName = 'Sangli';
-  unitName = 'Factory Unit 1';
-  finYear = '2026-27';
+  branchName = 'All Branches';
+  // unitName = 'Factory Unit 1';
+  // finYear = '2026-27';
 
   get companyName(): string {
-    return this.provider.companyInfo?.company?.firm_name ?? '';
+    return 'Canara Bank Api Integration System'; // Replace with actual logic to get the company name
+  }
+
+  get userName(): string {
+    const user = this.provider.companyInfo?.user as any;
+    return user?.username ?? user?.userName ?? user?.name ?? 'User';
+  }
+
+  get userRoleName(): string {
+    const role = Number(this.provider.companyInfo?.user?.role);
+    if (role === 1) return 'Administrator';
+    if (role === 2) return 'Checker';
+    if (role === 3) return 'Maker';
+    return 'User';
+  }
+
+  logout(): void {
+    this.auth.logout();
   }
 
   public newMessages = [
