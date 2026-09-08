@@ -26,12 +26,40 @@ describe('BulkPaymentRequestComponent', () => {
   });
 
   it('loads bulk requests and selects only search matches', () => {
-    expect(http.get).toHaveBeenCalledWith('Dashoboard/pending-details', { branch_id: 'BR', id: 2 });
+    expect(http.get).toHaveBeenCalledWith('Dashoboard/maker-requests', { branch_id: 'BR' });
     component.onSearchChange('DOC2');
     component.toggleAllSelections({ target: { checked: true } });
     expect([...component.selectedBulkItems]).toEqual([2]);
     component.onSearchChange('');
     expect(component.selectedBulkItems.size).toBe(0);
+  });
+
+  it('maps the maker response into a batch and opens its account details', () => {
+    const txn = { txnIdentity: { id: 1001, srNo: '1' }, txnAmt: '500.00', txnType: 'IFT',
+      benefIFSC: 'CNRB0006474', benefAcNo: '6474201000016', benefAcNm: 'TIRUMALA', nrtv: 'APITEST' };
+    http.get.and.returnValue(of({ status_cd: 1, errors: {}, data: [
+      { vch_id: 3, batch_no: '10110200000003', branch_id: '102', firm_id: 101,
+        srcAcctNumber: '6474201000015', doc_no: '1234', total_amt: 1000,
+        txnDetls: [txn, { ...txn, txnIdentity: { id: 1002, srNo: '2' } }] },
+    ] }));
+    component.ngOnInit();
+    expect(component.approvalData[0].request_count).toBe(2);
+    expect(component.approvalData[0].total_amt).toBe(1000);
+    expect(component.approvalData[0].narration).toBe('APITEST');
+    component.onSearchChange('6474201000016');
+    expect(component.filteredData.length).toBe(1);
+    component.toggleRequestDetails(component.filteredData[0]);
+    expect(component.expandedRequests.has(3)).toBeTrue();
+    component.toggleRequestDetails(component.filteredData[0]);
+    expect(component.expandedRequests.has(3)).toBeFalse();
+  });
+
+  it('shows an error when the maker API reports failure', () => {
+    http.get.and.returnValue(of({ status_cd: 0, errors: {}, data: [] }));
+    component.ngOnInit();
+    expect(component.approvalData).toEqual([]);
+    expect(component.loadError).toBeTruthy();
+    expect(component.isLoading).toBeFalse();
   });
 
   it('submits selected documents once and matches results by payment number', () => {

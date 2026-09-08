@@ -22,6 +22,7 @@
               <div class="d-flex align-items-start justify-content-between">
                 <div class="card-content">
                   <span
+                    *ngIf="card.count !== null"
                     class="card-badge"
                     [style.background-color]="getIconColor(card.color)"
                   >
@@ -99,7 +100,7 @@
             <!-- Animated progress bar at bottom -->
             <div
               class="card-progress"
-              [style.width.%]="card.count / 1.2"
+              [style.width.%]="(card.count ?? 0) / 1.2"
               [style.background-color]="getIconColor(card.color)"
             ></div>
           </div>

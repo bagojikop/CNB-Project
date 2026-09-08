@@ -2,10 +2,12 @@ import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { CurrencyPipe } from '@angular/common';
+import { SmartTableComponent, TemplateIdDirective, IColumn } from '@coreui/angular-pro';
 import { FormsModule } from '@angular/forms';
 import { Http } from '@shared-services/httpService';
 import { MyProvider } from '@shared-services/provider';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { apiResponse } from '@shared-interfaces/commans/apiResponse';
 
 interface PaymentResponse {
   payment_no: string;
@@ -20,7 +22,7 @@ interface PaymentResult extends PaymentResponse {
   doc_no: string | number;
   utr: string;
   payment_no: string;
-  benificery: SinglePayemntEcryptData | null;
+  benificery: BulkPaymentEncryptData | null;
 }
 
 interface Firm {
@@ -41,7 +43,7 @@ interface document {
 
 
 
-interface SinglePayemntEcryptData {
+interface BulkPaymentEncryptData {
   destAcctNumber: string | null;
   ifscCode: string | null;
   txnAmount: string | null;
@@ -52,29 +54,80 @@ interface SinglePayemntEcryptData {
   TrnType: string | null;
 }
 
-interface PendingSinglePayment {
-  status?: string | null;
-  error_message?: string | null;
+interface BulkTransaction {
+  txnIdentity: { id: number; srNo: string };
+  txnAmt: string;
+  txnType: string;
+  benefIFSC: string;
+  benefAcNo: string;
+  benefAcNm: string;
+  nrtv: string;
+}
+
+interface PendingBulkPayment {
+  batch_no: string;
+  date?: string;
+  txnDetls?: BulkTransaction[];
+  total_amt: number;
+  status?: string;
+
+  vch_id: number;
   branch_id: string;
   firm_id: string | number;
   srcAcctNumber: string;
   doc_no: string | number;
-  benificery: SinglePayemntEcryptData | null;
+  benificery: BulkPaymentEncryptData | null;
   payment_no: string | null
 }
 
 @Component({
-  selector: 'app-payment-request-approval',
-  imports: [CurrencyPipe, CommonModule, FormsModule],
-  templateUrl: './payment-request-approval.component.html',
-  styleUrl: './payment-request-approval.component.scss',
+  selector: 'app-bulk-payment-status',
+  imports: [CurrencyPipe, CommonModule, FormsModule, SmartTableComponent, TemplateIdDirective],
+  templateUrl: './bulk-payment-status.component.html',
+  styleUrl: '../bulk-payment-request/bulk-payment-request.component.scss',
 })
-export class PaymentRequestApprovalComponent implements OnInit {
+export class BulkPaymentStatusComponent implements OnInit {
+  title = 'Bulk Payment Status';
+  requestsEndpoint = 'BulkPaymentRequest/status-requests';
+  showPaymentActions = false;
+  showStatus = true;
+
+  get displayedColumns(): IColumn[] {
+    const columns = this.requestColumns.filter(column => this.showPaymentActions || column.key !== 'select');
+    return this.showStatus
+      ? [...columns.slice(0, -1), { key: 'status', label: 'Status' }, columns[columns.length - 1]]
+      : columns;
+  }
+
   private http = inject(Http);
   private provider = inject(MyProvider);
   private destroyRef = inject(DestroyRef);
   private documents: document[] = [];
   loadError = '';
+  isLoading = false;
+  expandedRequests = new Set<number>();
+  readonly requestColumns: IColumn[] = [
+    { key: 'select', label: '', sorter: false, filter: false },
+    { key: 'batch_no', label: 'Batch No.' },
+    { key: 'date', label: 'Date' },
+    { key: 'doc_no', label: 'Document No.' },
+    { key: 'firmName', label: 'Firm' },
+    { key: 'branchName', label: 'Branch' },
+    { key: 'srcAcctNumber', label: 'Account' },
+    { key: 'request_count', label: 'Request Count' },
+    { key: 'total_amt', label: 'Total Amount' },
+    { key: 'narration', label: 'Narration' },
+    { key: 'details', label: 'Details', sorter: false, filter: false },
+  ];
+
+  toggleRequestDetails(item: { vch_id: number }): void {
+    if (this.expandedRequests.has(item.vch_id)) {
+      this.expandedRequests.delete(item.vch_id);
+    } else {
+      this.expandedRequests.add(item.vch_id);
+    }
+  }
+
   isSubmitting = false;
   paymentResults: PaymentResult[] = [];
   private respondedPaymentIds = new Set<number>();
@@ -103,7 +156,7 @@ export class PaymentRequestApprovalComponent implements OnInit {
     this.respondedPaymentIds.clear();
     this.paymentResults = [];
     this.loadError = '';
-    this.selectedSingleItems.clear();
+    this.selectedBulkItems.clear();
   }
 
   approvalData: any[] = [];
@@ -112,10 +165,10 @@ export class PaymentRequestApprovalComponent implements OnInit {
     const branchId = this.provider.companyInfo?.company?.branch_id;
 
 
+    this.isLoading = true;
     forkJoin({
-      payments: this.http.get<PendingSinglePayment[]>('Dashoboard/pending-details', {
+      payments: this.http.get<apiResponse>(this.requestsEndpoint, {
         branch_id: branchId || '',
-        id: 1,
       }),
       firms: this.http.readJson<Firm[]>('assets/data/firms.json').pipe(
         catchError(() => of([] as Firm[])),
@@ -124,26 +177,33 @@ export class PaymentRequestApprovalComponent implements OnInit {
         catchError(() => of([] as Branch[])),
       ),
     })
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(finalize(() => { this.isLoading = false; }), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ payments: result, firms, branches }) => {
           const firmNames = new Map(firms.map((firm) => [String(firm.firm_code), firm.firm_name]));
           const branchNames = new Map(branches.map((branch) => [String(branch.branch_code), branch.branch_name]));
-          this.approvalData = (result ?? []).map((payment, index) => {
+          if (!Array.isArray(result) && result?.status_cd !== 1) {
+            this.approvalData = [];
+            this.loadError = 'Unable to load bulk payment requests. Please try again.';
+            return;
+          }
+          const payments = Array.isArray(result) ? result : result?.data ?? [];
+          this.approvalData = payments.map((payment: PendingBulkPayment) => {
 
             return {
 
               ...payment,
+              txnDetls: payment.txnDetls ?? [],
+              request_count: payment.txnDetls?.length ?? 0,
+              narration: [...new Set((payment.txnDetls ?? []).map(txn => txn.nrtv).filter(Boolean))].join('; '),
               firmName: firmNames.get(String(payment.firm_id)) ?? payment.firm_id,
               branchName: branchNames.get(String(payment.branch_id)) ?? payment.branch_id,
-              // The response has no row ID; use a unique local selection key.
 
-              paymentType: 'Single',
-              status: payment.status?.trim() || (payment.error_message?.trim() ? 'Failed' : 'Pending'),
-              message: payment.error_message,
+              paymentType: 'Bulk',
+              status: payment.status ?? (this.showStatus ? '' : 'Pending'),
             };
           });
-          this.selectedSingleItems.clear();
+          this.selectedBulkItems.clear();
         },
         error: () => {
           this.approvalData = [];
@@ -152,17 +212,17 @@ export class PaymentRequestApprovalComponent implements OnInit {
       });
   }
 
-  selectedSingleItems: Set<number> = new Set();
+  selectedBulkItems: Set<number> = new Set();
 
   // Computed property for Select All checkbox
   get allSelected(): boolean {
     const pendingItems = this.filteredData.filter(
       (item) =>
         item.status !== 'Approved' &&
-        item.paymentType.toLowerCase() === 'single',
+        item.paymentType.toLowerCase() === 'bulk',
     );
     if (pendingItems.length === 0) return false;
-    return pendingItems.every((item) => this.selectedSingleItems.has(item.vch_id));
+    return pendingItems.every((item) => this.selectedBulkItems.has(item.vch_id));
   }
 
   toggleAllSelections(event: any): void {
@@ -170,15 +230,15 @@ export class PaymentRequestApprovalComponent implements OnInit {
     const pendingItems = this.filteredData.filter(
       (item) =>
         item.status !== 'Approved' &&
-        item.paymentType.toLowerCase() === 'single',
+        item.paymentType.toLowerCase() === 'bulk',
     );
     if (checked) {
       pendingItems.forEach((item) => {
-        if (item.status != "Failed")
-          this.selectedSingleItems.add(item.vch_id)
+        if (!this.isFailedPayment(item.status))
+          this.selectedBulkItems.add(item.vch_id)
       });
     } else {
-      pendingItems.forEach((item) => this.selectedSingleItems.delete(item.vch_id));
+      pendingItems.forEach((item) => this.selectedBulkItems.delete(item.vch_id));
     }
   }
 
@@ -186,7 +246,7 @@ export class PaymentRequestApprovalComponent implements OnInit {
 
   onSearchChange(value: string): void {
     this.searchTerm = value;
-    this.selectedSingleItems.clear();
+    this.selectedBulkItems.clear();
   }
 
   // Search the displayed payment fields.
@@ -197,6 +257,8 @@ export class PaymentRequestApprovalComponent implements OnInit {
 
       return [
         item.firmName, item.branchName, item.srcAcctNumber, item.doc_no,
+        item.batch_no, item.date, item.status, item.request_count, item.total_amt, item.narration,
+        ...(item.txnDetls ?? []).flatMap((txn: BulkTransaction) => [txn.benefAcNm, txn.benefAcNo, txn.benefIFSC, txn.nrtv]),
         item.benificery?.valueDate, item.benificery?.benefName,
         item.benificery?.destAcctNumber, item.benificery?.ifscCode,
         item.benificery?.txnAmount,
@@ -232,111 +294,20 @@ export class PaymentRequestApprovalComponent implements OnInit {
     }
   }
 
-  getStatusClass(status: string): string {
-    switch (status) {
-      case 'Approved':
-        return 'badge bg-success';
-      case 'Rejected':
-        return 'badge bg-danger';
-      default:
-        return 'badge bg-warning';
-    }
+  // Bulk payment selection methods
+  isBulkSelected(itemId: number): boolean {
+    return this.selectedBulkItems.has(itemId);
   }
 
-  handleClickOutside(dropdown: any, event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    const dropdownElement =
-      dropdown._elementRef?.nativeElement || dropdown.parentElement;
-    if (dropdownElement && !dropdownElement.contains(target)) {
-      this.closeDropdown(dropdown);
-      document.removeEventListener(
-        'click',
-        this.handleClickOutside.bind(this, dropdown),
-      );
-    }
-  }
-
-  toggleDropdown(dropdown: any): void {
-    dropdown.isOpen = !dropdown.isOpen;
-    if (dropdown.isOpen) {
-      // Close other dropdowns
-      const allDropdowns = document.querySelectorAll('.dropdown');
-      allDropdowns.forEach((d: any) => {
-        if (d !== dropdown && d.isOpen) {
-          d.isOpen = false;
-        }
-      });
-      // Add click outside listener
-      setTimeout(() => {
-        document.addEventListener(
-          'click',
-          this.handleClickOutside.bind(this, dropdown),
-        );
-      }, 0);
+  toggleBulkSelection(itemId: number): void {
+    if (this.selectedBulkItems.has(itemId)) {
+      this.selectedBulkItems.delete(itemId);
     } else {
-      document.removeEventListener(
-        'click',
-        this.handleClickOutside.bind(this, dropdown),
-      );
-    }
-  }
-
-  closeDropdown(dropdown: any): void {
-    dropdown.isOpen = false;
-    document.removeEventListener(
-      'click',
-      this.handleClickOutside.bind(this, dropdown),
-    );
-  }
-
-
-  // Single payment selection methods
-  isSingleSelected(itemId: number): boolean {
-    return this.selectedSingleItems.has(itemId);
-  }
-
-  toggleSingleSelection(itemId: number): void {
-    if (this.selectedSingleItems.has(itemId)) {
-      this.selectedSingleItems.delete(itemId);
-    } else {
-      this.selectedSingleItems.add(itemId);
+      this.selectedBulkItems.add(itemId);
     }
   }
 
 
-  pushSelectedItems(): void {
-    const selectedIds = Array.from(this.selectedSingleItems);
-    if (selectedIds.length === 0) {
-      alert('Please select at least one payment request to push.');
-      return;
-    }
-
-    // Find the selected items from approvalData
-    const selectedItems = this.approvalData.filter(
-      (item) =>
-        selectedIds.includes(item.vch_id) &&
-        item.paymentType.toLowerCase() === 'single' && item.status?.toLowerCase() != "failed",
-    );
-
-    if (selectedItems.length === 0) {
-      alert('No valid single payment requests selected.');
-      return;
-    }
-
-    // Loop through each selected item and call approveSinglePayment
-
-    selectedItems.forEach((item) => {
-
-      // Set status to 'Approved' for each selected single payment
-      this.documents.push({ vch_id: item.vch_id, accountNo: item.srcAcctNumber })
-    });
-
-    // Clear selection after push
-    this.selectedSingleItems.clear();
-
-    // Show success message
-
-  }
   createPayments(): void {
     this.submitSelectedPayments('create');
   }
@@ -346,10 +317,10 @@ export class PaymentRequestApprovalComponent implements OnInit {
   }
 
   private submitSelectedPayments(action: 'create' | 'reject'): void {
-    if (this.isSubmitting) return;
+    if (this.isSubmitting || !this.showPaymentActions) return;
     const selectedItems = this.approvalData.filter((item) =>
-      this.selectedSingleItems.has(item.vch_id) && item.paymentType === 'Single'
-      && (action === 'reject' || item.status?.toLowerCase() != 'failed'),
+      this.selectedBulkItems.has(item.vch_id) && item.paymentType === 'Bulk'
+      && (action === 'reject' || !this.isFailedPayment(item.status)),
     );
     if (!selectedItems.length) return;
 
@@ -359,19 +330,8 @@ export class PaymentRequestApprovalComponent implements OnInit {
     this.paymentResults = [];
     this.loadError = '';
     this.isSubmitting = true;
-    this.http.post<PaymentResponse[] | PaymentResponse>(`SinglePaymentRequest/${action}`, this.documents)
-      // of<PaymentResponse[]>(
-      //   selectedItems.map((item, index) => ({
-      //     payment_no: String(item.payment_no),
-      //     utr: action === 'create' && index === 0 ? 'DEMO123456789' : '',
-      //     status: action === 'reject' ? 'REJECTED' : index === 0 ? 'SUCCESS' : 'FAILED',
-      //     message: action === 'reject'
-      //       ? 'Demo payment rejected successfully.'
-      //       : index === 0
-      //       ? 'Demo payment processed successfully.'
-      //       : 'Demo payment failed: beneficiary account is invalid.',
-      //   }))
-      // )
+    // Assumes the bulk API uses the same document payload and result shape as single payments.
+    this.http.post<PaymentResponse[] | PaymentResponse>(`BulkPaymentRequest/${action}`, this.documents)
       .pipe(finalize(() => { this.isSubmitting = false; }), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
@@ -384,7 +344,7 @@ export class PaymentRequestApprovalComponent implements OnInit {
               item.status = result.status;
               item.message = result.message;
               item.utr = result.utr;
-              this.selectedSingleItems.delete(item.vch_id);
+              this.selectedBulkItems.delete(item.vch_id);
             }
             return {
               firmName: item.firmName,

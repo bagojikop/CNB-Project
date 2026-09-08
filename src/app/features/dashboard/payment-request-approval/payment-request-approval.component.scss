@@ -292,8 +292,9 @@
   }
 
   &.payment-table {
+  --payment-table-width: max(1663px, 100cqw);
   // Offsets match the first seven colgroup widths.
-  $left-offsets: 0, .03, .14, .22, .33, .42, .50;
+  $left-offsets: 0, .024, .112, .176, .264, .336, .40;
 
   @for $column from 1 through 7 {
 
@@ -314,7 +315,7 @@
 
 
   td:nth-child(-n + 7),
-  td:nth-child(n + 10) {
+  td:nth-child(10) {
     background: #fff;
   }
 
@@ -393,6 +394,9 @@
 .payment-results { margin: 0; padding: 0; background: #fff; }
 .result-table {
   th:first-child, td:first-child { text-align: left; }
+}
+.payment-table,
+.result-table {
   .result-message {
     display: block;
     width: 100%;

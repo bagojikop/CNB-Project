@@ -1,3 +1,5 @@
+import { BulkPaymentInitializeComponent } from '@features/dashboard/bulk-payment-initialize/bulk-payment-initialize.component';
+import { BulkPaymentStatusComponent } from '@features/dashboard/bulk-payment-status/bulk-payment-status.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BulkPaymentRequestComponent } from '@features/dashboard/bulk-payment-request/bulk-payment-request.component';
@@ -8,6 +10,8 @@ import { PaymentStatusComponent } from '@features/dashboard/payment-status/payme
 import { QrStatusComponent } from '@features/dashboard/qr-status/qr-status.component';
 import { VANExpiryStatusComponent } from '@features/dashboard/vanexpiry-status/vanexpiry-status.component';
 const routes: Routes = [
+  { path: 'bulkPaymentInitialize', component: BulkPaymentInitializeComponent },
+  { path: 'bulkPaymentStatus', component: BulkPaymentStatusComponent },
   {
     path: 'singal-payment-request-Approval',
     component: PaymentRequestApprovalComponent,

@@ -1,11 +1,13 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, Input, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { CurrencyPipe } from '@angular/common';
+import { SmartTableComponent, TemplateIdDirective, IColumn } from '@coreui/angular-pro';
 import { FormsModule } from '@angular/forms';
 import { Http } from '@shared-services/httpService';
 import { MyProvider } from '@shared-services/provider';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { apiResponse } from '@shared-interfaces/commans/apiResponse';
 
 interface PaymentResponse {
   payment_no: string;
@@ -52,7 +54,23 @@ interface BulkPaymentEncryptData {
   TrnType: string | null;
 }
 
+interface BulkTransaction {
+  txnIdentity: { id: number; srNo: string };
+  txnAmt: string;
+  txnType: string;
+  benefIFSC: string;
+  benefAcNo: string;
+  benefAcNm: string;
+  nrtv: string;
+}
+
 interface PendingBulkPayment {
+  batch_no: string;
+  date?: string;
+  txnDetls?: BulkTransaction[];
+  total_amt: number;
+  status?: string;
+
   vch_id: number;
   branch_id: string;
   firm_id: string | number;
@@ -64,16 +82,52 @@ interface PendingBulkPayment {
 
 @Component({
   selector: 'app-bulk-payment-request',
-  imports: [CurrencyPipe, CommonModule, FormsModule],
+  imports: [CurrencyPipe, CommonModule, FormsModule, SmartTableComponent, TemplateIdDirective],
   templateUrl: './bulk-payment-request.component.html',
   styleUrl: './bulk-payment-request.component.scss',
 })
 export class BulkPaymentRequestComponent implements OnInit {
+  @Input() title = 'Bulk Payment Request';
+  @Input() requestsEndpoint = 'BulkPaymentRequest/maker-requests';
+  @Input() showPaymentActions = true;
+  @Input() showStatus = false;
+
+  get displayedColumns(): IColumn[] {
+    const columns = this.requestColumns.filter(column => this.showPaymentActions || column.key !== 'select');
+    return this.showStatus
+      ? [...columns.slice(0, -1), { key: 'status', label: 'Status' }, columns[columns.length - 1]]
+      : columns;
+  }
+
   private http = inject(Http);
   private provider = inject(MyProvider);
   private destroyRef = inject(DestroyRef);
   private documents: document[] = [];
   loadError = '';
+  isLoading = false;
+  expandedRequests = new Set<number>();
+  readonly requestColumns: IColumn[] = [
+    { key: 'select', label: '', sorter: false, filter: false },
+    { key: 'batch_no', label: 'Batch No.' },
+    { key: 'date', label: 'Date' },
+    { key: 'doc_no', label: 'Document No.' },
+    { key: 'firmName', label: 'Firm' },
+    { key: 'branchName', label: 'Branch' },
+    { key: 'srcAcctNumber', label: 'Account' },
+    { key: 'request_count', label: 'Request Count' },
+    { key: 'total_amt', label: 'Total Amount' },
+    { key: 'narration', label: 'Narration' },
+    { key: 'details', label: 'Details', sorter: false, filter: false },
+  ];
+
+  toggleRequestDetails(item: { vch_id: number }): void {
+    if (this.expandedRequests.has(item.vch_id)) {
+      this.expandedRequests.delete(item.vch_id);
+    } else {
+      this.expandedRequests.add(item.vch_id);
+    }
+  }
+
   isSubmitting = false;
   paymentResults: PaymentResult[] = [];
   private respondedPaymentIds = new Set<number>();
@@ -111,10 +165,10 @@ export class BulkPaymentRequestComponent implements OnInit {
     const branchId = this.provider.companyInfo?.company?.branch_id;
 
 
+    this.isLoading = true;
     forkJoin({
-      payments: this.http.get<PendingBulkPayment[]>('Dashoboard/pending-details', {
+      payments: this.http.get<apiResponse>(this.requestsEndpoint, {
         branch_id: branchId || '',
-        id: 2,
       }),
       firms: this.http.readJson<Firm[]>('assets/data/firms.json').pipe(
         catchError(() => of([] as Firm[])),
@@ -123,21 +177,30 @@ export class BulkPaymentRequestComponent implements OnInit {
         catchError(() => of([] as Branch[])),
       ),
     })
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(finalize(() => { this.isLoading = false; }), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ payments: result, firms, branches }) => {
           const firmNames = new Map(firms.map((firm) => [String(firm.firm_code), firm.firm_name]));
           const branchNames = new Map(branches.map((branch) => [String(branch.branch_code), branch.branch_name]));
-          this.approvalData = (result ?? []).map((payment) => {
+          if (!Array.isArray(result) && result?.status_cd !== 1) {
+            this.approvalData = [];
+            this.loadError = 'Unable to load bulk payment requests. Please try again.';
+            return;
+          }
+          const payments = Array.isArray(result) ? result : result?.data ?? [];
+          this.approvalData = payments.map((payment: PendingBulkPayment) => {
 
             return {
 
               ...payment,
+              txnDetls: payment.txnDetls ?? [],
+              request_count: payment.txnDetls?.length ?? 0,
+              narration: [...new Set((payment.txnDetls ?? []).map(txn => txn.nrtv).filter(Boolean))].join('; '),
               firmName: firmNames.get(String(payment.firm_id)) ?? payment.firm_id,
               branchName: branchNames.get(String(payment.branch_id)) ?? payment.branch_id,
 
               paymentType: 'Bulk',
-              status: 'Pending',
+              status: payment.status ?? (this.showStatus ? '' : 'Pending'),
             };
           });
           this.selectedBulkItems.clear();
@@ -194,6 +257,8 @@ export class BulkPaymentRequestComponent implements OnInit {
 
       return [
         item.firmName, item.branchName, item.srcAcctNumber, item.doc_no,
+        item.batch_no, item.date, item.status, item.request_count, item.total_amt, item.narration,
+        ...(item.txnDetls ?? []).flatMap((txn: BulkTransaction) => [txn.benefAcNm, txn.benefAcNo, txn.benefIFSC, txn.nrtv]),
         item.benificery?.valueDate, item.benificery?.benefName,
         item.benificery?.destAcctNumber, item.benificery?.ifscCode,
         item.benificery?.txnAmount,
@@ -252,7 +317,7 @@ export class BulkPaymentRequestComponent implements OnInit {
   }
 
   private submitSelectedPayments(action: 'create' | 'reject'): void {
-    if (this.isSubmitting) return;
+    if (this.isSubmitting || !this.showPaymentActions) return;
     const selectedItems = this.approvalData.filter((item) =>
       this.selectedBulkItems.has(item.vch_id) && item.paymentType === 'Bulk'
       && (action === 'reject' || !this.isFailedPayment(item.status)),

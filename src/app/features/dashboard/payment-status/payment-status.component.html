@@ -24,15 +24,15 @@
           <col style="width: 8%" /><col style="width: 9%" /><col style="width: 8%" />
         </colgroup>
         <thead><tr>
-          <th><input type="checkbox" class="form-check-input" aria-label="Select all failed payments" [checked]="allSelected" [disabled]="isLoading" (change)="toggleAll($event)" /></th>
+          <th><input type="checkbox" class="form-check-input" aria-label="Select all payments" [checked]="allSelected" (change)="toggleAll($event)" /></th>
           <th>Firm</th><th>Branch</th><th>Src Account No.</th><th>Document No.</th><th>Date</th><th>Beneficiary</th><th>Dest Account No.</th><th>IFSC Code</th><th class="text-end">Amount</th><th>UTR</th><th>Status</th>
         </tr></thead>
         <tbody>
           @for (item of filteredPayments; track item) {
             <tr [class.payment-failed]="isFailed(item.status)" [class.payment-selected]="selectedPayments.has(item)">
-              <td>@if (isFailed(item.status)) {
-                <input type="checkbox" class="form-check-input" [attr.aria-label]="'Select failed payment ' + item.doc_no" [checked]="selectedPayments.has(item)" [disabled]="isLoading || item.id == null" (change)="toggleSelection(item)" />
-              }</td>
+              <td>
+                <input type="checkbox" class="form-check-input" [attr.aria-label]="'Select payment ' + item.doc_no" [checked]="selectedPayments.has(item)" (change)="toggleSelection(item)" />
+              </td>
               <td [title]="item.firmName">{{ item.firmName }}</td><td [title]="item.branchName">{{ item.branchName }}</td>
               <td [title]="item.srcAcctNumber">{{ item.srcAcctNumber }}</td><td>{{ item.doc_no }}</td><td>{{ item.benificery?.valueDate || '-' }}</td>
               <td [title]="item.benificery?.benefName">{{ item.benificery?.benefName || '-' }}</td>

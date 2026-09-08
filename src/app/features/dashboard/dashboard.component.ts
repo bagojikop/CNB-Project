@@ -24,7 +24,7 @@ interface PendingCount {
 interface BankCard {
   id: number;
   title: string;
-  count: number;
+  count: number | null;
   icon: string;
   color: string;
   route?: string;
@@ -69,7 +69,7 @@ export class DashboardComponent implements OnInit {
       .subscribe((results) => {
         this.bankCards = this.bankCards.map((card) => ({
           ...card,
-          count: results.find((result) => result?.id === card.id)?.value ?? 0,
+          count: results.find((result) => result?.id === card.id)?.value ?? card.count,
         }));
       });
   }
@@ -84,6 +84,16 @@ export class DashboardComponent implements OnInit {
   };
 
   bankCards: BankCard[] = [
+    {
+      id: 9, title: 'Bulk Payment Initialize', count: null,
+      icon: 'cilClock', color: 'info',
+      route: '/dashboard/dashboard-form/bulkPaymentInitialize',
+    },
+    {
+      id: 10, title: 'Bulk Payment Status', count: null,
+      icon: 'cilCreditCard', color: 'primary',
+      route: '/dashboard/dashboard-form/bulkPaymentStatus',
+    },
     {
       id: 1,
       title: 'Singal Payment Request Pending',
@@ -175,6 +185,10 @@ export class DashboardComponent implements OnInit {
   }
 
   onCardClick(card: BankCard): void {
+    if (card.route) {
+      this.glob_Routing(card.route);
+      return;
+    }
     switch (card.id) {
       case 1:
         this.glob_Routing(

@@ -1,4 +1,4 @@
 {
-  "apiServer": "https://cnb.kgscoop.in/pi/",
+  "apiServer": "http://localhost:5184/",
   "reportServer": "http://localhost:5184/"
 }

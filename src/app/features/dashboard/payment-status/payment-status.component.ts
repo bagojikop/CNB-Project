@@ -14,7 +14,7 @@ interface Beneficiary {
   valueDate: string | null;
 }
 interface StatusPayment {
-  id?: number;
+  vch_id?: number;
   payment_no: string;
   branch_id: string | number;
   firm_id: string | number;
@@ -79,13 +79,13 @@ export class PaymentStatusComponent implements OnInit {
 
   refreshStatus(): void {
     if (this.isLoading || !this.payments.length) return;
-    if (this.payments.some((item) => item.id == null)) {
+    if (this.payments.some((item) => item.vch_id == null)) {
       this.errorMessage = 'The pending-details API must return each payment ID before status can be updated.';
       return;
     }
     const submittedPayments = [...this.payments];
     const documents = submittedPayments.map((item) => ({
-      id: item.id,
+      vch_id: item.vch_id,
       accountNo: item.srcAcctNumber,
     }));
     this.isLoading = true;
@@ -105,7 +105,6 @@ export class PaymentStatusComponent implements OnInit {
             item.status = result.status;
             item.utr = result.utr;
             item.message = result.message;
-            if (!this.isFailed(item.status)) this.selectedPayments.delete(item);
           });
         },
         error: () => { this.errorMessage = 'Unable to update payment status. Please try again.'; },
@@ -125,31 +124,30 @@ export class PaymentStatusComponent implements OnInit {
     return ['FAILED', 'FAILURE', 'FAIL', 'ERROR'].includes((status ?? '').trim().toUpperCase());
   }
   get allSelected(): boolean {
-    const failed = this.filteredPayments.filter((item) => this.isFailed(item.status) && item.id != null);
-    return failed.length > 0 && failed.every((item) => this.selectedPayments.has(item));
+    const visible = this.filteredPayments;
+    return visible.length > 0 && visible.every((item) => this.selectedPayments.has(item));
   }
   toggleAll(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    this.filteredPayments.filter((item) => this.isFailed(item.status) && item.id != null).forEach((item) => {
+    this.filteredPayments.forEach((item) => {
       if (checked) this.selectedPayments.add(item); else this.selectedPayments.delete(item);
     });
   }
   toggleSelection(item: StatusPayment): void {
-    if (!this.isFailed(item.status) || item.id == null || this.isLoading) return;
     if (this.selectedPayments.has(item)) this.selectedPayments.delete(item); else this.selectedPayments.add(item);
   }
   rejectPayments(): void {
     if (this.isLoading) return;
     const selected = [...this.selectedPayments].filter((item) => this.isFailed(item.status));
     if (!selected.length) return;
-    if (selected.some((item) => item.id == null)) {
+    if (selected.some((item) => item.vch_id == null)) {
       this.errorMessage = 'The pending-details API must return each payment ID before it can be rejected.';
       return;
     }
     this.isLoading = true;
     this.errorMessage = '';
     this.http.post<PaymentResponse[] | PaymentResponse>('SinglePaymentRequest/reject',
-      selected.map((item) => ({ id: item.id, accountNo: item.srcAcctNumber })))
+      selected.map((item) => ({ vch_id: item.vch_id, accountNo: item.srcAcctNumber })))
       .pipe(finalize(() => { this.isLoading = false; }), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {

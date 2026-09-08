@@ -141,16 +141,18 @@
       >
         <table class="payment-table">
           <colgroup>
-            <col style="width: 3%" />
-            <col style="width: 11%" />
-            <col style="width: 8%" />
-            <col style="width: 11%" />
-            <col style="width: 9%" />
+            <col style="width: 2.4%" />
+            <col style="width: 8.8%" />
+            <col style="width: 6.4%" />
+            <col style="width: 8.8%" />
+            <col style="width: 7.2%" />
+            <col style="width: 6.4%" />
+            <col style="width: 9.6%" />
+            <col style="width: 13.6%" />
+            <col style="width: 8.8%" />
+            <col style="width: 8.0%" />
             <col style="width: 8%" />
             <col style="width: 12%" />
-            <col style="width: 17%" />
-            <col style="width: 11%" />
-            <col style="width: 10%" />
           </colgroup>
           <thead class="text-nowrap">
             <tr>
@@ -172,14 +174,13 @@
               <th scope="col">Dest Account No.</th>
               <th scope="col">IFSC Code</th>
               <th scope="col" class="text-end">Amount</th>
+              <th scope="col">Status</th>
+              <th scope="col">Message</th>
             </tr>
           </thead>
           <tbody>
             @for (item of filteredData; track item.vch_id) {
-              <tr
-                [class.payment-selected]="isSingleSelected(item.vch_id)"
-                [class.payment-failed]="isFailedPayment(item.status)"
-              >
+              <tr [class.payment-selected]="isSingleSelected(item.vch_id)">
                 <td>
                   <input
                     type="checkbox"
@@ -199,15 +200,6 @@
                 <td class="text-nowrap">{{ item.srcAcctNumber || "-" }}</td>
                 <td class="text-nowrap">
                   {{ item.doc_no ?? "-" }}
-                  @if (isFailedPayment(item.status)) {
-                    <span
-                      class="failed-payment-label"
-                      [title]="
-                        item.message || 'Select this payment to reject it.'
-                      "
-                      >Failed</span
-                    >
-                  }
                 </td>
                 <td class="text-nowrap">{{ item.benificery?.valueDate }}</td>
                 <td
@@ -228,10 +220,26 @@
                       | currency: "INR" : "symbol"
                   }}
                 </td>
+                <td>
+                  <span [class]="getResultStatusClass(item.status)">{{ item.status }}</span>
+                </td>
+                <td>
+                  @if (item.message) {
+                    <button
+                      type="button"
+                      class="btn btn-link btn-sm result-message"
+                      (click)="showResultMessage(item, messageDialog)"
+                    >
+                      {{ item.message }}
+                    </button>
+                  } @else {
+                    -
+                  }
+                </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="10" class="text-center py-5 text-muted">
+                <td colspan="12" class="text-center py-5 text-muted">
                   {{
                     searchTerm.trim()
                       ? "No payments match your search."

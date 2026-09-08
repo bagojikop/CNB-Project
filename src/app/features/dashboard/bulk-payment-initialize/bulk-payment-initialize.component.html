@@ -137,7 +137,6 @@
       </section>
     } @else {
       <div class="p-3">
-        @if (showPaymentActions) {
         <label class="d-flex align-items-center gap-2 mb-3">
           <input
             type="checkbox"
@@ -146,9 +145,8 @@
             (change)="toggleAllSelections($event)"
             [checked]="allSelected"
           />
-          Select all matching requests
+          Select all matching requests ({{ selectedBulkItems.size }} selected)
         </label>
-        }
         <c-smart-table
           class="batch-request-table"
           [items]="filteredData"
