@@ -12,6 +12,8 @@ interface FirmAccount {
   id: number | string;
   firmId: number;
   firmName: string;
+  customerId: string;
+  selectionLabel: string;
   accountNos: string[];
 }
 
@@ -67,15 +69,16 @@ export class AccountStatementComponent {
   }
 
   private loadFirmAccounts(): void {
+    const branchId = this.provider.companyInfo?.company?.branch_id;
     this.http
-      .get<apiResponse>('bankAccount/all', {
-        branch_id: this.provider.companyInfo?.company.branch_id,
-      })
+      .get<apiResponse>('bankAccount/all', branchId == null || String(branchId).trim() === '' ? {} : { branch_id: branchId })
       .subscribe({
         next: (res: any) => {
           const accounts = res?.data ?? res ?? [];
-          this.firms = accounts.map(({ accountNo, ...firm }: any) => ({
+          this.firms = accounts
+            .map(({ accountNo, ...firm }: any) => ({
             ...firm,
+            selectionLabel: `${firm.firmName} — ${firm.customerId ?? ''}`,
             accountNos: String(accountNo ?? '')
               .split(',')
               .map((value) => value.trim())
@@ -86,10 +89,9 @@ export class AccountStatementComponent {
       });
   }
 
-  onFirmSelect(): void {
-    const firmId = Number(this.filterForm.controls.firm_id.value);
+  onFirmSelect(firm: FirmAccount | null): void {
     this.selectedFirm =
-      this.firms.find((firm) => Number(firm.firmId) === firmId) ?? null;
+      this.firms.find((account) => String(account.id) === String(firm?.id)) ?? null;
     this.filterForm.controls.accountNo.setValue('');
   }
 
@@ -100,6 +102,10 @@ export class AccountStatementComponent {
     }
 
     const { accountNo, fromDate, endDate } = this.filterForm.getRawValue();
+    if (!this.selectedFirm.accountNos.includes(accountNo!)) {
+      this.errorMessage.set('Select an account belonging to the selected firm and customer ID.');
+      return;
+    }
     if (new Date(fromDate!) > new Date(endDate!)) {
       this.errorMessage.set('From Date cannot be after End Date.');
       return;

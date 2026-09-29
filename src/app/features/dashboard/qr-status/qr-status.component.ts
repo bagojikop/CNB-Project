@@ -1,3 +1,4 @@
+import { RouterLink } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
@@ -9,7 +10,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-qr-status',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [RouterLink, ReactiveFormsModule, CommonModule],
   templateUrl: './qr-status.component.html',
   styleUrl: './qr-status.component.scss',
 })

@@ -3,6 +3,10 @@ import { cinfDetlFormValue } from './bankAccount-detail.module';
 
 export function createConfigurationForm(fb: FormBuilder) {
   return fb.group({
+    mcc: fb.control<string | null>(null, [Validators.maxLength(10)]),
+    sid: fb.control<string | null>(null, [Validators.maxLength(10)]),
+    mid: fb.control<string | null>(null, [Validators.maxLength(10)]),
+    terminalId: fb.control<string | null>(null, [Validators.maxLength(10)]),
     id: fb.nonNullable.control<cinfDetlFormValue['id']>(null),
 
     firmId: fb.nonNullable.control<cinfDetlFormValue['firmId']>(0, [

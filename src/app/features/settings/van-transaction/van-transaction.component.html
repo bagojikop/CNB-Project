@@ -1,0 +1,268 @@
+<div class="statement-wrapper">
+  <header class="statement-heading">
+    <div>
+      <span class="eyebrow">TRANSACTION ENQUIRY</span>
+      <h2>VAN Statement</h2>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+    <span class="mode-badge">{{
+      isVanEnquiry ? "Single VAN" : "Bank account"
+    }}</span>
+    <a routerLink="/settings-form/virtualAccounts" class="btn btn-sm btn-outline-secondary text-nowrap" aria-label="Close and return to Virtual Account Banking"><span aria-hidden="true">&times;</span> Close</a>
+    </div>
+  </header>
+  @if (showFilters) {
+    <section class="filter-panel" aria-label="Transaction filters">
+      <form [formGroup]="filterForm" (ngSubmit)="showResult()">
+        <fieldset class="filter-grid" [disabled]="isLoading || loadingAccounts">
+          <div class="bank-field">
+            <dss-ng-select
+              label="Firm / Customer ID"
+              placeholder="Select bank"
+              [items]="accounts"
+              bindLabel="selectionLabel"
+              bindValue="id"
+              formControlName="bankId"
+              sizing="md"
+              (change)="onBankSelect()"
+            ></dss-ng-select>
+              <dss-ng-select
+                label="Account number"
+                placeholder="Select account number"
+                [items]="selectedBank?.accountNos ?? []"
+                formControlName="accountNo"
+                sizing="md"
+                [disabled]="!selectedBank || isLoading || loadingAccounts"
+              ></dss-ng-select>
+          </div>
+
+          <div class="date-fields">
+            <div>
+              <label for="transactionFrom" class="mb-0">From</label
+              ><input
+                id="transactionFrom"
+                type="datetime-local"
+                step="0.001"
+                class="form-control"
+                formControlName="fromDate"
+              />
+            </div>
+            <div>
+              <label for="transactionTo" class="mb-0">To</label
+              ><input
+                id="transactionTo"
+                type="datetime-local"
+                step="0.001"
+                class="form-control"
+                formControlName="toDate"
+              />
+            </div>
+            <div class="van-field">
+              <label for="transactionVan" class="mb-0"
+                >VAN number <span>Optional</span></label
+              >
+              <input
+                id="transactionVan"
+                class="form-control"
+                formControlName="vanNo"
+                placeholder="Enter VAN number"
+                aria-describedby="vanHelp"
+              />
+            </div>
+            <div class="count-field">
+              <label for="transactionCount" class="mb-0"
+                >Transactions per page <span>Max. 500</span></label
+              >
+              <input
+                id="transactionCount"
+                type="number"
+                min="1"
+                max="500"
+                step="1"
+                class="form-control"
+                formControlName="noOfTransactions"
+              />
+            </div>
+          </div>
+
+          <div class="statement-actions">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="isLoading || loadingAccounts"
+            >
+              {{ isLoading ? "Loading..." : "Show statement" }}
+            </button>
+            <p id="vanHelp">
+              For a single VAN statement, enter the VAN number. Otherwise, leave
+              it blank.
+            </p>
+          </div>
+        </fieldset>
+      </form>
+      @if (loadingAccounts) {
+        <p class="load-note" role="status">Loading bank accounts...</p>
+      }
+      @if (!loadingAccounts && !accounts.length) {
+        <button type="button" class="btn btn-link" (click)="loadAccounts()">
+          Reload bank accounts
+        </button>
+      }
+    </section>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+  }
+  @if (!showFilters) {
+    <section
+      class="results-panel"
+      aria-label="Transaction statement"
+      [attr.aria-busy]="isLoading"
+    >
+      <div class="results-heading">
+        <div>
+          <h3>Transactions</h3>
+          <span
+            >{{ statementName }} {{ statementAccount }} |
+            {{ rows.length }} records</span
+          >
+        </div>
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          (click)="editFilters()"
+          [disabled]="isLoading"
+        >
+          Edit filters
+        </button>
+      </div>
+      @if (showUpdatePrompt) {
+        <div class="alert alert-info" role="status">
+          <p>Update statement for page {{ currentPage }} ({{ rows.length }} transactions)?</p>
+          <button type="button" class="btn btn-primary me-2"
+            (click)="updateStatement()" [disabled]="isLoading">
+            {{ isUpdating ? 'Updating...' : 'Update statement' }}
+          </button>
+          <button type="button" class="btn btn-outline-secondary"
+            (click)="skipUpdate()" [disabled]="isLoading">Skip</button>
+        </div>
+      }
+      @if (updateMessage) {
+        <div class="alert alert-info" role="status">{{ updateMessage }}</div>
+      }
+      @if (updateResults !== null) {
+        <div class="table-scroll update-results" role="region" aria-label="Transaction update results" tabindex="0">
+          <table>
+            <caption class="visually-hidden">Update results for page {{ currentPage }}</caption>
+            <thead>
+              <tr>
+                <th scope="col">UTR</th>
+                <th scope="col">VAN number</th>
+                <th scope="col">Reference number</th>
+                <th scope="col" class="amount">Amount</th>
+                <th scope="col">Status</th>
+                <th scope="col">Message</th>
+                <th scope="col">Response</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of updateResults; track $index) {
+                <tr>
+                  <td>{{ displayCell(item.utr) }}</td>
+                  <td>{{ displayCell(item.vanNo) }}</td>
+                  <td>{{ displayCell(item.txnRefNo) }}</td>
+                  <td class="amount">{{ item.amount === null ? '-' : (item.amount | number: '1.2-2') }}</td>
+                  <td><strong>{{ displayCell(item.status) }}</strong></td>
+                  <td class="description">{{ displayCell(item.message) }}</td>
+                  <td>
+                    @if (item.response !== null) {
+                      <details><summary>View response</summary><pre>{{ item.response | json }}</pre></details>
+                    } @else { - }
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td colspan="7" class="empty-state">No transaction update results returned.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      <div
+        class="table-scroll"
+        role="region"
+        aria-label="Scrollable transactions"
+        tabindex="0"
+      >
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              @for (column of columns; track column.key) {
+                <th scope="col" [class.amount]="column.isAmount">
+                  {{ column.label }}
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows; track $index; let i = $index) {
+              <tr>
+                <td class="row-number">{{ i + 1 }}</td>
+                @for (column of columns; track column.key) {
+                  <td
+                    [class.amount]="column.isAmount"
+                    [class.description]="column.key === 'TxnDescription'"
+                  >
+                    {{ displayCell(row[column.key]) }}
+                  </td>
+                }
+              </tr>
+            } @empty {
+              <tr>
+                <td [attr.colspan]="columns.length + 1" class="empty-state">
+                  <strong>{{
+                    isLoading
+                      ? "Loading transactions..."
+                      : "No transactions found"
+                  }}</strong>
+                  <span>{{
+                    isLoading
+                      ? "Please wait while the statement is retrieved."
+                      : "No transactions match this enquiry. Use Edit filters to change your search."
+                  }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <nav class="pagination-bar" aria-label="Statement pages">
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          (click)="goToPage(currentPage - 1)"
+          [disabled]="isLoading || currentPage <= 1"
+        >
+          Previous
+        </button>
+        <span role="status">{{
+          isLoading ? "Loading..." : "Page " + currentPage + " of " + totalPages
+        }}</span>
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          (click)="goToPage(currentPage + 1)"
+          [disabled]="isLoading || currentPage >= totalPages"
+        >
+          Next
+        </button>
+      </nav>
+      <footer class="totals-footer">
+        <span>Total amount <small>Current page</small></span
+        ><strong>{{
+          totalAmount === null ? "--" : (totalAmount | number: "1.2-2")
+        }}</strong>
+      </footer>
+    </section>
+  }
+</div>

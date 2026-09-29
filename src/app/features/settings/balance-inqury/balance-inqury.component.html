@@ -39,9 +39,10 @@
             class="field-control"
             (change)="onFirmSelect()"
           >
-            @for (firm of firms; track firm.firmId) {
-              <option [value]="firm.firmId">
-                {{ firm.firmName }}
+            <option value="">Select Firm / Customer ID</option>
+            @for (firm of firms; track firm.id) {
+              <option [value]="firm.id">
+                {{ firm.firmName }} — {{ firm.customerId }}
               </option>
             }
           </select>

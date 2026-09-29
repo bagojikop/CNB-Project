@@ -1,5 +1,8 @@
 <div class="van-creation-dashboard">
-  <h2>VAN Creation Dashboard</h2>
+  <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+    <h2 class="mb-0">VAN Creation Dashboard</h2>
+    <a routerLink="/settings-form/virtualAccounts" class="btn btn-sm btn-outline-secondary text-nowrap" aria-label="Close and return to Virtual Account Banking"><span aria-hidden="true">&times;</span> Close</a>
+  </div>
 
   <form [formGroup]="form">
     <div class="mode-selector">
@@ -19,9 +22,9 @@
           label="Bank Account"
           formControlName="accountNo"
           [items]="bankAccounts"
-          bindLabel="accountName,accountNo"
+          bindLabel="selectionLabel"
           bindValue="accountNo"
-          searchColumns="accountName,accountNo"
+          searchColumns="firmName,customerId,accountName,accountNo"
           [bindSubObj]="[
             { key: 'Account No', value: 'accountNo' },
             { key: 'Branch Code', value: 'branchCode' },
@@ -129,9 +132,9 @@
           label="Bank Account"
           formControlName="accountNo"
           [items]="bankAccounts"
-          bindLabel="accountName,accountNo"
+          bindLabel="selectionLabel"
           bindValue="accountNo"
-          searchColumns="accountName,accountNo"
+          searchColumns="firmName,customerId,accountName,accountNo"
           [bindSubObj]="[
             { key: 'Account No', value: 'accountNo' },
             { key: 'Branch Code', value: 'branchCode' },

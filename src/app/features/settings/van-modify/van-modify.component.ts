@@ -1,481 +1,207 @@
-import { Component, OnInit, inject } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { DSS_FORM_CONTROLS } from '@shared-directives/dss-form-controls';
-import { vanCreationService } from '@shared-services/user.service';
-import { ModalModule } from '@coreui/angular-pro';
+import { FormsModule } from '@angular/forms';
+import { finalize, map } from 'rxjs';
+import { Http } from '@shared-services/httpService';
 
+export interface VANExpiyList {
+  Id: number;
+  endDate: string;
+  firm_id: number;
+  branch_id: string;
+  srcAcctNumber: string;
+  customerId: string;
+  van: string;
+}
+interface VanModifiedResponse {
+  van: string;
+  response?: {
+    response?: {
+      body?: {
+        encryptData?: {
+          vanModifyResponse?: {
+            status?: { replyCode?: string | number; replyText?: unknown };
+          };
+        };
+      };
+    };
+  };
+  error?: string | null;
+}
+interface VanModifiedRecord {
+  Id?: number;
+  id?: number;
+  endDate: string;
+  firm_id: number;
+  branch_id: string;
+  srcAcctNumber: string;
+  customerId: string;
+  VANResponse?: VanModifiedResponse[];
+  vanResponse?: VanModifiedResponse[];
+}
+type ModifyResponse = VanModifiedRecord[];
+interface ModificationResult {
+  van: string;
+  account: string;
+  endDate: string;
+  success: boolean;
+  error: string | null;
+}
+interface ExpiryRow extends VANExpiyList {
+  customerName: string;
+  startDate: string;
+  checked: boolean;
+}
+interface ApiResponse {
+  status_cd?: number;
+  data?: Record<string, unknown>[];
+  errors?: { message?: string };
+}
 @Component({
   selector: 'app-van-modify',
-  imports: [
-    ReactiveFormsModule,
-    CommonModule,
-    DSS_FORM_CONTROLS,
-    HttpClientModule,
-    ModalModule,
-  ],
+  imports: [RouterLink, CommonModule, FormsModule],
   templateUrl: './van-modify.component.html',
   styleUrl: './van-modify.component.scss',
 })
 export class VanModifyComponent implements OnInit {
-  vanForm!: FormGroup;
-  editForm!: FormGroup;
-  isLoading = false;
-  isFetching = false;
-  responseData: any = null;
-  errorMessage: string = '';
-  apiUrl = 'YOUR_API_ENDPOINT_HERE';
-  showResult: boolean = false;
-  selectedVan: any = null;
-  showEditModal: boolean = false;
-
-  // VAN data
-  vanList: any[] = [];
-  groupedVanList: any[] = []; // Grouped by account number
-  originalVanRecords: any[] = []; // Full API records with id
-
-  // Pagination properties
-  currentPage: number = 1;
-  pageSize: number = 5;
-  totalPages: number = 1;
-  extendCheckbox: boolean = false;
-  selectedVanNumbers: any[] = []; // Multiple VANs for selected account
-
-  private vanCreationService = inject(vanCreationService);
-
-  constructor(
-    private fb: FormBuilder,
-    private http: HttpClient,
-  ) {}
-
-  ngOnInit(): void {
-    this.vanForm = this.fb.group({
-      accountNo: ['6025253000001', [Validators.required]],
-      vanNo: ['00792000000471289', [Validators.required]],
-      endDate: ['01-01-2035', [Validators.required]],
-    });
-
-    this.editForm = this.fb.group({
-      newExpDate: ['', [Validators.required]],
-    });
-
-    // Fetch VAN data on component load
-    this.fetchVanList();
-  }
-
-  // Fetch VAN list from service
-  fetchVanList(): void {
-    this.isFetching = true;
-    this.errorMessage = '';
-
-    this.vanCreationService.getAll().subscribe({
-      next: (data: any[]) => {
-        // Store original records with their IDs
-        this.originalVanRecords = data;
-
-        // Flatten all VANs from all records
-        const allVans: any[] = [];
-        data.forEach((item: any) => {
-          const encryptData = item.Request?.body?.encryptData;
-          if (encryptData) {
-            // Check if virtualAccountDetails exists (multiple VANs)
-            if (
-              encryptData.virtualAccountDetails &&
-              Array.isArray(encryptData.virtualAccountDetails)
-            ) {
-              encryptData.virtualAccountDetails.forEach((van: any) => {
-                allVans.push({
-                  id: item.id, // Store the record ID
-                  accountNo: encryptData.accountNo,
-                  vanNo: van.vanNumber || van.vanNo,
-                  customerName: encryptData.customerName || '',
-                  expDate: encryptData.endDate || encryptData.ExpDate || '',
-                  startDate: encryptData.startDate || '',
-                });
-              });
-            } else {
-              // Single VAN (fallback)
-              allVans.push({
-                id: item.id, // Store the record ID
-                accountNo: encryptData.accountNo,
-                vanNo: encryptData.vanNo || encryptData.vanNumber,
-                customerName: encryptData.customerName || '',
-                expDate: encryptData.endDate || encryptData.ExpDate || '',
-                startDate: encryptData.startDate || '',
-              });
-            }
-          }
-        });
-
-        this.vanList = allVans;
-        this.groupVanListByAccount();
-        this.isFetching = false;
-        this.totalPages = Math.ceil(this.groupedVanList.length / this.pageSize);
-      },
-      error: (error) => {
-        this.errorMessage = 'Failed to load VAN data. Please try again.';
-        console.error('Error fetching VAN list:', error);
-        this.isFetching = false;
-      },
+  private readonly http = inject(Http);
+  vanList: ExpiryRow[] = [];
+  results: ModificationResult[] = [];
+  loading = false;
+  submitting = false;
+  error = '';
+  success = '';
+  extensionDays: number | null = 0;
+  extensionMonths: number | null = 0;
+  ngOnInit(): void { this.loadRequests(); }
+  loadRequests(): void {
+    if (this.loading || this.submitting) return;
+    this.loading = true;
+    this.error = '';
+    this.success = '';
+    this.results = [];
+    this.vanList = [];
+    this.extensionDays = 0;
+    this.extensionMonths = 0;
+    this.http.get<ApiResponse | Record<string, unknown>[]>('VanCreateRequest/modify-requests').pipe(
+      map(response => {
+        const rows = Array.isArray(response) ? response : response.data;
+        if ((!Array.isArray(response) && response.status_cd !== undefined && response.status_cd !== 1) || !Array.isArray(rows)) {
+          throw new Error('Unable to load expiring VANs.');
+        }
+        return rows.map(row => ({
+          Id: Number(row['vch_id'] ?? row['Id'] ?? row['id']),
+          firm_id: Number(row['firm_id']),
+          branch_id: String(row['branch_id'] ?? ''),
+          srcAcctNumber: String(row['srcAcctNumber'] ?? ''),
+          customerId: String(row['customerId'] ?? row['CustomerId'] ?? ''),
+          van: String(row['VanNumber'] ?? row['vanNumber'] ?? row['van'] ?? ''),
+          customerName: String(row['CustomerName'] ?? row['customerName'] ?? ''),
+          startDate: this.dateOnly(row['StartDate'] ?? row['startDate']),
+          endDate: this.dateOnly(row['EndDate'] ?? row['endDate']),
+          checked: false,
+        })).sort((a, b) => a.endDate.localeCompare(b.endDate));
+      }),
+      finalize(() => this.loading = false),
+    ).subscribe({
+      next: rows => this.vanList = rows,
+      error: () => this.error = 'Unable to load expiring VANs. Please retry.',
     });
   }
-
-  // Group VANs by account number
-  groupVanListByAccount(): void {
-    const grouped: { [key: string]: any[] } = {};
-    this.vanList.forEach((van) => {
-      if (!grouped[van.accountNo]) {
-        grouped[van.accountNo] = [];
-      }
-      grouped[van.accountNo].push(van);
-    });
-
-    this.groupedVanList = Object.keys(grouped).map((accountNo) => ({
-      accountNo: accountNo,
-      customerName: grouped[accountNo][0]?.customerName || '',
-      vans: grouped[accountNo],
-    }));
+  private dateOnly(value: unknown): string {
+    const date = String(value ?? '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return '';
+    const parsed = new Date(date + 'T00:00:00Z');
+    return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date ? date : '';
   }
-
-  // Get paginated list (grouped by account)
-  get paginatedList(): any[] {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    return this.groupedVanList.slice(startIndex, endIndex);
+  get selectedVans(): ExpiryRow[] { return this.vanList.filter(row => row.checked); }
+  get allSelected(): boolean { return this.vanList.length > 0 && this.vanList.every(row => row.checked); }
+  toggleAll(checked: boolean): void {
+    if (this.submitting) return;
+    this.vanList.forEach(row => row.checked = checked);
+    this.success = '';
   }
-
-  // Change page
-  changePage(page: number): void {
-    if (page < 1 || page > this.totalPages) {
-      return;
-    }
-    this.currentPage = page;
-  }
-
-  // Get page numbers for pagination
-  getPageNumbers(): number[] {
-    const pages: number[] = [];
-    for (let i = 1; i <= this.totalPages; i++) {
-      pages.push(i);
-    }
-    return pages;
-  }
-
-  // Get earliest expiry date from a list of VANs
-  getEarliestExpiry(vans: any[]): string {
-    if (!vans || vans.length === 0) return '';
-    const dates = vans.map((v) => new Date(v.expDate).getTime());
-    const minDate = Math.min(...dates);
-    return new Date(minDate).toISOString().split('T')[0];
-  }
-
-  // Check if expiry date is within 15 days
-  // isExpiringSoon(expDate: string): boolean {
-  //   if (!expDate) return false;
-  //   const today = new Date();
-  //   const expiry = new Date(expDate);
-  //   const diffTime = expiry.getTime() - today.getTime();
-  //   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  //   return diffDays <= 15 && diffDays >= 0;
-  // }
-
-  isExpiringSoon(expDate: string): boolean {
-    if (!expDate) return false;
-
+  get extensionBaseDate(): string {
     const today = new Date();
-    const expiry = new Date(expDate);
-
-    const diffTime = expiry.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    console.log({
-      expDate,
-      today,
-      expiry,
-      diffDays,
-    });
-
-    return diffDays <= 15 && diffDays >= 0;
+    const localToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    return this.selectedVans.reduce((date, row) => row.endDate > date ? row.endDate : date, localToday);
   }
-
-  // Open edit modal with all VANs for the account
-  openEditModal(group: any): void {
-    this.selectedVan = group;
-    this.showEditModal = true;
-    // Get the original record to fetch individual VAN expiry dates
-    const recordId = group.vans[0]?.id;
-    const originalRecord = this.originalVanRecords.find(
-      (item) => item.id === recordId,
-    );
-
-    // Get individual VAN expiry dates from the original record
-    const vanExpiryMap: { [key: string]: string } = {};
-    if (originalRecord?.Request?.body?.encryptData?.virtualAccountDetails) {
-      originalRecord.Request.body.encryptData.virtualAccountDetails.forEach(
-        (van: any) => {
-          vanExpiryMap[van.vanNumber] = van.endDate || '';
-        },
-      );
+  get endDate(): string {
+    const months = this.extensionMonths ?? 0;
+    const days = this.extensionDays ?? 0;
+    if (!this.selectedVans.length || !Number.isInteger(months) || !Number.isInteger(days) ||
+      months < 0 || days < 0 || months > 120000 || days > 3652059 || months + days === 0) return '';
+    const base = new Date(this.extensionBaseDate + 'T00:00:00Z');
+    const day = base.getUTCDate();
+    base.setUTCDate(1);
+    base.setUTCMonth(base.getUTCMonth() + months);
+    const lastDay = new Date(base.getTime());
+    lastDay.setUTCMonth(lastDay.getUTCMonth() + 1, 0);
+    base.setUTCDate(Math.min(day, lastDay.getUTCDate()) + days);
+    if (!Number.isFinite(base.getTime()) || base.getUTCFullYear() > 9999) return '';
+    return base.toISOString().slice(0, 10);
+  }
+  get validationMessage(): string {
+    const selected = this.selectedVans;
+    if (!selected.length) return 'Select one or more VANs to extend.';
+    if (selected.some(row => !Number.isInteger(row.Id) || row.Id <= 0 ||
+      !Number.isInteger(row.firm_id) || row.firm_id <= 0 || !row.branch_id.trim() ||
+      !row.srcAcctNumber.trim() || !row.customerId.trim() || !row.van.trim() || !row.endDate)) {
+      return 'Selected VANs are missing required account details or expiry dates. Refresh the list or contact support.';
     }
-
-    this.selectedVanNumbers = group.vans.map((van: any) => ({
-      ...van,
-      checked: false,
-      newExpDate: van.expDate,
-      // Use individual endDate from original record if available, otherwise fallback to expDate
-      individualEndDate: vanExpiryMap[van.vanNo] || van.expDate,
+    if (!this.endDate) return 'Enter non-negative whole months and days, with at least one greater than zero, within the supported date range.';
+    return '';
+  }
+  submit(): void {
+    if (this.loading || this.submitting || this.validationMessage) return;
+    const selected = this.selectedVans;
+    const payload: VANExpiyList[] = selected.map(row => ({
+      Id: row.Id, endDate: this.endDate, firm_id: row.firm_id,
+      branch_id: row.branch_id, srcAcctNumber: row.srcAcctNumber,
+      customerId: row.customerId, van: row.van,
     }));
-    // Set first VAN's expiry date as default
-    if (this.selectedVanNumbers.length > 0) {
-      this.editForm.patchValue({
-        newExpDate:
-          this.selectedVanNumbers[0].individualEndDate ||
-          this.selectedVanNumbers[0].expDate,
-      });
-    }
-  }
-
-  // Close edit modal
-  closeEditModal(): void {
-    console.log('abcd');
-    this.showEditModal = false;
-    this.selectedVan = null;
-    this.selectedVanNumbers = [];
-    this.extendCheckbox = false;
-  }
-
-  // Update expiry date for selected VANs
-  updateExpiryDate(): void {
-    if (this.editForm.invalid || !this.selectedVan) {
-      return;
-    }
-
-    const newDate = this.editForm.value.newExpDate;
-    const selectedVans = this.selectedVanNumbers.filter((v: any) => v.checked);
-
-    if (selectedVans.length === 0) {
-      alert('Please select at least one VAN to update.');
-      return;
-    }
-
-    // Get the ID from the first selected VAN (all VANs in the same account share the same record ID)
-    const firstSelectedVan = selectedVans[0];
-    const recordId = firstSelectedVan.id;
-
-    if (!recordId) {
-      alert('Unable to find the record ID. Please refresh the data.');
-      return;
-    }
-
-    // Get the original record to preserve all fields
-    const originalRecord = this.originalVanRecords.find(
-      (item) => item.id === recordId,
-    );
-
-    if (!originalRecord) {
-      alert('Unable to find the original record. Please refresh the data.');
-      return;
-    }
-
-    // Get the startDate from the original record
-    const startDate =
-      originalRecord.Request?.body?.encryptData?.startDate ||
-      new Date().toISOString().split('T')[0];
-
-    // Get all VANs from the original record (preserve all, update only selected ones)
-    const allVansFromRecord =
-      originalRecord.Request?.body?.encryptData?.virtualAccountDetails || [];
-
-    // ✅ Update ONLY the selected (checked) VANs with the new expiry date
-    // ✅ All unselected VANs remain completely unchanged
-    const updatedVanDetails = allVansFromRecord.map((van: any) => {
-      // Check if this VAN is selected (checked)
-      const isSelected = selectedVans.some(
-        (selected: any) => selected.vanNo === (van.vanNumber || van.vanNo),
-      );
-
-      if (isSelected) {
-        // ✅ SELECTED VAN: Update expiry date only
-        return {
-          ...van,
-          vanNumber: van.vanNumber || van.vanNo,
-          endDate: newDate, // Only this field changes
-        };
-      }
-
-      // ✅ UNSELECTED VAN: Return unchanged, preserve all original data
-      return {
-        ...van,
-        vanNumber: van.vanNumber || van.vanNo,
-        // No endDate field added - preserves original data
-      };
-    });
-
-    // Prepare update payload with all required fields
-    const updatePayload: any = {
-      id: recordId,
-      Request: {
-        body: {
-          encryptData: {
-            accountNo: firstSelectedVan.accountNo,
-            startDate: startDate,
-            endDate: newDate,
-            countVAN: String(allVansFromRecord.length),
-            virtualAccountDetails: updatedVanDetails,
-          },
-        },
-      },
-    };
-
-    console.log(updatePayload);
-    // Send update to API
-    this.vanCreationService.update(updatePayload).subscribe({
-      next: (response) => {
-        // Update local state for selected VANs only
-        selectedVans.forEach((selectedVan: any) => {
-          const index = this.vanList.findIndex(
-            (item) =>
-              item.vanNo === selectedVan.vanNo &&
-              item.accountNo === selectedVan.accountNo,
-          );
-          if (index !== -1) {
-            this.vanList[index].expDate = newDate;
-            this.vanList[index].endDate = newDate;
-          }
+    this.submitting = true;
+    this.error = '';
+    this.success = '';
+    this.results = [];
+    this.http.post<ModifyResponse>('van/modify-van', payload).pipe(
+      map(response => {
+        if (!Array.isArray(response)) throw new Error('Invalid modification results.');
+        return response;
+      }),
+      finalize(() => this.submitting = false),
+    ).subscribe({
+      next: records => {
+        const succeeded = new Set<ExpiryRow>();
+        this.results = selected.map((row, index) => {
+          const record = records.find(item => Number(item.Id ?? item.id) === row.Id &&
+            Number(item.firm_id) === row.firm_id && String(item.branch_id) === row.branch_id &&
+            item.srcAcctNumber === row.srcAcctNumber && item.customerId === row.customerId &&
+            (item.VANResponse ?? item.vanResponse ?? []).some(result => result.van === row.van));
+          const result = (record?.VANResponse ?? record?.vanResponse ?? []).find(item => item.van === row.van);
+          const status = result?.response?.response?.body?.encryptData?.vanModifyResponse?.status;
+          const success = !!result && !result.error && String(status?.replyCode) === '0';
+          const bankError = status?.replyCode != null && String(status.replyCode) !== '0'
+            ? (typeof status.replyText === 'string' && status.replyText.trim()
+              ? status.replyText : `Bank rejected modification (reply code ${status.replyCode}).`)
+            : null;
+          if (success) succeeded.add(row);
+          return {
+            van: row.van, account: row.srcAcctNumber, endDate: payload[index].endDate, success,
+            error: success ? null : result?.error || bankError || 'No successful result returned for this VAN.',
+          };
         });
-
-        // Refresh the grouped list
-        this.groupVanListByAccount();
-
-        alert(
-          `Expiry date updated successfully for ${selectedVans.length} VAN(s)!`,
-        );
+        if (succeeded.size) this.success = `End date extended successfully for ${succeeded.size} VAN(s).`;
+        const failed = selected.length - succeeded.size;
+        if (failed) this.error = `${failed} VAN(s) failed. See the results below. Failed VANs remain selected for retry.`;
+        this.vanList = this.vanList.filter(row => !succeeded.has(row));
+        if (!failed) {
+          this.extensionDays = 0;
+          this.extensionMonths = 0;
+        }
       },
-      error: (error) => {
-        console.error('Error updating expiry date:', error);
-        alert('Failed to update expiry date. Please try again.');
-      },
+      error: () => this.error = 'Unable to extend VAN end dates. Please check the request and retry.',
     });
-  }
-
-  // Toggle checkbox for individual VAN
-  toggleVanSelection(index: number): void {
-    this.selectedVanNumbers[index].checked =
-      !this.selectedVanNumbers[index].checked;
-  }
-
-  // Toggle all VANs in the list
-  toggleAllVans(event: any): void {
-    const checked = event.target.checked;
-    this.selectedVanNumbers.forEach((van: any) => (van.checked = checked));
-  }
-
-  // Check if all VANs are selected
-  isAllVansSelected(): boolean {
-    if (!this.selectedVanNumbers || this.selectedVanNumbers.length === 0) {
-      return false;
-    }
-    return this.selectedVanNumbers.every((van: any) => van.checked);
-  }
-
-  // Check if any VAN is selected
-  hasSelectedVans(): boolean {
-    return this.selectedVanNumbers?.some((van: any) => van.checked) || false;
-  }
-
-  // Handle checkbox for date extension
-  onExtendCheckboxChange(event: any): void {
-    this.extendCheckbox = event.target.checked;
-    if (this.extendCheckbox && this.selectedVanNumbers.length > 0) {
-      // Extend by 30 days for all selected VANs
-      const currentDate = this.editForm.value.newExpDate;
-      if (currentDate) {
-        const newDate = new Date(currentDate);
-        newDate.setDate(newDate.getDate() + 30);
-        this.editForm.patchValue({
-          newExpDate: newDate.toISOString().split('T')[0],
-        });
-      }
-    }
-  }
-
-  onSubmit(): void {
-    if (this.vanForm.invalid) {
-      this.vanForm.markAllAsTouched();
-      return;
-    }
-
-    this.isLoading = true;
-    this.errorMessage = '';
-    this.responseData = null;
-    this.showResult = true;
-
-    const payload = {
-      Request: {
-        body: {
-          encryptData: this.vanForm.value,
-        },
-      },
-    };
-
-    // === EXAMPLE RESPONSE DATA ===
-    // Simulate API call with example response
-    setTimeout(() => {
-      this.responseData = {
-        Response: {
-          body: {
-            encryptData: {
-              responseCode: '0',
-              responseMessage: 'VAN modified successfully',
-              modifiedDetails: {
-                accountNo: this.vanForm.value.accountNo,
-                vanNo: this.vanForm.value.vanNo,
-                endDate: this.vanForm.value.endDate,
-                modifiedDate: new Date().toISOString().split('T')[0],
-                status: 'Modified',
-              },
-            },
-          },
-        },
-      };
-      this.isLoading = false;
-    }, 1500);
-
-    /* === REAL API CALL (uncomment to use) ===
-    this.http.post(this.apiUrl, payload).subscribe({
-      next: (response) => {
-        this.responseData = response;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.errorMessage =
-          error.message || 'An error occurred while modifying VAN.';
-        this.isLoading = false;
-      },
-    });
-    */
-  }
-
-  closeResult(): void {
-    this.showResult = false;
-    this.responseData = null;
-    this.errorMessage = '';
-  }
-
-  resetForm(): void {
-    this.vanForm.patchValue({
-      accountNo: '6025253000001',
-      vanNo: '00792000000471289',
-      endDate: '20350101',
-    });
-    this.errorMessage = '';
-    this.responseData = null;
-    this.showResult = false;
   }
 }

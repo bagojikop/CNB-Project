@@ -58,11 +58,13 @@ export class BalanceInquiryComponent {
       firm_id: ['', Validators.required],
       accountNo: ['*', [Validators.pattern(/^(\*|\d{9,18})$/)]],
     });
-    this.http.get<apiResponse>('bankAccount/all', { branch_id: this.provider.companyInfo?.company.branch_id }).subscribe((res) => {
+    const branchId = this.provider.companyInfo?.company?.branch_id;
+    this.http.get<apiResponse>('bankAccount/all', branchId == null || String(branchId).trim() === '' ? {} : { branch_id: branchId }).subscribe((res) => {
 
       this.firms = res.data || res;
 
-      this.firms = this.firms.map(({ accountNo, ...firm }) => ({
+      this.firms = this.firms
+        .map(({ accountNo, ...firm }) => ({
         ...firm,
         accountNos: [
 
@@ -81,11 +83,11 @@ export class BalanceInquiryComponent {
 
 
   onFirmSelect(): void {
-    const firmId = +this.balanceForm.get('firm_id')?.value;
+    const recordId = this.balanceForm.get('firm_id')?.value;
 
     this.selectedFirm = this.firms.find(
-      firm => firm.firmId === firmId
-    );
+      firm => String(firm.id) === String(recordId)
+    ) ?? { accountNos: [] };
     this.balanceForm.patchValue({ accountNo: '*' });
   }
 
@@ -120,12 +122,16 @@ export class BalanceInquiryComponent {
   }
 
   async fetchBalance() {
-    if (this.balanceForm.invalid) {
+    if (this.balanceForm.invalid || this.selectedFirm.id == null) {
       this.balanceForm.markAllAsTouched();
       return;
     }
 
     const accountNumber = this.balanceForm.value.accountNo;
+    if (accountNumber && accountNumber !== '*' && !this.selectedFirm.accountNos.includes(accountNumber)) {
+      this.balanceForm.get('accountNo')?.setErrors({ invalidAccount: true });
+      return;
+    }
     const accNos = accountNumber === '*' || accountNumber === ''
       ? this.selectedFirm.accountNos
       : [accountNumber];

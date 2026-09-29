@@ -1,3 +1,4 @@
+import { RouterLink } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import {
@@ -18,11 +19,12 @@ import {
   DSS_FORM_CONTROLS,
   DssInputTextComponent,
 } from '@shared-directives/dss-form-controls';
+import { MyProvider } from '@shared-services/provider';
 import { createVanCreation } from './van-creation-edit.factory';
 
 @Component({
   selector: 'app-van-creation-edit',
-  imports: [
+  imports: [RouterLink, 
     CommonModule,
     ReactiveFormsModule,
     DSS_FORM_CONTROLS,
@@ -34,13 +36,14 @@ import { createVanCreation } from './van-creation-edit.factory';
 export class VanCreationEditComponent implements OnInit {
   private crudSrc = inject(vanCreationService);
   private configSrc = inject(ConfigService);
+  private readonly provider = inject(MyProvider);
   private dialog = inject(DialogsService);
   private location = inject(Location);
   private readonly fb = inject(FormBuilder);
   saveUndoButtonIsDisable: boolean = false;
   form = createVanCreation(this.fb);
   submitted = false;
-  bankAccounts: bankAccount[] = [];
+  bankAccounts: (bankAccount & { selectionLabel: string })[] = [];
 
   constructor() {
     // enable/disable validators based on initial mode
@@ -121,9 +124,17 @@ export class VanCreationEditComponent implements OnInit {
   }
 
   private loadBankAccounts(): void {
+    const branchId = this.provider.companyInfo?.company?.branch_id;
     this.configSrc.getAll().subscribe({
       next: (accounts) => {
-        this.bankAccounts = accounts;
+        this.bankAccounts = accounts
+          .filter(account => branchId == null || String(branchId).trim() === '' || String(account.branchId).trim() === String(branchId).trim())
+          .flatMap(account => String(account.accountNo ?? '').split(',')
+            .map(value => value.split('|')[0].trim()).filter(Boolean)
+            .map(accountNo => ({
+              ...account, accountNo,
+              selectionLabel: `${account.firmName} ? ${account.customerId} ? ${accountNo}`,
+            })));
       },
       error: (error) => {
         this.dialog.swal({
@@ -246,6 +257,12 @@ export class VanCreationEditComponent implements OnInit {
     }
 
     const mode = this.form.get('mode')?.value;
+    const accountControl = (mode === 'custom' ? this.customGroup : this.randomGroup).get('accountNo');
+    if (!this.bankAccounts.some(account => account.accountNo === accountControl?.value)) {
+      accountControl?.setErrors({ invalidAccount: true });
+      accountControl?.markAsTouched();
+      return;
+    }
     const id = this.form.get('id')?.value;
     let payload: any;
 

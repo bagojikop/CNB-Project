@@ -1,0 +1,75 @@
+<section class="card">
+  <div class="card-header d-flex justify-content-between align-items-center gap-3">
+    <h2 class="h4 mb-0">Generated UPI QR List</h2>
+    <a routerLink="/dashboard/dashboard-form/vpa" class="btn btn-sm btn-outline-secondary">Close</a>
+  </div>
+  <div class="card-body">
+    <p class="text-body-secondary">Select a bank to view its generated dynamic and static QR records.</p>
+    <div class="d-flex flex-wrap align-items-end gap-3 mb-3">
+      <div class="flex-grow-1" style="max-width: 480px">
+        <label for="qr-bank" class="form-label">Select bank</label>
+        <select #bankSelect id="qr-bank" class="form-select" [value]="bankId ?? ''" [disabled]="loadingBanks || !!bankError"
+          (change)="selectBank(bankSelect.value)">
+          <option value="">Select a bank</option>
+          @for (bank of banks; track bank.id) { <option [value]="bank.id">{{ bank.label }}</option> }
+        </select>
+      </div>
+      <button type="button" class="btn btn-outline-primary" [disabled]="bankId === null || loading" (click)="loadPage()">Refresh</button>
+    </div>
+    @if (bankError) {
+      <div role="alert" class="alert alert-danger">{{ bankError }}</div>
+      <button type="button" class="btn btn-outline-primary" (click)="loadBanks()">Retry</button>
+    } @else if (loadingBanks || loading) {
+      <p role="status">Loading…</p>
+    } @else if (error) {
+      <div role="alert" class="alert alert-danger">{{ error }}</div>
+      <button type="button" class="btn btn-outline-primary" (click)="loadPage()">Retry</button>
+    } @else if (!banks.length) {
+      <p role="status">No banks found.</p>
+    } @else if (bankId === null) {
+      <p role="status" class="text-body-secondary">Select a bank to show generated QR records.</p>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <caption class="visually-hidden">Generated UPI QR records for the selected bank</caption>
+          <thead><tr>
+            <th scope="col">Batch ID</th><th scope="col">Customer</th><th scope="col">Document Type</th>
+            <th scope="col">Document No.</th><th scope="col">Challan ID</th><th scope="col">Reference No.</th>
+            <th scope="col" class="text-end">Amount</th><th scope="col">Remark</th><th scope="col">Type</th>
+            <th scope="col">Created</th><th scope="col">QR</th>
+          </tr></thead>
+          <tbody>
+            @for (row of rows; track row.batch_id) {
+              <tr>
+                <td>{{ row.batch_id }}</td><td>{{ row.param1 }}</td><td>{{ part(row.param2, 0) }}</td>
+                <td>{{ part(row.param2, 1) }}</td><td>{{ part(row.extTransactionId, 1) }}</td><td>{{ row.param3 }}</td>
+                <td class="text-end text-nowrap">{{ row.amount | number:'1.2-2' }}</td><td>{{ row.remark || '—' }}</td>
+                <td><span class="badge" [class.bg-primary]="row.type === 'D'" [class.bg-secondary]="row.type === 'S'">{{ row.type === 'D' ? 'Dynamic' : 'Static' }}</span></td>
+                <td class="text-nowrap">{{ row.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td><button type="button" class="btn btn-sm btn-outline-primary" [attr.aria-expanded]="expandedId === row.batch_id"
+                  (click)="expandedId = expandedId === row.batch_id ? null : row.batch_id">{{ expandedId === row.batch_id ? 'Hide' : 'View' }}</button></td>
+              </tr>
+              @if (expandedId === row.batch_id) {
+                <tr><td colspan="11" class="bg-body-tertiary">
+                  <div class="mb-2"><strong>UPI ID:</strong> {{ row.upiId || '—' }} · <strong>Status:</strong> {{ row.status || '—' }}</div>
+                  <div class="mb-2"><strong>Transaction ID:</strong> {{ row.extTransactionId }}</div>
+                  <label [for]="'qr-data-' + row.batch_id" class="form-label">Generated QR data</label>
+                  <textarea [id]="'qr-data-' + row.batch_id" class="form-control" rows="3" readonly [value]="row.qrString"></textarea>
+                </td></tr>
+              }
+            } @empty { <tr><td colspan="11" class="text-center py-4">No generated QR records found for this bank.</td></tr> }
+          </tbody>
+        </table>
+      </div>
+      @if (total > 0) {
+        <nav aria-label="Generated QR pages" class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+          <span>{{ total }} records · Page {{ page }} of {{ pageCount }}</span>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="page <= 1" (click)="loadPage(page - 1)">Previous</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="page >= pageCount" (click)="loadPage(page + 1)">Next</button>
+          </div>
+        </nav>
+      }
+    }
+  </div>
+</section>

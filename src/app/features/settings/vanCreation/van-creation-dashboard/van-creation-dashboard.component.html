@@ -1,23 +1,181 @@
-<fieldset>
-  <div class="card dss-card-vh-100" dssViewportHeight="140px">
-    <div class="card-body dss-card-body-scroll">
-      <dss-table-dashboard
-        #dashboardGrid
-        class="dss-table-grid-header"
-        [title]="dashboardTitle"
-        [isFilterVisible]="false"
-        [items]="jsonData"
-        [columns]="columns"
-        [autoLoad]="false"
-        [bordered]="true"
-        [paginated]="true"
-        [actions]="true"
-        [handleAdd]="handleAdd"
-        [handleEdit]="handleEdit"
-        [handleDelete]="handleDelete"
-        [bodyHeight]="'calc(100vh - 350px)'"
+﻿<div class="card">
+  <div
+    class="card-header d-flex justify-content-between align-items-center gap-3"
+  >
+    <div>
+      <h4 class="mb-1">VAN Creation Requests</h4>
+      <span
+        >{{ jsonData.length }} requests · Total VAN count:
+        {{ totalCount }}</span
       >
-      </dss-table-dashboard>
+    </div>
+    <a routerLink="/settings-form/virtualAccounts" class="btn btn-sm btn-outline-secondary text-nowrap" aria-label="Close and return to Virtual Account Banking"><span aria-hidden="true">&times;</span> Close</a>
+  </div>
+  <div class="card-body">
+    @if (error) {
+      <div class="alert alert-danger" role="alert">
+        {{ error }}
+        @if (!selected) {
+          <button
+            type="button"
+            class="btn btn-link"
+            (click)="loadRequests()"
+            [disabled]="loading"
+          >
+            Retry
+          </button>
+        }
+      </div>
+    }
+    @if (success) {
+      <div class="alert alert-success" role="status">{{ success }}</div>
+    }
+    <div class="request-layout">
+      <section aria-label="VAN creation requests">
+        <h5>Requests</h5>
+        <div
+          class="request-table-scroll"
+          role="region"
+          aria-label="VAN requests table"
+          tabindex="0"
+        >
+          <table class="table table-bordered table-hover mb-0 request-table">
+            <thead>
+              <tr>
+                <th scope="col">Firm</th>
+                <th scope="col">Branch</th>
+                <th scope="col">Account No.</th>
+                <th scope="col" class="text-end">VAN Request Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (loading) {
+                <tr>
+                  <td colspan="4" role="status">Loading requests…</td>
+                </tr>
+              } @else {
+                @for (request of jsonData; track request.id) {
+                  <tr
+                    [class.table-active]="selected === request"
+                    [class.request-disabled]="submitting"
+                    (click)="selectRequest(request)"
+                  >
+                    <td>{{ request.firmName }}</td>
+                    <td>{{ request.branchName }}</td>
+                    <td>
+                      <button
+                        type="button"
+                        class="btn btn-link p-0 text-start"
+                        [attr.aria-pressed]="selected === request"
+                        [disabled]="submitting"
+                        (click)="
+                          $event.stopPropagation(); selectRequest(request)
+                        "
+                      >
+                        {{ request.Request.body.encryptData.accountNo }}
+                      </button>
+                      @if (completed.has(request.id)) {
+                        <span class="badge bg-success d-block mt-1"
+                          >Submitted</span
+                        >
+                      }
+                    </td>
+                    <td class="text-end">{{ count(request) }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="4">No VAN creation requests found.</td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section aria-label="Selected request details">
+        @if (selected; as request) {
+          <h5>Request {{ request.id }}</h5>
+          <p>
+            <strong>Total VAN count: {{ count(request) }}</strong>
+          </p>
+          <h5>Request JSON</h5>
+          <pre class="request-json">{{
+            request.Request.body.encryptData.virtualAccountDetails | json
+          }}</pre>
+          <form #dateForm="ngForm" (ngSubmit)="submit()">
+            <fieldset [disabled]="submitting || completed.has(request.id)">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label for="startDate" class="form-label">Start date</label>
+                  <input
+                    id="startDate"
+                    name="startDate"
+                    type="date"
+                    class="form-control"
+                    [(ngModel)]="startDate"
+                    [disabled]="true"
+                    required
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label for="expiryMonths" class="form-label"
+                    >Expiry months</label
+                  >
+                  <input
+                    id="expiryMonths"
+                    name="expiryMonths"
+                    type="number"
+                    class="form-control"
+                    [(ngModel)]="expiryMonths"
+                    min="0"
+                    step="1"
+                    required
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label for="expiryDays" class="form-label">Expiry days</label>
+                  <input
+                    id="expiryDays"
+                    name="expiryDays"
+                    type="number"
+                    class="form-control"
+                    [(ngModel)]="expiryDays"
+                    min="0"
+                    step="1"
+                    required
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label for="endDate" class="form-label">End date</label>
+                  <input
+                    id="endDate"
+                    type="date"
+                    class="form-control"
+                    [value]="endDate"
+                    readonly
+                  />
+                </div>
+              </div>
+              <p class="form-text">
+                Start date is today. Enter whole months and days, with at least
+                one greater than zero. End date = start date + months + days.
+              </p>
+              <button
+                type="submit"
+                class="btn btn-primary mb-3"
+                [disabled]="dateForm.invalid || !endDate"
+              >
+                {{ submitting ? "Submitting…" : "Submit and create VANs" }}
+              </button>
+            </fieldset>
+          </form>
+        } @else {
+          <p class="text-body-secondary">
+            Select a request to view its VAN numbers and enter the validity
+            dates.
+          </p>
+        }
+      </section>
     </div>
   </div>
-</fieldset>
+</div>

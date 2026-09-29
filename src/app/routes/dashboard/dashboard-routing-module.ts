@@ -9,7 +9,37 @@ import { PaymentRequestApprovalComponent } from '@features/dashboard/payment-req
 import { PaymentStatusComponent } from '@features/dashboard/payment-status/payment-status.component';
 import { QrStatusComponent } from '@features/dashboard/qr-status/qr-status.component';
 import { VANExpiryStatusComponent } from '@features/dashboard/vanexpiry-status/vanexpiry-status.component';
+import { PaymentErpUpdateComponent } from '@features/dashboard/payment-erp-update/payment-erp-update.component';
 const routes: Routes = [
+  {
+    path: 'qrGenerated',
+    loadComponent: () => import('@features/dashboard/qr-generated/qr-generated.component').then(m => m.QrGeneratedComponent),
+  },
+  {
+    path: 'vpaDeactivation',
+    loadComponent: () => import('@features/dashboard/vpa-creation/vpa-creation.component').then(m => m.VpaCreationComponent),
+    data: { deactivation: true },
+  },
+  {
+    path: 'vpaCreation',
+    loadComponent: () => import('@features/dashboard/vpa-creation/vpa-creation.component').then(m => m.VpaCreationComponent),
+  },
+  {
+    path: 'singlePayment',
+    loadComponent: () => import('@features/dashboard/payment-services/payment-services.component').then(m => m.PaymentServicesComponent),
+    data: { service: 'single' },
+  },
+  {
+    path: 'bulkPayment',
+    loadComponent: () => import('@features/dashboard/payment-services/payment-services.component').then(m => m.PaymentServicesComponent),
+    data: { service: 'bulk' },
+  },
+  {
+    path: 'vpa',
+    loadComponent: () => import('@features/dashboard/payment-services/payment-services.component').then(m => m.PaymentServicesComponent),
+    data: { service: 'vpa' },
+  },
+  { path: 'paymentErpUpdate', component: PaymentErpUpdateComponent },
   { path: 'bulkPaymentInitialize', component: BulkPaymentInitializeComponent },
   { path: 'bulkPaymentStatus', component: BulkPaymentStatusComponent },
   {

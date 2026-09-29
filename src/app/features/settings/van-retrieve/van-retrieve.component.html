@@ -1,406 +1,165 @@
-<div class="van-retrive-container">
-  <div class="page-header">
-    <h2>VAN Retrive</h2>
-    <p class="text-muted">
-      Enter the details below to retrieve VAN information
+<div class="retrieval-wrapper">
+  <header class="mb-4 d-flex justify-content-between align-items-start gap-3">
+    <div>
+    <h2>VAN Retrieval</h2>
+    <p class="text-body-secondary">
+      View VANs for a selected account and period
     </p>
-  </div>
-
-  <div class="card form-card">
+    </div>
+    <a routerLink="/settings-form/virtualAccounts" class="btn btn-sm btn-outline-secondary text-nowrap" aria-label="Close and return to Virtual Account Banking"><span aria-hidden="true">&times;</span> Close</a>
+  </header>
+  <section class="card mb-3" aria-label="VAN retrieval filters">
     <div class="card-body">
-      <form [formGroup]="vanForm" (ngSubmit)="onSubmit()">
-        <div class="row">
-          <!-- Customer ID -->
-          <div class="col-md-4 mb-3">
-            <dss-input-text
-              label="Customer ID "
-              type="text"
-              sizing="md"
-              id="customerID"
-              formControlName="customerID"
-              placeholder="Enter Customer ID"
-            />
-          </div>
-
-          <!-- Account No -->
-          <div class="col-md-4 mb-3">
-            <dss-input-text
-              label="Account No "
-              type="text"
-              sizing="md"
-              id="accountNo"
-              formControlName="accountNo"
-              placeholder="Enter Account No"
-            />
-          </div>
-
-          <!-- From Date -->
-          <div class="col-md-4 mb-3">
-            <dss-date-fin
-              label="From Date"
-              type="date"
-              sizing="md"
-              id="fromDate"
-              formControlName="fromDate"
-            />
-          </div>
-
-          <!-- To Date -->
-          <div class="col-md-4 mb-3">
-            <dss-date-fin
-              label="To Date"
-              sizing="md"
-              type="date"
-              id="toDate"
-              formControlName="toDate"
-            />
-          </div>
-
-          <!-- No of Transactions -->
-          <div class="col-md-4 mb-3">
-            <dss-input-text
-              label="No of Transactions"
-              type="number"
-              id="noOfTransactions"
-              sizing="md"
-              currency="false"
-              formControlName="noOfTransactions"
-              placeholder="Enter number of transactions"
-            />
-          </div>
-
-          <!-- Page No -->
-          <div class="col-md-4 mb-3">
-            <dss-input-text
-              label="Page No"
-              type="string"
-              id="pageNo"
-              sizing="md"
-              currency="true"
-              formControlName="pageNo"
-              placeholder="Enter page number"
-            />
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="form-actions">
+      <form [formGroup]="filterForm" (ngSubmit)="showResult()">
+        <fieldset
+          class="filter-grid"
+          [disabled]="isLoading || loadingAccounts || updatingPortal"
+        >
+          <dss-ng-select
+            label="Firm / Customer ID"
+            placeholder="Select Firm"
+            [items]="firms"
+            bindLabel="selectionLabel"
+            bindValue="id"
+            formControlName="firm_id"
+            (change)="onFirmSelect($event)"
+          ></dss-ng-select>
+          <dss-ng-select
+            label="Account No"
+            placeholder="Select Account No"
+            [items]="selectedFirm?.accountNos ?? []"
+            formControlName="accountNo"
+          ></dss-ng-select>
+          <dss-date-fin
+            label="From"
+            [value]="filterForm.controls.fromDate.value"
+            (valueChange)="filterForm.controls.fromDate.setValue($event)"
+          ></dss-date-fin>
+          <dss-date-fin
+            label="To"
+            [value]="filterForm.controls.endDate.value"
+            (valueChange)="filterForm.controls.endDate.setValue($event)"
+          ></dss-date-fin>
           <button
             type="submit"
-            class="btn btn-primary btn-lg"
-            [disabled]="isLoading"
+            class="btn btn-primary"
+            [disabled]="isLoading || loadingAccounts || updatingPortal"
           >
-            @if (isLoading) {
-              <span
-                class="spinner-border spinner-border-sm me-2"
-                role="status"
-              ></span>
-            }
-
-            @if (!isLoading) {
-              <i class="fas fa-search me-2"></i>
-              {{ isLoading ? "Searching..." : "Search" }}
-            }
+            {{ isLoading ? "Loading..." : "Show" }}
           </button>
-          <button
-            type="button"
-            class="btn btn-secondary btn-lg"
-            (click)="resetForm()"
-            [disabled]="isLoading"
-          >
-            <i class="fas fa-undo me-2"></i>
-            Reset
-          </button>
-        </div>
+        </fieldset>
       </form>
+      @if (loadingAccounts) {
+        <p role="status">Loading firm accounts...</p>
+      }
+      @if (!loadingAccounts && !firms.length) {
+        <button type="button" class="btn btn-link" (click)="loadFirmAccounts()">
+          Reload firm accounts
+        </button>
+      }
     </div>
-  </div>
-
-  <!-- Error Message -->
+  </section>
   @if (errorMessage) {
-    <div class="alert alert-danger mt-3" role="alert">
-      <i class="fas fa-exclamation-circle me-2"></i>
+    <div class="alert alert-danger" role="alert">
       {{ errorMessage }}
+      @if (errorResponseJson) {
+        <pre class="mt-2 mb-0 text-wrap">{{ errorResponseJson }}</pre>
+      }
     </div>
   }
-
-  <!-- Response Display -->
-  @if (responseData) {
-    <div class="card response-card dss-mobile-card-table mt-3">
-      <div class="card-header bg-success text-white">
-        <i class="fas fa-check-circle me-2"></i>
-        Response Data
-      </div>
-      <div class="card-body">
-        <!-- VAN Details -->
-        <div class="response-section">
-          <h5 class="section-title">VAN Details</h5>
-          <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-              <tbody>
-                <tr>
-                  <th class="w-25">Customer ID</th>
-                  <td data-label="Customer ID">
-                    {{
-                      responseData.Response?.body?.encryptData?.vanDetails
-                        ?.customerID
-                    }}
-                  </td>
-                </tr>
-                <tr>
-                  <th>Account No</th>
-                  <td data-label="Account No">
-                    {{
-                      responseData.Response?.body?.encryptData?.vanDetails
-                        ?.accountNo
-                    }}
-                  </td>
-                </tr>
-                <tr>
-                  <th>VAN Number</th>
-                  <td data-label="VAN Number">
-                    {{
-                      responseData.Response?.body?.encryptData?.vanDetails
-                        ?.vanNumber
-                    }}
-                  </td>
-                </tr>
-                <tr>
-                  <th>VAN Status</th>
-                  <td data-label="VAN Status">
-                    <span
-                      class="badge"
-                      [class.bg-success]="
-                        responseData.Response?.body?.encryptData?.vanDetails
-                          ?.vanStatus === 'Active'
-                      "
-                      [class.bg-warning]="
-                        responseData.Response?.body?.encryptData?.vanDetails
-                          ?.vanStatus === 'Pending'
-                      "
-                      [class.bg-danger]="
-                        responseData.Response?.body?.encryptData?.vanDetails
-                          ?.vanStatus === 'Inactive'
-                      "
-                    >
-                      {{
-                        responseData.Response?.body?.encryptData?.vanDetails
-                          ?.vanStatus
-                      }}
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <th>Created Date</th>
-                  <td data-label="Created Date">
-                    {{
-                      responseData.Response?.body?.encryptData?.vanDetails
-                        ?.createdDate | date: "dd-MMM-yyyy"
-                    }}
-                  </td>
-                </tr>
-                <tr>
-                  <th>Expiry Date</th>
-                  <td data-label="Expiry Date">
-                    {{
-                      responseData.Response?.body?.encryptData?.vanDetails
-                        ?.expiryDate | date: "dd-MMM-yyyy"
-                    }}
-                  </td>
-                </tr>
-                <tr>
-                  <th>Total Transactions</th>
-                  <td data-label="Total Transactions">
-                    <strong>{{
-                      responseData.Response?.body?.encryptData?.vanDetails
-                        ?.totalTransactions
-                    }}</strong>
-                  </td>
-                </tr>
-                <tr>
-                  <th>Total Amount</th>
-                  <td data-label="Total Amount">
-                    <strong>{{
-                      responseData.Response?.body?.encryptData?.vanDetails
-                        ?.totalAmount
-                    }}</strong>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+  @if (isLoading) {
+    <p role="status">
+      Fetched {{ fetchedPages }} of {{ totalApiPages || 1 }} API pages;
+      {{ rows.length }} VANs loaded.
+    </p>
+  }
+  @if (summary) {
+    <section class="card" aria-label="VAN retrieval results">
+      <div class="card-header">
+        <div
+          class="d-flex justify-content-between align-items-center gap-3 mb-2"
+        >
+          <h5 class="mb-0">VAN Details</h5>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="updatePortal()"
+            [disabled]="!canUpdatePortal"
+          >
+            {{
+              updatingPortal
+                ? "Updating portal..."
+                : portalUpdated
+                  ? "VAN updated"
+                  : "Sync VAN Details"
+            }}
+          </button>
         </div>
-
-        <!-- Transactions Table -->
-        @if (
-          responseData.Response?.body?.encryptData?.vanDetails?.transactions
-            ?.length > 0
-        ) {
-          <div class="response-section mt-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="section-title mb-0">Transaction History</h5>
-              <span class="text-muted small">
-                Showing {{ (currentPage - 1) * pageSize + 1 }} -
-                {{ Math.min(currentPage * pageSize, totalItems) }} of
-                {{ totalItems }} transactions
-              </span>
-            </div>
-            <div
-              class="table-scroll-wrapper"
-              style="
-                height: 300px;
-                overflow-y: auto;
-                border: 1px solid #dee2e6;
-                border-radius: 8px;
-              "
-            >
-              <table
-                class="table table-bordered table-hover"
-                style="margin-bottom: 0"
-              >
-                <thead class="table-dark">
-                  <tr>
-                    <th>#</th>
-                    <th>Transaction ID</th>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (
-                    txn of paginatedTransactions;
-                    track txn.transactionId;
-                    let i = $index
-                  ) {
-                    <tr>
-                      <td data-label="#">
-                        {{ (currentPage - 1) * pageSize + i + 1 }}
-                      </td>
-                      <td data-label="Transaction ID">
-                        {{ txn.transactionId }}
-                      </td>
-                      <td data-label="Date">
-                        {{ txn.date | date: "dd-MMM-yyyy" }}
-                      </td>
-                      <td data-label="Amount">{{ txn.amount }}</td>
-                      <td data-label="Type">
-                        <span
-                          class="badge"
-                          [class.bg-success]="txn.type === 'Credit'"
-                          [class.bg-danger]="txn.type === 'Debit'"
-                        >
-                          {{ txn.type }}
-                        </span>
-                      </td>
-                      <td data-label="Status">
-                        <span
-                          class="badge"
-                          [class.bg-success]="txn.status === 'Completed'"
-                          [class.bg-warning]="txn.status === 'Pending'"
-                          [class.bg-danger]="txn.status === 'Failed'"
-                        >
-                          {{ txn.status }}
-                        </span>
-                      </td>
-                    </tr>
-                  }
-                  <!-- Empty state when no transactions on current page -->
-                  @if (paginatedTransactions.length === 0) {
-                    <tr>
-                      <td colspan="6" class="text-center text-muted py-4">
-                        <i class="fas fa-inbox me-2"></i>
-                        No transactions to display on this page
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Pagination Controls -->
-            @if (totalItems > 0) {
-              <div
-                class="d-flex justify-content-between align-items-center mt-3"
-              >
-                <div class="pagination-info">
-                  <select
-                    class="form-select form-select-sm"
-                    style="width: auto"
-                    (change)="onPageSizeChange($event)"
-                  >
-                    <option value="2">2 per page</option>
-                    <option value="5" selected>5 per page</option>
-                    <option value="10">10 per page</option>
-                    <option value="20">20 per page</option>
-                  </select>
-                </div>
-                <nav aria-label="Transaction pagination">
-                  <ul class="pagination pagination-sm mb-0">
-                    <!-- First Page -->
-                    <li class="page-item" [class.disabled]="currentPage === 1">
-                      <a
-                        class="page-link"
-                        href="javascript:void(0)"
-                        (click)="changePage(1)"
-                        >First</a
-                      >
-                    </li>
-                    <!-- Previous -->
-                    <li class="page-item" [class.disabled]="currentPage === 1">
-                      <a
-                        class="page-link"
-                        href="javascript:void(0)"
-                        (click)="changePage(currentPage - 1)"
-                        >Previous</a
-                      >
-                    </li>
-                    <!-- Page Numbers -->
-                    @for (page of getVisiblePages(); track page) {
-                      <li
-                        class="page-item"
-                        [class.active]="page === currentPage"
-                      >
-                        <a
-                          class="page-link"
-                          href="javascript:void(0)"
-                          (click)="changePage(page)"
-                          >{{ page }}</a
-                        >
-                      </li>
-                    }
-                    <!-- Next -->
-                    <li
-                      class="page-item"
-                      [class.disabled]="currentPage === totalPages"
-                    >
-                      <a
-                        class="page-link"
-                        href="javascript:void(0)"
-                        (click)="changePage(currentPage + 1)"
-                        >Next</a
-                      >
-                    </li>
-                    <!-- Last -->
-                    <li
-                      class="page-item"
-                      [class.disabled]="currentPage === totalPages"
-                    >
-                      <a
-                        class="page-link"
-                        href="javascript:void(0)"
-                        (click)="changePage(totalPages)"
-                        >Last</a
-                      >
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-            }
+        @if (portalMessage) {
+          <div class="alert alert-success" role="status">
+            {{ portalMessage }}
           </div>
         }
+        @if (portalError) {
+          <pre class="alert alert-danger text-wrap" role="alert">{{
+            portalError
+          }}</pre>
+        }
+        <span
+          >Account: {{ summary.CasaAccountNo }} | {{ summary.fromDate }} to
+          {{ summary.toDate }}</span
+        >
+        <p class="mb-0">
+          {{ rows.length }} of {{ summary.TotalNoOfRecords }} records loaded |
+          API pages fetched: {{ fetchedPages }} / {{ totalApiPages }}
+        </p>
       </div>
-    </div>
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered mb-0">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">VAN</th>
+              <th scope="col">Start Date</th>
+              <th scope="col">End Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of pagedRows; track $index; let i = $index) {
+              <tr>
+                <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                <td>{{ row.Van }}</td>
+                <td>{{ row.VanStartDate }}</td>
+                <td>{{ row.VanEndDate }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4">No VANs found for the selected period.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <nav
+        class="card-footer d-flex align-items-center justify-content-between"
+        aria-label="VAN results pagination"
+      >
+        <button
+          class="btn btn-outline-primary"
+          (click)="goToPage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button
+          class="btn btn-outline-primary"
+          (click)="goToPage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </nav>
+    </section>
   }
 </div>

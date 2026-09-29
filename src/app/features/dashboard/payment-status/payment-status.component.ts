@@ -1,3 +1,4 @@
+import { RouterLink } from '@angular/router';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -38,7 +39,7 @@ interface PaymentResponse {
   selector: 'app-payment-status',
   templateUrl: './payment-status.component.html',
   styleUrls: ['../payment-request-approval/payment-request-approval.component.scss', './payment-status.component.scss'],
-  imports: [FormsModule, CommonModule],
+  imports: [RouterLink, FormsModule, CommonModule],
 })
 export class PaymentStatusComponent implements OnInit {
   private http = inject(Http);

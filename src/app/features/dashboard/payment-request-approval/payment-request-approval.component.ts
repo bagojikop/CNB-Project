@@ -1,3 +1,4 @@
+import { RouterLink } from '@angular/router';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -9,9 +10,9 @@ import { catchError, finalize, forkJoin, of } from 'rxjs';
 
 interface PaymentResponse {
   payment_no: string;
-  utr: string;
+  utr?: string;
   status: string;
-  message: unknown;
+  message?: unknown;
 }
 
 interface PaymentResult extends PaymentResponse {
@@ -65,7 +66,7 @@ interface PendingSinglePayment {
 
 @Component({
   selector: 'app-payment-request-approval',
-  imports: [CurrencyPipe, CommonModule, FormsModule],
+  imports: [RouterLink, CurrencyPipe, CommonModule, FormsModule],
   templateUrl: './payment-request-approval.component.html',
   styleUrl: './payment-request-approval.component.scss',
 })
@@ -139,7 +140,7 @@ export class PaymentRequestApprovalComponent implements OnInit {
               // The response has no row ID; use a unique local selection key.
 
               paymentType: 'Single',
-              status: payment.status?.trim() || (payment.error_message?.trim() ? 'Failed' : 'Pending'),
+              status: payment.status?.trim() || 'Pending',
               message: payment.error_message,
             };
           });
@@ -378,7 +379,8 @@ export class PaymentRequestApprovalComponent implements OnInit {
           const results = Array.isArray(response) ? response : response ? [response] : [];
           const byPaymentNo = new Map(results.map((result) => [String(result.payment_no), result]));
           this.paymentResults = selectedItems.map((item) => {
-            const result = byPaymentNo.get(String(item.payment_no));
+            const result = byPaymentNo.get(String(item.payment_no))
+              ?? (action === 'reject' ? byPaymentNo.get(`VCH-${item.vch_id}`) : undefined);
             if (result) {
               this.respondedPaymentIds.add(item.vch_id);
               item.status = result.status;
@@ -391,7 +393,7 @@ export class PaymentRequestApprovalComponent implements OnInit {
               branchName: item.branchName,
               doc_no: item.doc_no,
               benificery: item.benificery,
-              payment_no: String(item.payment_no),
+              payment_no: result?.payment_no ?? String(item.payment_no),
               utr: result?.utr ?? '',
               status: result?.status ?? 'No response',
               message: result?.message ?? (result ? null : 'No result returned for this payment.'),

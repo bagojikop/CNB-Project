@@ -110,6 +110,28 @@
         class="card-header mb-3 d-flex gap-3 fw-bold gradient-border align-items-center"
       >
         <svg cIcon name="cilLockLocked" size="sm"></svg>
+        <h5 class="mb-0 text-secondary">UPI / VPA Details</h5>
+      </div>
+      <c-row class="mb-3 mx-1">
+        <c-col sm="3">
+          <label for="bank-mcc" class="form-label">MCC</label>
+          <input id="bank-mcc" class="form-control form-control-sm" formControlName="mcc" maxlength="10" />
+        </c-col>
+        <c-col sm="3">
+          <label for="bank-sid" class="form-label">SID</label>
+          <input id="bank-sid" class="form-control form-control-sm" formControlName="sid" maxlength="10" />
+        </c-col>
+        <c-col sm="3">
+          <label for="bank-mid" class="form-label">Merchant ID (MID)</label>
+          <input id="bank-mid" class="form-control form-control-sm" formControlName="mid" maxlength="10" />
+        </c-col>
+        <c-col sm="3">
+          <label for="bank-terminal" class="form-label">Terminal ID</label>
+          <input id="bank-terminal" class="form-control form-control-sm" formControlName="terminalId" maxlength="10" />
+        </c-col>
+      </c-row>
+      <div class="card-header mb-3 d-flex gap-3 fw-bold gradient-border align-items-center">
+        <svg cIcon name="cilLockLocked" size="sm"></svg>
         <h5 class="mb-0 text-secondary">API & Integration Keys</h5>
       </div>
       <c-row class="mb-3 mx-1">

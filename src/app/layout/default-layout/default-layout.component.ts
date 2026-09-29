@@ -168,7 +168,7 @@ export class DefaultLayoutComponent implements OnDestroy {
     }
 
     this.activeModuleTitle = '';
-    this.navItems = this.normalizeNavIcons(this.getVisibleNavItems(navItems));
+    this.navItems = this.getModuleNavItems(moduleName);
   }
 
   private getModuleNavItems(moduleName: string): INavData[] {
@@ -188,9 +188,9 @@ export class DefaultLayoutComponent implements OnDestroy {
         ? 'push checker'
         : '';
 
-    if (!disabledName) return items;
-
-    return items.map((item) => {
+    return items.filter((item) =>
+      item.name !== 'Settings' || this.auth.isAdmin(),
+    ).map((item) => {
       const children = item.children?.length
         ? this.filterNavItemsByRole(item.children)
         : item.children;

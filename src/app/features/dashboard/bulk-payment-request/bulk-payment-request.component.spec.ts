@@ -35,13 +35,19 @@ describe('BulkPaymentRequestComponent', () => {
   });
 
   it('maps the maker response into a batch and opens its account details', () => {
-    const txn = { txnIdentity: { id: 1001, srNo: '1' }, txnAmt: '500.00', txnType: 'IFT',
-      benefIFSC: 'CNRB0006474', benefAcNo: '6474201000016', benefAcNm: 'TIRUMALA', nrtv: 'APITEST' };
-    http.get.and.returnValue(of({ status_cd: 1, errors: {}, data: [
-      { vch_id: 3, batch_no: '10110200000003', branch_id: '102', firm_id: 101,
-        srcAcctNumber: '6474201000015', doc_no: '1234', total_amt: 1000,
-        txnDetls: [txn, { ...txn, txnIdentity: { id: 1002, srNo: '2' } }] },
-    ] }));
+    const txn = {
+      txnIdentity: { id: 1001, srNo: '1' }, txnAmt: '500.00', txnType: 'IFT',
+      benefIFSC: 'CNRB0006474', benefAcNo: '6474201000016', benefAcNm: 'TIRUMALA', nrtv: 'APITEST'
+    };
+    http.get.and.returnValue(of({
+      status_cd: 1, errors: {}, data: [
+        {
+          vch_id: 3, batch_no: '10110200000003', branch_id: '102', firm_id: 101,
+          srcAcctNumber: '6474201000015', doc_no: '1234', total_amt: 1000,
+          txnDetls: [txn, { ...txn, txnIdentity: { id: 1002, srNo: '2' } }]
+        },
+      ]
+    }));
     component.ngOnInit();
     expect(component.approvalData[0].request_count).toBe(2);
     expect(component.approvalData[0].total_amt).toBe(1000);

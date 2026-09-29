@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { adminGuard } from '../../shared/services/auth.guard';
 
 import { AccountStatementComponent } from '@features/settings/account-statement/account-statement.component';
 import { BalanceInquiryComponent } from '@features/settings/balance-inqury/balance-inqury.component';
@@ -13,20 +14,28 @@ import { pushMakerComponent } from '@features/settings/push-checker-maker/push-m
 import { UserMgtDashboardComponent } from '@features/settings/userManagement/user-mgt-dashboard/user-mgt-dashboard.component';
 import { VanModifyComponent } from '@features/settings/van-modify/van-modify.component';
 import { VanRetrieveComponent } from '@features/settings/van-retrieve/van-retrieve.component';
+import { VanTransactionComponent } from '@features/settings/van-transaction/van-transaction.component';
 import { VanCreationDashboardComponent } from '@features/settings/vanCreation/van-creation-dashboard/van-creation-dashboard.component';
 import { VanCreationEditComponent } from '@features/settings/vanCreation/van-creation-edit/van-creation-edit.component';
 
 const routes: Routes = [
   {
+    path: 'virtualAccounts',
+    loadComponent: () => import('@features/settings/virtual-accounts/virtual-accounts.component').then(m => m.VirtualAccountsComponent),
+  },
+  {
     path: 'bankAccountDashboard',
+    canActivate: [adminGuard],
     component: BankAccountDashboardComponent,
   },
   {
     path: 'bankAccountDetails',
+    canActivate: [adminGuard],
     component: BankAccountDetailComponent,
   },
   {
     path: 'userMgtDashboard',
+    canActivate: [adminGuard],
     component: UserMgtDashboardComponent,
   },
   {
@@ -44,6 +53,10 @@ const routes: Routes = [
   {
     path: 'vanRetrieve',
     component: VanRetrieveComponent,
+  },
+  {
+    path: 'vanTransaction',
+    component: VanTransactionComponent,
   },
   {
     path: 'vanModify',

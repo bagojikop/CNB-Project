@@ -1,3 +1,4 @@
+import { RouterLink } from '@angular/router';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -82,7 +83,7 @@ interface PendingBulkPayment {
 
 @Component({
   selector: 'app-bulk-payment-initialize',
-  imports: [CurrencyPipe, CommonModule, FormsModule, SmartTableComponent, TemplateIdDirective],
+  imports: [RouterLink, CurrencyPipe, CommonModule, FormsModule, SmartTableComponent, TemplateIdDirective],
   templateUrl: './bulk-payment-initialize.component.html',
   styleUrl: '../bulk-payment-request/bulk-payment-request.component.scss',
 })

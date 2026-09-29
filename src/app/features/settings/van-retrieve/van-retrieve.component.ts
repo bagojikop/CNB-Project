@@ -1,227 +1,264 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import {
-  DSS_FORM_CONTROLS,
-  DssInputNumComponent,
-} from '@shared-directives/dss-form-controls';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DSS_FORM_CONTROLS } from '@shared-directives/dss-form-controls';
+import { Http } from '@shared-services/httpService';
+import { MyProvider } from '@shared-services/provider';
+import { EMPTY, expand, finalize, map } from 'rxjs';
 
+interface FirmAccount {
+  id: number | string;
+  firmId: number;
+  firmName: string;
+  selectionLabel: string;
+  accountNos: string[];
+  customerId: string;
+  branchId?: string;
+  branch_id?: string;
+}
+interface VanDetail { Van: string; VanStartDate: string; VanEndDate: string; }
+interface RetrievalPage {
+  CasaAccountNo: string;
+  fromDate: string;
+  toDate: string;
+  TotalNoOfPages: string;
+  TotalNoOfRecords: string;
+  pageNo: string;
+  VanTxnDetailsDTO: VanDetail[];
+}
 @Component({
   selector: 'app-van-retrieve',
-  imports: [ReactiveFormsModule, CommonModule, DSS_FORM_CONTROLS],
+  imports: [RouterLink, CommonModule, ReactiveFormsModule, DSS_FORM_CONTROLS],
   templateUrl: './van-retrieve.component.html',
   styleUrl: './van-retrieve.component.scss',
 })
-export class VanRetrieveComponent implements OnInit {
-  vanForm!: FormGroup;
+export class VanRetrieveComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly http = inject(Http);
+  private readonly provider = inject(MyProvider);
+  private readonly destroyRef = inject(DestroyRef);
+  readonly apiUrl = 'van/retrieve-van';
+  firms: FirmAccount[] = [];
+  selectedFirm: FirmAccount | null = null;
   isLoading = false;
-  responseData: any = null;
-  errorMessage: string = '';
-  apiUrl = 'YOUR_API_ENDPOINT_HERE';
-
-  // Pagination properties
+  loadingAccounts = false;
+  updatingPortal = false;
+  portalUpdated = false;
+  portalMessage = '';
+  portalError = '';
+  retrievalComplete = false;
+  private retrievalContext: { firm_id: number; branch_id: string; customerId: string } | null = null;
+  errorMessage = '';
+  errorResponseJson = '';
+  rows: VanDetail[] = [];
+  summary: RetrievalPage | null = null;
+  fetchedPages = 0;
+  totalApiPages = 0;
   currentPage = 1;
-  pageSize = 5;
-  totalItems = 0;
-  paginatedTransactions: any[] = [];
+  readonly pageSize = 100;
+  readonly filterForm = this.fb.group({
+    firm_id: ['', Validators.required],
+    accountNo: ['', Validators.required],
+    fromDate: ['', Validators.required],
+    endDate: ['', Validators.required],
+  });
 
-  constructor(private fb: FormBuilder) {}
+  constructor() { this.loadFirmAccounts(); }
 
-  ngOnInit(): void {
-    this.vanForm = this.fb.group({
-      customerID: ['111025456', [Validators.required]],
-      accountNo: ['6038111000017', [Validators.required]],
-      fromDate: ['2020-03-02', [Validators.required]],
-      toDate: ['2025-03-02', [Validators.required]],
-      noOfTransactions: [
-        1,
-        [Validators.required, Validators.min(1), Validators.max(500)],
-      ],
-      pageNo: [
-        1,
-        [Validators.required, Validators.min(1), Validators.max(500)],
-      ],
+  loadFirmAccounts(): void {
+    if (this.loadingAccounts || this.isLoading || this.updatingPortal) return;
+    this.firms = [];
+    this.selectedFirm = null;
+    this.filterForm.controls.firm_id.setValue('');
+    this.filterForm.controls.accountNo.setValue('');
+    const branchId = this.provider.companyInfo?.company?.branch_id;
+    this.loadingAccounts = true;
+    this.errorMessage = '';
+    this.errorResponseJson = '';
+    this.http.get<any>('bankAccount/all', branchId == null || String(branchId).trim() === '' ? {} : { branch_id: branchId }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.loadingAccounts = false)).subscribe({
+      next: response => {
+        const accounts = response?.data ?? response;
+        if (!Array.isArray(accounts)) {
+          this.errorMessage = 'Unable to load firm accounts.';
+          return;
+        }
+        this.firms = accounts
+          .map(({ accountNo, ...firm }: any) => ({
+          ...firm,
+          selectionLabel: `${firm.firmName} ? ${firm.customerId ?? firm.customerID ?? ''}`,
+          customerId: String(firm.customerId ?? firm.customerID ?? '').trim(),
+          accountNos: String(accountNo ?? '').split(',').map(value => value.trim()).filter(Boolean),
+        }));
+      },
+      error: () => this.errorMessage = 'Unable to load firm accounts. Please retry.',
     });
   }
 
-  onSubmit(): void {
-    if (this.vanForm.invalid) {
-      this.vanForm.markAllAsTouched();
+  onFirmSelect(firm: FirmAccount | null): void {
+    this.selectedFirm = this.firms.find(account => String(account.id) === String(firm?.id)) ?? null;
+    this.filterForm.controls.accountNo.setValue('');
+  }
+
+  showResult(): void {
+    if (this.isLoading || this.updatingPortal) return;
+    if (this.filterForm.invalid || !this.selectedFirm) {
+      this.filterForm.markAllAsTouched();
+      this.errorMessage = 'Select a firm, account, and date range.';
+      return;
+    }
+    const { accountNo, fromDate, endDate } = this.filterForm.getRawValue();
+    if (!this.selectedFirm.accountNos.includes(accountNo!)) {
+      this.errorMessage = 'Select an account belonging to the selected firm.';
+      return;
+    }
+    if (!this.validDate(fromDate!) || !this.validDate(endDate!) || fromDate! > endDate!) {
+      this.errorMessage = 'Enter valid dates with From on or before To.';
+      return;
+    }
+    const customerID = this.selectedFirm.customerId;
+    if (!customerID) {
+      this.errorMessage = 'The selected account is missing its customer ID. Update the bank account details and retry.';
       return;
     }
 
-    this.isLoading = true;
+    this.retrievalContext = {
+      firm_id: Number(this.selectedFirm.firmId),
+      branch_id: String(this.selectedFirm.branchId ?? this.selectedFirm.branch_id ?? this.provider.companyInfo?.company?.branch_id ?? '').trim(),
+      customerId: customerID,
+    };
+    this.retrievalComplete = false;
+    this.portalUpdated = false;
+    this.portalMessage = '';
+    this.portalError = '';
+    const firmRecordId = this.selectedFirm.id;
+    const requestDetails = {
+      customerID,
+      accountNo: accountNo!.split('|')[0].trim(),
+      fromDate: fromDate!,
+      toDate: endDate!,
+      noOfTransactions: '1000',
+    };
+    this.rows = [];
+    this.summary = null;
+    this.fetchedPages = 0;
+    this.totalApiPages = 0;
+    this.currentPage = 1;
     this.errorMessage = '';
-    this.responseData = null;
+    this.errorResponseJson = '';
+    this.isLoading = true;
+    let requestedPage = 1;
+    const fetchPage = (page: number) => {
+      requestedPage = page;
+      const payload = {
+        Request: { body: { encryptData: { ...requestDetails, pageNo: String(page) } } },
+      };
+      return this.http.post<any>(this.apiUrl, payload, { id: firmRecordId }).pipe(
+        map(res => {
+          const root = res?.data ?? res;
+          const response = root?.Response ?? root?.response ?? root;
+          const encrypted = response?.body?.encryptData;
+          const details = encrypted?.vanTxnDetailsDTO ?? encrypted?.VanTxnDetailsDTO;
+          if (!Array.isArray(details)) {
+            this.errorResponseJson = JSON.stringify(res, null, 2) ?? 'null';
+            throw new Error('VAN details were not returned.');
+          }
+          const reportedPages = Number(encrypted.totalNoOfPages ?? encrypted.TotalNoOfPages);
+          const pages = Number.isSafeInteger(reportedPages) && reportedPages >= page ? reportedPages : page;
+          const returnedAccount = encrypted.casaAccountNo ?? encrypted.CasaAccountNo;
+          const data: RetrievalPage = {
+            CasaAccountNo: returnedAccount == null ? requestDetails.accountNo : String(returnedAccount).trim(),
+            fromDate: encrypted.fromDate ?? requestDetails.fromDate,
+            toDate: encrypted.toDate ?? requestDetails.toDate,
+            TotalNoOfPages: String(pages),
+            TotalNoOfRecords: String(encrypted.totalNoOfRecords ?? encrypted.TotalNoOfRecords ?? details.length),
+            pageNo: String(page),
+            VanTxnDetailsDTO: details.map((row: any): VanDetail => {
+              const van = String(row?.van ?? row?.Van ?? '');
+              return {
+                Van: van.trim(),
+                VanStartDate: row?.vanStartDate ?? row?.VanStartDate ?? '',
+                VanEndDate: row?.vanEndDate ?? row?.VanEndDate ?? '',
+              };
+            }),
+          };
+          if (page === 1) this.totalApiPages = pages;
 
+          return data;
+        }),
+      );
+    };
+    fetchPage(1).pipe(
+      expand(data => Number(data.pageNo) < this.totalApiPages ? fetchPage(Number(data.pageNo) + 1) : EMPTY, 1),
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.isLoading = false),
+    ).subscribe({
+      next: data => {
+        this.summary = data;
+        this.fetchedPages++;
+        this.rows = [...this.rows, ...data.VanTxnDetailsDTO.map(row => ({ ...row, Van: row.Van.trim() }))];
+      },
+      complete: () => this.retrievalComplete = this.fetchedPages === this.totalApiPages,
+      error: error => {
+        if (!this.errorResponseJson && error?.error != null) {
+          this.errorResponseJson = JSON.stringify(error.error, null, 2);
+        }
+        this.errorMessage = `Unable to fetch page ${requestedPage}. ${this.rows.length} records loaded; results are incomplete. Search again to retry.`;
+      },
+    });
+  }
+
+  get canUpdatePortal(): boolean {
+    return this.retrievalComplete && !this.isLoading && !this.updatingPortal && !this.portalUpdated &&
+      this.rows.length > 0 && !!this.retrievalContext &&
+      Number.isInteger(this.retrievalContext.firm_id) && this.retrievalContext.firm_id > 0 &&
+      !!this.retrievalContext.branch_id && !!this.retrievalContext.customerId;
+  }
+
+  updatePortal(): void {
+    if (!this.canUpdatePortal || !this.summary || !this.retrievalContext) return;
     const payload = {
-      Request: {
-        body: {
-          encryptData: this.vanForm.value,
+      body: {
+        encryptData: {
+          ...this.summary,
+          TotalNoOfPages: '1',
+          TotalNoOfRecords: String(this.rows.length),
+          NoOfRecords: String(this.rows.length),
+          EndOfStatement: 'Y',
+          HasMoreResults: 'false',
+          pageNo: '1',
+          VanTxnDetailsDTO: this.rows.map(row => ({ ...row })),
         },
       },
     };
-
-    // === EXAMPLE RESPONSE DATA ===
-    // To use real API, comment out the setTimeout block below
-    // and uncomment the http.post section
-
-    // Simulate API call with example response
-    setTimeout(() => {
-      this.responseData = {
-        Response: {
-          body: {
-            encryptData: {
-              responseCode: '0',
-              responseMessage: 'Success',
-              vanDetails: {
-                customerID: this.vanForm.value.customerID,
-                accountNo: this.vanForm.value.accountNo,
-                vanNumber: 'VAN-2024-001234',
-                vanStatus: 'Active',
-                createdDate: '2024-01-15',
-                expiryDate: '2025-01-15',
-                transactions: [
-                  {
-                    transactionId: 'TXN-001',
-                    date: '2024-03-01',
-                    amount: '₹1,25,000.00',
-                    type: 'Credit',
-                    status: 'Completed',
-                  },
-                  {
-                    transactionId: 'TXN-002',
-                    date: '2024-03-05',
-                    amount: '₹45,000.00',
-                    type: 'Debit',
-                    status: 'Completed',
-                  },
-                  {
-                    transactionId: 'TXN-003',
-                    date: '2024-03-10',
-                    amount: '₹2,00,000.00',
-                    type: 'Credit',
-                    status: 'Pending',
-                  },
-                  {
-                    transactionId: 'TXN-004',
-                    date: '2024-03-15',
-                    amount: '₹75,000.00',
-                    type: 'Debit',
-                    status: 'Completed',
-                  },
-                  {
-                    transactionId: 'TXN-005',
-                    date: '2024-03-20',
-                    amount: '₹3,50,000.00',
-                    type: 'Credit',
-                    status: 'Completed',
-                  },
-                ],
-                totalTransactions: 5,
-                totalAmount: '₹7,95,000.00',
-              },
-            },
-          },
-        },
-      };
-      this.updatePagination();
-      this.isLoading = false;
-    }, 1500);
-
-    /* === REAL API CALL (uncomment to use) ===
-    this.http.post(this.apiUrl, payload).subscribe({
-      next: (response) => {
-        this.responseData = response;
-        this.isLoading = false;
+    this.updatingPortal = true;
+    this.portalMessage = '';
+    this.portalError = '';
+    this.http.post<{ status: string; updatedCount: number }>('VanCreateRequest/update-vans', payload, { ...this.retrievalContext }).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.updatingPortal = false),
+    ).subscribe({
+      next: response => {
+        if (response?.status !== 'Success' || !Number.isInteger(response.updatedCount) || response.updatedCount < 0) {
+          this.portalError = JSON.stringify(response, null, 2) ?? 'Portal update failed.';
+          return;
+        }
+        this.portalUpdated = true;
+        this.portalMessage = `Portal updated successfully. ${response.updatedCount} VAN(s) updated.`;
       },
-      error: (error) => {
-        this.errorMessage =
-          error.message || 'An error occurred while fetching data.';
-        this.isLoading = false;
-      },
+      error: error => this.portalError = error?.error != null
+        ? JSON.stringify(error.error, null, 2)
+        : 'Unable to update the portal. Please retry.',
     });
-    */
   }
 
-  resetForm(): void {
-    this.vanForm.patchValue({
-      customerID: '111025456',
-      accountNo: '6038111000017',
-      fromDate: '2020-03-02',
-      toDate: '2025-03-02',
-      noOfTransactions: '500',
-      pageNo: '1',
-    });
-
-    this.errorMessage = '';
-    this.responseData = null;
-    this.currentPage = 1;
-    this.paginatedTransactions = [];
+  private validDate(value: string): boolean {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    const date = new Date(value + 'T00:00:00Z');
+    return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
   }
-
-  // Pagination methods
-  updatePagination(): void {
-    const transactions =
-      this.responseData?.Response?.body?.encryptData?.vanDetails
-        ?.transactions || [];
-    this.totalItems = transactions.length;
-    this.currentPage = 1;
-    this.updatePaginatedData(transactions);
-  }
-
-  updatePaginatedData(transactions: any[]): void {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedTransactions = transactions.slice(startIndex, endIndex);
-  }
-
-  changePage(page: number): void {
-    const transactions =
-      this.responseData?.Response?.body?.encryptData?.vanDetails
-        ?.transactions || [];
-    const totalPages = Math.ceil(transactions.length / this.pageSize);
-    if (page < 1 || page > totalPages) return;
-    this.currentPage = page;
-    this.updatePaginatedData(transactions);
-  }
-
-  get totalPages(): number {
-    const transactions =
-      this.responseData?.Response?.body?.encryptData?.vanDetails
-        ?.transactions || [];
-    return Math.ceil(transactions.length / this.pageSize) || 1;
-  }
-
-  getVisiblePages(): number[] {
-    const total = this.totalPages;
-    const current = this.currentPage;
-    const maxVisible = 5;
-    let start = Math.max(1, current - Math.floor(maxVisible / 2));
-    let end = Math.min(total, start + maxVisible - 1);
-    if (end - start < maxVisible - 1) {
-      start = Math.max(1, end - maxVisible + 1);
-    }
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  }
-
-  onPageSizeChange(event: any): void {
-    this.pageSize = parseInt(event.target.value, 10);
-    this.currentPage = 1;
-    const transactions =
-      this.responseData?.Response?.body?.encryptData?.vanDetails
-        ?.transactions || [];
-    this.updatePaginatedData(transactions);
-  }
-
-  // Expose Math to template
-  get Math(): any {
-    return Math;
-  }
+  get totalPages(): number { return Math.max(1, Math.ceil(this.rows.length / this.pageSize)); }
+  get pagedRows(): VanDetail[] { return this.rows.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize); }
+  goToPage(page: number): void { this.currentPage = Math.min(Math.max(page, 1), this.totalPages); }
 }

@@ -1,0 +1,50 @@
+<main class="virtual-accounts">
+  <header class="overview">
+    <div class="overview-copy">
+      <span class="eyebrow">BANKING SERVICES</span>
+      <h1>Virtual Account Banking</h1>
+      <p>Create accounts, manage validity, and follow every transaction. Your virtual account services, together in one place.</p>
+      <span class="overview-tag"><span aria-hidden="true"></span>Virtual Account Number (VAN)</span>
+    </div>
+    <div class="bank-illustration" aria-hidden="true">
+      <span class="bank-orbit"></span>
+      <span class="bank-tile"><svg [cIcon]="icons.bank" size="3xl"></svg></span>
+      <span class="bank-caption">VIRTUAL ACCOUNTS</span>
+    </div>
+  </header>
+
+  <section aria-labelledby="services-title" class="services">
+    <div class="section-heading">
+      <div>
+        <h2 id="services-title">What would you like to do?</h2>
+        <p>Choose a service to get started.</p>
+      </div>
+      <span class="section-note">ACCOUNT SERVICES</span>
+    </div>
+    <div class="service-grid">
+      @for (service of services; track service.route) {
+        <a class="service-card" [class]="'service-card ' + service.theme" [routerLink]="service.route">
+          <div class="card-top">
+            <span class="service-icon"><svg [cIcon]="service.icon" size="xl" aria-hidden="true"></svg></span>
+            <svg class="top-arrow" [cIcon]="icons.arrow" aria-hidden="true"></svg>
+          </div>
+          <span class="category">{{ service.category }}</span>
+          <h3>{{ service.title }}</h3>
+          <p class="description">{{ service.description }}</p>
+          <ul>
+            @for (detail of service.details; track detail) {
+              <li>{{ detail }}</li>
+            }
+          </ul>
+          <span class="card-action">{{ service.action }}<svg [cIcon]="icons.arrow" aria-hidden="true"></svg></span>
+        </a>
+      }
+    </div>
+  </section>
+
+  <aside class="retrieval-note" aria-label="Virtual account retrieval">
+    <span class="note-icon"><svg [cIcon]="icons.bank" size="xl" aria-hidden="true"></svg></span>
+    <div><h2>Looking for existing virtual accounts?</h2><p>Retrieve VAN details for a selected bank account and date range.</p></div>
+    <a routerLink="/settings-form/vanRetrieve">Retrieve accounts<svg [cIcon]="icons.arrow" aria-hidden="true"></svg></a>
+  </aside>
+</main>

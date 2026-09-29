@@ -153,6 +153,10 @@ export class AuthService {
 
   isAuthenticated(): boolean { return this.isAuthenticatedSubject.value; }
 
+  isAdmin(): boolean {
+    return this.isAuthenticated() && Number(this.provider.companyInfo?.user?.role) === 1;
+  }
+
   private storeContext(): void {
     if (this.isBrowser) localStorage.setItem(this.contextStorageKey, JSON.stringify(this.provider.companyInfo));
   }

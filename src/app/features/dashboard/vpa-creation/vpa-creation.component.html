@@ -1,0 +1,79 @@
+<section class="card">
+  <div class="card-header d-flex justify-content-between align-items-center gap-3">
+    <h2 class="h4 mb-0">{{ deactivationMode ? 'VPA Deactivation' : 'VPA Creation' }}</h2>
+    <a routerLink="/dashboard/dashboard-form/vpa" class="btn btn-sm btn-outline-secondary">Close</a>
+  </div>
+  <div class="card-body">
+    <p>{{ deactivationMode ? 'Deactivate an existing VPA using the account’s UPI ID.' : 'Create a VPA for a configured bank account, or deactivate an existing VPA.' }}</p>
+    <div class="d-flex flex-wrap align-items-end gap-3 mb-3">
+      <div class="flex-grow-1" style="max-width: 480px">
+        <label for="vpa-bank" class="form-label">Select bank</label>
+        <select #bankSelect id="vpa-bank" class="form-select" [value]="selectedBankId ?? ''"
+          [disabled]="busy || !!loadError || !banks.length" (change)="selectBank(bankSelect.value)">
+          <option value="">Select a bank</option>
+          @for (bank of banks; track bank.id) {
+            <option [value]="bank.id">{{ bank.label }}</option>
+          }
+        </select>
+      </div>
+      <button type="button" class="btn btn-outline-primary" [disabled]="busy" (click)="loadAccounts()">Refresh accounts</button>
+    </div>
+    @if (loading) {
+      <p role="status">Loading bank accounts…</p>
+    } @else if (loadError) {
+      <div class="alert alert-danger" role="alert">{{ loadError }}</div>
+      <button type="button" class="btn btn-outline-primary" (click)="loadAccounts()">Retry</button>
+    } @else if (!banks.length) {
+      <p class="text-body-secondary" role="status">No bank accounts found.</p>
+    } @else if (selectedBankId === null) {
+      <p class="text-body-secondary" role="status">Select a bank to view its accounts and VPA actions.</p>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <caption class="visually-hidden">Bank accounts and VPA actions</caption>
+          <thead><tr>
+            <th scope="col">Bank</th><th scope="col">Account No.</th><th scope="col">MCC</th>
+            <th scope="col">SID</th><th scope="col">Merchant ID</th><th scope="col">VPA / UPI ID</th><th scope="col">Action</th>
+          </tr></thead>
+          <tbody>
+            @for (row of visibleRows; track row) {
+              <tr>
+                <td>{{ row.data.bank_name || '—' }}</td>
+                <td>{{ row.data.account_number || '—' }}</td>
+                <td>{{ row.data.mcc || '—' }}</td>
+                <td>{{ row.data.sid || '—' }}</td>
+                <td>{{ row.data.mid || '—' }}</td>
+                <td>{{ row.upiId || '—' }}</td>
+                <td>
+                  @if (!deactivationMode) {
+                  <button type="button" class="btn btn-primary btn-sm" [disabled]="!canCreate(row)" (click)="create(row)">
+                    {{ row.pending && !row.deactivating ? 'Creating…' : row.created ? (row.status || 'Created') : 'Create' }}
+                  </button>
+                  }
+                  <button type="button" class="btn btn-outline-danger btn-sm ms-2" [disabled]="!canDeactivate(row)" (click)="deactivate(row)">
+                    {{ row.deactivating ? 'Deactivating…' : row.deactivated ? 'Deactivated' : 'Deactivate' }}
+                  </button>
+                  @if (!deactivationMode && !row.created && missingDetails(row)) {
+                    <small class="d-block text-body-secondary mt-1">Missing: {{ missingDetails(row) }}</small>
+                  }
+                  @if (!row.upiId) {
+                    <small class="d-block text-body-secondary mt-1">{{ row.created ? 'Awaiting confirmed VPA / UPI ID.' : 'No existing VPA / UPI ID.' }}</small>
+                  }
+                  @if (row.id === null) {
+                    <small class="d-block text-body-secondary mt-1">Missing or invalid bank account ID.</small>
+                  }
+                  @if (row.message) {
+                    <small class="d-block mt-1" [class.text-danger]="row.error" [class.text-success]="!row.error" role="status">{{ row.message }}</small>
+                  }
+
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="7" class="text-center py-4">No bank accounts found.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>

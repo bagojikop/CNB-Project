@@ -1,0 +1,5 @@
+.erp-table {
+  min-width: 1300px;
+  th:first-child, td:first-child { width: 44px; text-align: center; }
+  .erp-message { white-space: normal; overflow-wrap: anywhere; min-width: 220px; }
+}

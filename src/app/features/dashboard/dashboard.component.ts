@@ -85,6 +85,11 @@ export class DashboardComponent implements OnInit {
 
   bankCards: BankCard[] = [
     {
+      id: 11, title: 'Payment ERP Update', count: null,
+      icon: 'cilCheckCircle', color: 'success',
+      route: '/dashboard/dashboard-form/paymentErpUpdate',
+    },
+    {
       id: 9, title: 'Bulk Payment Initialize', count: null,
       icon: 'cilClock', color: 'info',
       route: '/dashboard/dashboard-form/bulkPaymentInitialize',

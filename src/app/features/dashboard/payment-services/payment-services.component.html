@@ -1,0 +1,47 @@
+<main class="virtual-accounts">
+  <header class="overview">
+    <div class="overview-copy">
+      <span class="eyebrow">BANKING SERVICES</span>
+      <h1>{{ dashboard().title }}</h1>
+      <p>{{ dashboard().description }}</p>
+      <span class="overview-tag"><span aria-hidden="true"></span>{{ dashboard().tag }}</span>
+    </div>
+    <div class="bank-illustration" aria-hidden="true">
+      <span class="bank-orbit"></span>
+      <span class="bank-tile"><svg [cIcon]="dashboard().icon" size="3xl"></svg></span>
+      <span class="bank-caption">{{ dashboard().tag }}</span>
+    </div>
+  </header>
+
+  <section aria-labelledby="services-title" class="services">
+    <div class="section-heading">
+      <div>
+        <h2 id="services-title">What would you like to do?</h2>
+        <p>Choose a service to get started.</p>
+      </div>
+      <span class="section-note">ACCOUNT SERVICES</span>
+    </div>
+    <div class="service-grid">
+      @for (service of dashboard().services; track service.title) {
+        <a class="service-card" [class]="'service-card ' + service.theme" [routerLink]="service.route"
+          [attr.aria-disabled]="service.route ? null : 'true'" [attr.tabindex]="service.route ? null : -1">
+          <div class="card-top">
+            <span class="service-icon"><svg [cIcon]="service.icon" size="xl" aria-hidden="true"></svg></span>
+            @if (service.route) {
+              <svg class="top-arrow" [cIcon]="icons.arrow" aria-hidden="true"></svg>
+            }
+          </div>
+          <span class="category">{{ service.category }}</span>
+          <h3>{{ service.title }}</h3>
+          <p class="description">{{ service.description }}</p>
+          <ul>
+            @for (detail of service.details; track detail) {
+              <li>{{ detail }}</li>
+            }
+          </ul>
+          <span class="card-action">{{ service.action }}@if (service.route) {<svg [cIcon]="icons.arrow" aria-hidden="true"></svg>}</span>
+        </a>
+      }
+    </div>
+  </section>
+</main>

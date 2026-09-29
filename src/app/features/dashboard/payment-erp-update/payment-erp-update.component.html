@@ -1,0 +1,48 @@
+<div class="approval-wrapper">
+  <div class="approval-panel">
+    <div class="approval-header">
+      <a routerLink="/dashboard/dashboard-form/singlePayment" class="btn btn-sm btn-outline-secondary text-nowrap" aria-label="Close and return to Single Payment"><span aria-hidden="true">&times;</span> Close</a>
+      <div>
+        <h5 class="mb-1">Payment ERP Update</h5>
+        <p class="text-muted small mb-0">Use this option when an internet interruption or API error prevented the automatic status update in your ERP application. Select the successful payments below to retry their ERP updates.</p>
+      </div>
+      <div class="approval-tools">
+        <div class="payment-search"><div class="payment-search-field">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input type="search" placeholder="Search payments..." aria-label="Search payments"
+            [ngModel]="searchTerm" (ngModelChange)="onSearchChange($event)" [disabled]="isLoading || isUpdating" />
+        </div></div>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="loadPayments()" [disabled]="isLoading || isUpdating">Refresh</button>
+        <button type="button" class="btn btn-success btn-sm" (click)="updateErp()" [disabled]="isLoading || isUpdating || !selectedPayments.size">
+          {{ isUpdating ? 'Updating ERP...' : 'Retry ERP Update' }}
+        </button>
+      </div>
+    </div>
+    @if (errorMessage) { <div class="alert alert-danger m-3" role="alert">{{ errorMessage }}</div> }
+    @if (successMessage) { <div class="alert alert-success m-3" role="status">{{ successMessage }}</div> }
+    <div class="table-responsive payment-table-container" tabindex="0" role="region" aria-label="Payments awaiting ERP update" [attr.aria-busy]="isLoading || isUpdating">
+      <table class="result-table erp-table">
+        <thead><tr>
+          <th><input type="checkbox" class="form-check-input" aria-label="Select all visible payments" [checked]="allSelected" (change)="toggleAll($event)" [disabled]="isLoading || isUpdating || !filteredPayments.length" /></th>
+          <th>Voucher No.</th><th>Document No.</th><th>Date</th><th>Firm ID</th><th>Branch</th><th>Source Account</th>
+          <th>UTR</th><th>Payment Status</th><th>ERP Status</th><th>Message</th>
+        </tr></thead>
+        <tbody>
+          @for (item of filteredPayments; track item.vch_id) {
+            <tr>
+              <td><input type="checkbox" class="form-check-input" [attr.aria-label]="'Select voucher ' + item.vch_id" [checked]="selectedPayments.has(item)" (change)="toggleSelection(item)" [disabled]="isLoading || isUpdating" /></td>
+              <td>{{ item.vch_no ?? item.vch_id }}</td><td>{{ item.doc_no }}</td><td>{{ item.doc_dt | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ item.firm_id ?? '-' }}</td><td>{{ item.branch_id || '-' }}</td><td>{{ item.srcAcctNumber || '-' }}</td>
+              <td>{{ item.utr || '-' }}</td>
+              <td><span class="result-status result-status-success">{{ item.status }}</span></td>
+              <td><span class="result-status result-status-warning">Not updated</span></td>
+              <td class="erp-message">{{ item.message || item.error_message || '-' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="11" class="text-center py-5">{{ isLoading ? 'Loading payments...' : searchTerm ? 'No payments match your search.' : 'No successful payments awaiting ERP update.' }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

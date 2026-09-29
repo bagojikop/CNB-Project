@@ -8,6 +8,10 @@ export interface bankAccount {
   accountNo: string;
   branchCode: string;
   accountName: string;
+  mcc?: string | null;
+  sid?: string | null;
+  mid?: string | null;
+  terminalId?: string | null;
   ifsc_Code: string | null;
   customerId: string;
   clientId: string;

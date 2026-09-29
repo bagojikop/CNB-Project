@@ -16,13 +16,13 @@
       class="filter-grid"
     >
       <dss-ng-select
-        label="Firm"
-        placeholder="Select Firm"
+        label="Firm / Customer ID"
+        placeholder="Select Firm / Customer ID"
         [items]="firms"
-        bindLabel="firmName"
-        bindValue="firmId"
+        bindLabel="selectionLabel"
+        bindValue="id"
         formControlName="firm_id"
-        (change)="onFirmSelect()"
+        (change)="onFirmSelect($event)"
       ></dss-ng-select>
       <dss-ng-select
         label="Account No"
